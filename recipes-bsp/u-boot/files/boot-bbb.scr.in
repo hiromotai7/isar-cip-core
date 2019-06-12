@@ -1,0 +1,11 @@
+setenv loadaddr 0x82000000
+setenv fdtaddr 0x88000000
+setenv rdaddr 0x88080000
+setenv bootargs "console=ttyO0,115200 root=/dev/mmcblk0p2 rootwait"
+
+load mmc 0:1 ${fdtaddr} am335x-boneblack.dtb
+load mmc 0:1 ${loadaddr} vmlinuz
+load mmc 0:1 ${rdaddr} initrd
+setenv rdsize ${filesize}
+bootz ${loadaddr} ${rdaddr}:${rdsize} ${fdtaddr}
+

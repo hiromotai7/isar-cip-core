@@ -6,9 +6,8 @@
 # SPDX-License-Identifier: MIT
 #
 
-part --source rawcopy --sourceparams "file=/usr/lib/u-boot/am335x_boneblack/MLO" --no-table --align 128
-part --source rawcopy --sourceparams "file=/usr/lib/u-boot/am335x_boneblack/u-boot.img" --no-table --align 384
+part --source bootimg-partition --ondisk mmcblk1 --fstype vfat --label boot --align 1 --size 32 --overhead-factor 1 --extra-space 0 --active
+part / --source rootfs-u-boot --ondisk mmcblk1 --fstype ext4 --label platformA --align 1024
+part / --source rootfs-u-boot --ondisk mmcblk1 --fstype ext4 --label platformB --align 1024
 
-part / --source rootfs-u-boot --ondisk mmcblk0 --fstype ext4 --label platform --align 1024 --active
-
-bootloader --append "rootwait console=ttyO,115200"
+bootloader --append "rw rootwait"
