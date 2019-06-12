@@ -15,6 +15,7 @@ ISAR_RELEASE_CMD = "git -C ${LAYERDIR_cip-core} describe --tags --dirty --always
 DESCRIPTION = "CIP Core image"
 
 IMAGE_INSTALL += "customizations"
+IMAGE_INSTALL += "swupdate"
 
 do_wic_image_prepend () {
     # Make ${PP_DEPLOY} available to wic
