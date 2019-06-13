@@ -20,6 +20,10 @@ repos:
   isar:
     url: https://github.com/ilbers/isar
     refspec: 596732aa99c361b756655434bc90e0108e1caa33
+    patches:
+      bmap:
+        repo: cip-core
+        path: 0001-bmap-generate-bmap-for-wic-images.patch
     layers:
       meta:
 

@@ -1,0 +1,57 @@
+From 4bf7d60b4fb64ed0a7a131431cc6a2573e7178a4 Mon Sep 17 00:00:00 2001
+From: Daniel Sangorrin <daniel.sangorrin@toshiba.co.jp>
+Date: Thu, 13 Jun 2019 13:51:28 +0900
+Subject: [PATCH] bmap: generate bmap for wic images
+
+bmap shortens the time required to flash an image.
+This can be useful when you need a fixed-size image, for
+example to update partitions with swupdate.
+
+Example usage:
+sudo bmaptool copy --bmap \
+build/tmp/deploy/images/iwg20m/cip-core-image-cip-core-iwg20m.wic.img.bmap \
+build/tmp/deploy/images/iwg20m/cip-core-image-cip-core-iwg20m.wic.img \
+/dev/sdf
+
+Signed-off-by: Daniel Sangorrin <daniel.sangorrin@toshiba.co.jp>
+---
+ meta/classes/wic-img.bbclass        | 5 ++++-
+ meta/conf/distro/debian-common.conf | 4 ++--
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/meta/classes/wic-img.bbclass b/meta/classes/wic-img.bbclass
+index 09d9f2e..f227655 100644
+--- a/meta/classes/wic-img.bbclass
++++ b/meta/classes/wic-img.bbclass
+@@ -151,9 +151,12 @@ EOSUDO
+         ${ISARROOT}/scripts/wic create ${WKS_FULL_PATH} \
+             --vars "${STAGING_DIR}/${MACHINE}/imgdata/" \
+             -o /tmp/${IMAGE_FULLNAME}.wic/ \
++            --bmap \
+             -e ${IMAGE_BASENAME} ${WIC_CREATE_EXTRA_ARGS}
+     sudo chown -R $(stat -c "%U" ${ISARROOT}) ${ISARROOT}/meta ${ISARROOT}/meta-isar ${ISARROOT}/scripts || true
+-    cp -f $(ls -t -1 ${BUILDCHROOT_DIR}/tmp/${IMAGE_FULLNAME}.wic/*.direct | head -1) ${WIC_IMAGE_FILE}
++    WIC_DIRECT=$(ls -t -1 ${BUILDCHROOT_DIR}/tmp/${IMAGE_FULLNAME}.wic/*.direct | head -1)
++    cp -f ${WIC_DIRECT} ${WIC_IMAGE_FILE}
++    cp -f ${WIC_DIRECT}.bmap ${WIC_IMAGE_FILE}.bmap
+ }
+ 
+ do_wic_image[file-checksums] += "${WKS_FILE_CHECKSUM}"
+diff --git a/meta/conf/distro/debian-common.conf b/meta/conf/distro/debian-common.conf
+index 5a47483..c1e5d6b 100644
+--- a/meta/conf/distro/debian-common.conf
++++ b/meta/conf/distro/debian-common.conf
+@@ -10,8 +10,8 @@ WIC_IMAGER_INSTALL = "parted \
+                       util-linux \
+                       dosfstools \
+                       mtools \
+-                      e2fsprogs \
+-                      python3"
++                      python3 \
++                      bmap-tools"
+ 
+ GRUB_BOOTLOADER_INSTALL_amd64 = "grub-efi-amd64-bin"
+ GRUB_BOOTLOADER_INSTALL_i386 = "grub-efi-ia32-bin"
+-- 
+2.17.1
+
