@@ -18,31 +18,24 @@ Assumed environment
     * Installed packages: `docker-ce`, `qemu-system`
     * Users who does the following actions must be in the groups `docker` and `kvm`
 
-Create kas file
----------------
+Create image recipe
+-------------------
 
-Create a kas file named `opt-security.yml` to add security settings.
-
-Add security packages to rootfs
--------------------------------
-
-Set `IMAGE_PREINSTALL` to the list of packages required to enable
-the security features. This variable can be set through the kas file.
+Create the recipe `recipes-core/images/cip-core-image-security.bb`
+to generate a image including required packages.
+We can install existing Debian packages by setting
+`IMAGE_PREINSTALL` in the image recipe.
 
 Example:
 
-```
-local_conf_header:
-  security: |
     IMAGE_PREINSTALL = "openssl"
-```
 
 Build images
 ------------
 
-Build images for QEMU x86 64bit machine:
+Build images for QEMU x86 64bit machine.
 
-    $ ./kas-docker --isar build kas.yml:board-qemu-amd64.yml:opt-security.yml
+    $ ./kas-docker --isar build --target cip-core-image-security kas.yml:board-qemu-amd64.yml
 
 Run on QEMU
 -----------
