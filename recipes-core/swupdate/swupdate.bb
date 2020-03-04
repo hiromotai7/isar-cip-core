@@ -69,7 +69,7 @@ python do_check_bootloader () {
 }
 addtask check_bootloader before do_fetch
 
-BUILD_DEPENDS   = "liblua5.3-dev, librsync-dev, libconfig-dev, libarchive-dev, python-sphinx:native, dh-systemd, libsystemd-dev, "
+BUILD_DEPENDS   = "liblua5.3-dev, librsync-dev, libconfig-dev, libarchive-dev, python-sphinx:native, dh-systemd, libsystemd-dev, libjson-c-dev, libcurl4-openssl-dev, "
 BUILD_DEPENDS  += "${@get_crossnative_deps(d)}"
 BUILD_DEPENDS  += "${@get_bootloader_deps(d, "deb_deps")}"
 DEPENDS        += "${@get_bootloader_deps(d, "bb_deps")}"
