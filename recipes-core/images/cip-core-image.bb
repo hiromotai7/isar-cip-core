@@ -25,4 +25,6 @@ do_wic_image_prepend () {
 do_rootfs_append () {
     # Add /boot to /etc/fstab for fw_printenv
     echo "/dev/mmcblk0p1 /boot vfat defaults,nofail 0 0" | sudo tee -a ${IMAGE_ROOTFS}/etc/fstab
+    # Mount /tmp as tmpfs (384MiB) to put an update image on this directory temporarily
+    echo "tmpfs /tmp tmpfs rw,nodev,nosuid,size=393216k 0 0" | sudo tee -a ${IMAGE_ROOTFS}/etc/fstab
 }

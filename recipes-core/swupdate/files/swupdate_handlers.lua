@@ -129,6 +129,15 @@ chainhandler=rawfile
 ]]
 --]===]
 
+-- u-boot configuration
+local configuration = [[
+[bootloader]
+name=uboot
+
+[roundrobin]
+chainhandler=raw
+]]
+
 -- Default configuration file, tried if no compiled-in config is available.
 local cfgfile = "/etc/swupdate.handler.ini"
 
@@ -374,9 +383,9 @@ function handler_roundrobin(image)
         swupdate.info(string.format("Setting EFI Bootguard environment: kernelparams=%s", value))
         swupdate.set_bootenv("kernelparams", value)
     elseif config.bootloader.name == BOOTLOADER.UBOOT then
-        -- Update U-Boot environment.
-        swupdate.info(string.format("Setting U-Boot environment"))
-        -- TODO
+        -- Update U-Boot environment: ustate
+        swupdate.info(string.format("Setting U-Boot environment: ustate=1"))
+        swupdate.set_bootenv("ustate", 1);
     end
 
     return 0

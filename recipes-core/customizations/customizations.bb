@@ -17,7 +17,8 @@ SRC_URI = " \
     file://postinst \
     file://ethernet \
     file://99-silent-printk.conf \
-    file://99-watchdog.conf"
+    file://99-watchdog.conf \
+    file://swupdate.sh"
 
 DEPENDS += "sshd-regen-keys"
 
@@ -34,4 +35,7 @@ do_install() {
 
 	install -v -d ${D}/usr/lib/systemd/system.conf.d
 	install -v -m 0644 ${WORKDIR}/99-watchdog.conf ${D}/usr/lib/systemd/system.conf.d
+
+	install -v -d install -v -d ${D}/root
+	install -v -m 0755 ${WORKDIR}/swupdate.sh ${D}/root/
 }

@@ -88,7 +88,7 @@ do_prepare_build() {
     install -m 0644 ${WORKDIR}/${SWUPDATE_DEFCONFIG} ${S}/configs/${SWUPDATE_DEFCONFIG}
     if [ "${SWUPDATE_BOOTLOADER}" = "u-boot" ]; then
         echo 'CONFIG_UBOOT=y' >> ${S}/configs/${SWUPDATE_DEFCONFIG}
-        echo 'CONFIG_UBOOT_FWENV="/etc/fw_env.config' >> ${S}/configs/${SWUPDATE_DEFCONFIG}
+        echo 'CONFIG_UBOOT_FWENV="/etc/fw_env.config"' >> ${S}/configs/${SWUPDATE_DEFCONFIG}
     fi
     if [ "${SWUPDATE_BOOTLOADER}" = "efibootguard" ]; then
         echo 'CONFIG_BOOTLOADER_EBG=y' >> ${S}/configs/${SWUPDATE_DEFCONFIG}

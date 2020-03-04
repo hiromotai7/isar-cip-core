@@ -1,11 +1,79 @@
 setenv loadaddr 0x82000000
 setenv fdtaddr 0x88000000
 setenv rdaddr 0x88080000
-setenv bootargs "console=ttyO0,115200 root=/dev/mmcblk0p2 rootwait"
+
+echo "#########################################################"
+if printenv ustate; then
+    echo "ustate value is ${ustate}"
+    if test ${ustate} = 0; then
+        ## swprovisioning did not run, nothing to do.
+        echo "ustate is: ok"
+        echo "Update did not run. Boot normally."
+    elif test ${ustate} = 1; then
+        ## swprovisioning did perform an update, hence
+        ## * set new state to "testing"
+        ## * switch root filesystems
+
+        setenv ustate 2
+        #echo "setting swprovisioning state to: testing"
+        echo "Setting ustate to: testing"
+        echo "ustate value has been changed to ${ustate}"
+
+        setenv chg "${bootpart_root}"
+        setenv bootpart_root "${bootpart_root2}"
+        setenv bootpart_root2 "${chg}"
+        echo "new bootpart: ${bootpart_root} (was: ${bootpart_root2})"
+
+        saveenv
+    elif test ${ustate} = 2; then
+        ## swprovisioning did not run, the update is not confirmed
+        ## working by the swprovisioning daemon, hence
+        ## * set new state to "failed"
+        ## * switch back to old root filesystem
+
+        setenv chg "${bootpart_root}"
+        setenv bootpart_root "${bootpart_root2}"
+        setenv bootpart_root2 "${chg}"
+        echo "update not confirmed working!, restored root to ${bootpart_root} (was: ${bootpart_root2})"
+
+        setenv ustate 3
+        #echo "setting swprovisioning state to: failed"
+        echo "Setting ustate to: failed"
+        echo "ustate value has been changed to ${ustate}"
+
+        saveenv
+    elif test ${ustate} = 3; then
+        ## Return ustate from 3 to 0 to handle new update
+        setenv ustate 0
+        echo "Return ustate to normal boot to be able to handle new update"
+        echo "Setting ustate to: ok"
+        echo "ustate value has been changed to ${ustate}"
+
+        saveenv
+    else
+        ## error handling
+        echo "unsupported ustate value ${ustate}. reset."
+
+	reset
+    fi
+else
+    ## first bootup of device, initialize environment
+    #echo "doing first-run initialization of swprovisioning environment"
+    echo "doing first-run initialization of environment variables"
+    setenv ustate 0
+    setenv bootpart_root 2
+    setenv bootpart_root2 3
+    echo "Setting ustate to: ok"
+    echo "ustate value has been created. The value is ${ustate}."
+
+    saveenv
+fi
+echo "#########################################################"
+
+setenv bootargs "console=ttyO0,115200 root=/dev/mmcblk0p${bootpart_root} ro rootwait omap_wdt.early_enable=1 omap_wdt.timer_margin=60"
 
 load mmc 0:1 ${fdtaddr} am335x-boneblack.dtb
 load mmc 0:1 ${loadaddr} vmlinuz
 load mmc 0:1 ${rdaddr} initrd
 setenv rdsize ${filesize}
 bootz ${loadaddr} ${rdaddr}:${rdsize} ${fdtaddr}
-
