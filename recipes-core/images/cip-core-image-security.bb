@@ -18,7 +18,7 @@ IMAGE_INSTALL += "customizations"
 
 # Debian packages that provide security features
 # TODO: Add sudo or sudo-ldap which conflict each other
-IMAGE_PREINSTALL = " \
+IMAGE_PREINSTALL += " \
 	openssl libssl1.1 \
 	fail2ban \
 	openssh-server openssh-sftp-server openssh-client \
