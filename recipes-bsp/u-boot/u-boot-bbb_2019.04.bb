@@ -44,9 +44,8 @@ do_prepare_build_append() {
     install -v -m 0644 ${WORKDIR}/fw_env.config ${S}/tools/env/fw_env.config
 }
 
-do_build[dirs] += "${DEPLOY_DIR_IMAGE}"
-
 dpkg_runbuild_append() {
+    mkdir -p ${DEPLOY_DIR_IMAGE}
     install ${WORKDIR}/boot.scr ${DEPLOY_DIR_IMAGE}/boot.scr
     install ${WORKDIR}/ubootenv-bbb ${DEPLOY_DIR_IMAGE}/uboot.env
 }
