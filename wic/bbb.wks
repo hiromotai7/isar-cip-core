@@ -7,7 +7,7 @@
 #
 
 part --source bootimg-partition --ondisk mmcblk1 --fstype vfat --label boot --align 1 --size 32 --overhead-factor 1 --extra-space 0 --active
-part / --source rootfs-u-boot --ondisk mmcblk1 --fstype ext4 --label platformA --align 1024
-part / --source rootfs-u-boot --ondisk mmcblk1 --fstype ext4 --label platformB --align 1024
+part / --source rootfs-u-boot --ondisk mmcblk1 --fstype ext4 --label platformA --align 1024 --size 2048
+part / --source rootfs-u-boot --ondisk mmcblk1 --fstype ext4 --label platformB --align 1024 --size 2048
 
 bootloader --append "rw rootwait"
