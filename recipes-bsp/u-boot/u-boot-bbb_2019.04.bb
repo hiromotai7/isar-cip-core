@@ -11,6 +11,9 @@
 
 DESCRIPTION = "U-Boot for BBB"
 
+# To build u-boot-tools package
+U_BOOT_TOOLS_PACKAGE = "1"
+
 require recipes-bsp/u-boot/u-boot-custom.inc
 
 U_BOOT_REV = "3c99166441bf3ea325af2da83cfe65430b49c066"
