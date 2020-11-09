@@ -1,0 +1,100 @@
+From 60915461f01b7b86e03bf96114399f416cb15ea5 Mon Sep 17 00:00:00 2001
+From: Daniel Sangorrin <daniel.sangorrin@toshiba.co.jp>
+Date: Thu, 1 Oct 2020 09:46:45 +0900
+Subject: [PATCH] meta/classes: export dpkg status file for debsecan
+
+Although the currently exported manifest has enough
+information for scanning vulnerabilities, the tool
+debsecan depends on the /var/lib/dpkg/status file
+format. This patch adds a feature to export such file.
+
+All rootfs'es export the file by default and with
+the same file name syntax as the manifests, except
+for the file extension which is ".dpkg_status"
+instead of ".manifest".
+
+Remove the feature with:
+  ROOTFS_FEATURES_remove = "export-dpkg-status"
+
+Signed-off-by: Daniel Sangorrin <daniel.sangorrin@toshiba.co.jp>
+---
+ meta/classes/image.bbclass                        | 3 ++-
+ meta/classes/rootfs.bbclass                       | 8 ++++++++
+ meta/recipes-devtools/buildchroot/buildchroot.inc | 3 ++-
+ meta/recipes-devtools/sdkchroot/sdkchroot.bb      | 3 ++-
+ 4 files changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/meta/classes/image.bbclass b/meta/classes/image.bbclass
+index a296cc0..8e350a3 100644
+--- a/meta/classes/image.bbclass
++++ b/meta/classes/image.bbclass
+@@ -63,9 +63,10 @@ image_do_mounts() {
+ }
+ 
+ ROOTFSDIR = "${IMAGE_ROOTFS}"
+-ROOTFS_FEATURES += "clean-package-cache finalize-rootfs generate-manifest"
++ROOTFS_FEATURES += "clean-package-cache finalize-rootfs generate-manifest export-dpkg-status"
+ ROOTFS_PACKAGES += "${IMAGE_PREINSTALL} ${IMAGE_INSTALL}"
+ ROOTFS_MANIFEST_DEPLOY_DIR ?= "${DEPLOY_DIR_IMAGE}"
++ROOTFS_DPKGSTATUS_DEPLOY_DIR ?= "${DEPLOY_DIR_IMAGE}"
+ 
+ inherit rootfs
+ inherit image-sdk-extension
+diff --git a/meta/classes/rootfs.bbclass b/meta/classes/rootfs.bbclass
+index afec1cb..bd73ee6 100644
+--- a/meta/classes/rootfs.bbclass
++++ b/meta/classes/rootfs.bbclass
+@@ -11,6 +11,7 @@ ROOTFS_PACKAGES ?= ""
+ # available features are:
+ # 'clean-package-cache' - delete package cache from rootfs
+ # 'generate-manifest' - generate a package manifest of the rootfs into ${ROOTFS_MANIFEST_DEPLOY_DIR}
++# 'export-dpkg-status' - exports /var/lib/dpkg/status file to ${ROOTFS_DPKGSTATUS_DEPLOY_DIR}
+ # 'finalize-rootfs' - delete files needed to chroot into the rootfs
+ ROOTFS_FEATURES ?= ""
+ 
+@@ -201,6 +202,13 @@ rootfs_generate_manifest () {
+         ${ROOTFS_MANIFEST_DEPLOY_DIR}/"${PF}".manifest
+ }
+ 
++ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('ROOTFS_FEATURES', 'export-dpkg-status', 'rootfs_export_dpkg_status', '', d)}"
++rootfs_export_dpkg_status() {
++    mkdir -p ${ROOTFS_DPKGSTATUS_DEPLOY_DIR}
++    cp '${ROOTFSDIR}'/var/lib/dpkg/status \
++       '${ROOTFS_DPKGSTATUS_DEPLOY_DIR}'/'${PF}'.dpkg_status
++}
++
+ ROOTFS_POSTPROCESS_COMMAND += "${@bb.utils.contains('ROOTFS_FEATURES', 'finalize-rootfs', 'rootfs_postprocess_finalize', '', d)}"
+ rootfs_postprocess_finalize() {
+     sudo -s <<'EOSUDO'
+diff --git a/meta/recipes-devtools/buildchroot/buildchroot.inc b/meta/recipes-devtools/buildchroot/buildchroot.inc
+index b4d7b76..e9c2cfe 100644
+--- a/meta/recipes-devtools/buildchroot/buildchroot.inc
++++ b/meta/recipes-devtools/buildchroot/buildchroot.inc
+@@ -20,7 +20,8 @@ ROOTFSDIR = "${BUILDCHROOT_DIR}"
+ ROOTFS_PACKAGES = "${BUILDCHROOT_PREINSTALL}"
+ ROOTFS_CLEAN_FILES = ""
+ ROOTFS_MANIFEST_DEPLOY_DIR = "${DEPLOY_DIR_BUILDCHROOT}"
+-ROOTFS_FEATURES += "generate-manifest"
++ROOTFS_DPKGSTATUS_DEPLOY_DIR = "${DEPLOY_DIR_BUILDCHROOT}"
++ROOTFS_FEATURES += "generate-manifest export-dpkg-status"
+ 
+ BUILDCHROOT_PREINSTALL_COMMON = " \
+     make \
+diff --git a/meta/recipes-devtools/sdkchroot/sdkchroot.bb b/meta/recipes-devtools/sdkchroot/sdkchroot.bb
+index 467e682..796fefa 100644
+--- a/meta/recipes-devtools/sdkchroot/sdkchroot.bb
++++ b/meta/recipes-devtools/sdkchroot/sdkchroot.bb
+@@ -22,8 +22,9 @@ ROOTFS_ARCH = "${HOST_ARCH}"
+ ROOTFS_DISTRO = "${HOST_DISTRO}"
+ ROOTFSDIR = "${S}"
+ ROOTFS_PACKAGES = "${SDKCHROOT_PREINSTALL} ${TOOLCHAIN}"
+-ROOTFS_FEATURES += "clean-package-cache generate-manifest"
++ROOTFS_FEATURES += "clean-package-cache generate-manifest export-dpkg-status"
+ ROOTFS_MANIFEST_DEPLOY_DIR = "${DEPLOY_DIR_SDKCHROOT}"
++ROOTFS_DPKGSTATUS_DEPLOY_DIR = "${DEPLOY_DIR_SDKCHROOT}"
+ 
+ python() {
+     if d.getVar("HOST_ARCH") not in ['i386', 'amd64']:
+-- 
+2.25.1
+

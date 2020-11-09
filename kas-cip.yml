@@ -30,6 +30,9 @@ repos:
       02-initramfs:
         path: isar-patches/v7-0001-meta-support-Generate-a-custom-initramfs.patch
         repo: cip-core
+      03-dpkgstatus:
+        path: isar-patches/0001-meta-classes-export-dpkg-status-file-for-debsecan.patch
+        repo: cip-core
 
 bblayers_conf_header:
   standard: |
