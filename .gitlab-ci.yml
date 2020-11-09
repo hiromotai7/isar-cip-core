@@ -13,6 +13,7 @@ variables:
 
 stages:
   - build
+  - cve-check
 
 default:
   before_script:
@@ -30,6 +31,7 @@ default:
     - large
   variables:
     base_yaml: "kas-cip.yml:kas/board/${target}.yml"
+    dpkg_status: "cip-core-image-1.0-r0.dpkg_status"
   script:
     - if [ "${use_rt}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/rt.yml"; fi
     - if [ "${extension}" != "none" ]; then base_yaml="${base_yaml}:kas/opt/${extension}.yml"; fi
@@ -39,8 +41,17 @@ default:
     - if [ "${release}" = "bullseye" ]; then base_yaml="${base_yaml}:kas/opt/bullseye.yml"; fi
     - echo "Building ${base_yaml}"
     - kas build ${base_yaml}
-    - if [ "${deploy}" = "enable" ]; then scripts/deploy-cip-core.sh ${release} ${target} ${extension} ${dtb} ${CI_COMMIT_REF_SLUG}; fi
+    - if [ "${deploy}" = "enable" ]; then scripts/deploy-cip-core.sh ${release} ${target} ${extension} ${dtb} ${CI_COMMIT_REF_SLUG} ${dpkg_status}; fi
     - if [ "${deploy_kernelci}" = "enable" ]; then scripts/deploy-kernelci.py ${release} ${target} ${extension} ${dtb}; fi
+  except:
+    - schedules
+
+cve-checks:
+  stage: cve-check
+  image: registry.gitlab.com/cip-playground/cip-core-sec:build-latest
+  script:
+    - apt install -y python3-pip
+    - scripts/run-cve-checks.sh
 
 # base image
 build:simatic-ipc227e-base:
@@ -76,6 +87,7 @@ build:qemu-amd64-base:
   variables:
     target: qemu-amd64
     extension: security
+    dpkg_status: cip-core-image-security-1.0-r0.dpkg_status
     use_rt: disable
     wic_targz: disable
     targz: enable
