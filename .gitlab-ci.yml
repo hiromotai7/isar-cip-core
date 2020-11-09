@@ -11,6 +11,7 @@ variables:
 
 stages:
   - build
+  - cve-check
 
 default:
   before_script:
@@ -25,13 +26,23 @@ default:
   stage: build
   variables:
     base_yaml: "kas-cip.yml:kas/board/${target}.yml"
+    dpkg_status: "cip-core-image-1.0-r0.dpkg_status"
   script:
     - sudo rm -rf build/tmp
     - if [ "${use_rt}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/rt.yml"; fi;
     - if [ "${extention}" != "base" ]; then base_yaml="${base_yaml}:kas/opt/${extention}.yml"; fi;
     - if [ "${targz}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/targz-img.yml"; fi;
     - kas build ${base_yaml}
-    - if [ "${deploy}" = "enable" ]; then scripts/deploy-cip-core.sh ${release} ${target} ${extention} ${dtb}; fi
+    - if [ "${deploy}" = "enable" ]; then scripts/deploy-cip-core.sh ${release} ${target} ${extention} ${dtb} ${dpkg_status}; fi
+  except:
+    - schedules
+
+cve-checks:
+  stage: cve-check
+  image: registry.gitlab.com/cip-playground/cip-core-sec:build-latest
+  script:
+    - apt install -y python3-pip
+    - scripts/run-cve-checks.sh
 
 # base image
 build:simatic-ipc227e-base:
@@ -67,6 +78,7 @@ build:qemu-amd64-base:
   variables:
     target: qemu-amd64
     extention: security
+    dpkg_status: cip-core-image-security-1.0-r0.dpkg_status
     use_rt: disable
     targz: disable
     deploy: disable
