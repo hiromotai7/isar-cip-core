@@ -50,6 +50,7 @@ cve-checks:
   stage: cve-check
   image: registry.gitlab.com/cip-playground/cip-core-sec:build-latest
   script:
+    - apt update
     - apt install -y python3-pip
     - scripts/run-cve-checks.sh
 
