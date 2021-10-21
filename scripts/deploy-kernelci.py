@@ -18,6 +18,10 @@ extension=sys.argv[3]
 
 rootfs_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+".tar.gz"
 initrd_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+"-initrd.img"
+
+# initrd is actually gz compressed
+initrd_gz_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+"-initrd.img.gz"
+
 input_dir="build/tmp/deploy/images/"+target
 upload_path="/images/rootfs/cip/"+cdate+"/"+target+"/"
 rootfs=input_dir+"/"+rootfs_filename
@@ -44,5 +48,5 @@ if os.path.exists(rootfs) and os.path.exists(initrd):
     print("uploading rootfs to KernelCI")
     upload_file(api, token, upload_path, rootfs, rootfs_filename)
     print("uploading initrd to KernelCI")
-    upload_file(api, token, upload_path, initrd, initrd_filename)
+    upload_file(api, token, upload_path, initrd, initrd_gz_filename)
     print("uploaded to: https://storage.staging.kernelci.org"+upload_path)
