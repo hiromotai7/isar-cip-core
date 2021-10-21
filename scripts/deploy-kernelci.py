@@ -24,6 +24,7 @@ initrd_gz_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+"
 
 input_dir="build/tmp/deploy/images/"+target
 upload_path="/images/rootfs/cip/"+cdate+"/"+target+"/"
+upload_path_latest="/images/rootfs/cip/latest/"+target+"/"
 rootfs=input_dir+"/"+rootfs_filename
 initrd=input_dir+"/"+initrd_filename
 
@@ -50,3 +51,10 @@ if os.path.exists(rootfs) and os.path.exists(initrd):
     print("uploading initrd to KernelCI")
     upload_file(api, token, upload_path, initrd, initrd_gz_filename)
     print("uploaded to: https://storage.staging.kernelci.org"+upload_path)
+
+    # Upload latest
+    print("uploading rootfs to KernelCI CIP latest")
+    upload_file(api, token, upload_path_latest, rootfs, rootfs_filename)
+    print("uploading initrd to KernelCI CIP latest")
+    upload_file(api, token, upload_path_latest, initrd, initrd_gz_filename)
+    print("uploaded to: https://storage.staging.kernelci.org"+upload_path_latest)
