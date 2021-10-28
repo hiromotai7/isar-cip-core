@@ -16,11 +16,18 @@ release=sys.argv[1]
 target=sys.argv[2]
 extension=sys.argv[3]
 
-rootfs_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+".tar.gz"
-initrd_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+"-initrd.img"
+if extension == "security":
+    rootfs_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+".tar.gz"
+    initrd_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+"-initrd.img"
+elif extension == "base":
+    rootfs_filename="cip-core-image-cip-core-"+release+"-"+target+".tar.gz"
+    initrd_filename="cip-core-image-cip-core-"+release+"-"+target+"-initrd.img"
 
 # initrd is actually gz compressed
-initrd_gz_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+"-initrd.img.gz"
+if extension == "security":
+    initrd_gz_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+"-initrd.img.gz"
+elif extension == "base":
+    initrd_gz_filename="cip-core-image-cip-core-"+release+"-"+target+"-initrd.img.gz"
 
 input_dir="build/tmp/deploy/images/"+target
 upload_path="/images/rootfs/cip/"+cdate+"/"+target+"/"
@@ -28,6 +35,14 @@ upload_path_latest="/images/rootfs/cip/latest/"+target+"/"
 rootfs=input_dir+"/"+rootfs_filename
 initrd=input_dir+"/"+initrd_filename
 
+print("arguments:")
+print(release)
+print(target)
+print(extension)
+print("filenames:")
+print(rootfs_filename)
+print(initrd_filename)
+print(initrd_gz_filename)
 print("build directory contents:")
 print(os.listdir(input_dir))
 
