@@ -9,7 +9,7 @@ variables:
   targz: disable
   dtb: none
   deploy: enable
-  deploy_kernelci: enable
+  kernelci: disable
 
 stages:
   - build
@@ -39,7 +39,7 @@ default:
     - echo "Building ${base_yaml}"
     - kas build ${base_yaml}
     - if [ "${deploy}" = "enable" ]; then scripts/deploy-cip-core.sh ${release} ${target} ${extention} ${dtb}; fi;
-    - if [ "${deploy_kernelci}" = "enable" ]; then scripts/deploy-kernelci.py ${release} ${target} ${extention} ${dtb}; fi
+    - if [ "${kernelci}" = "enable" ]; then scripts/deploy-kernelci.py ${release} ${target} ${extention} ${dtb}; fi
 
 # base image
 build:simatic-ipc227e-base:
@@ -78,6 +78,17 @@ build:qemu-amd64-base:
     use_rt: disable
     wic_targz: disable
     targz: enable
+
+build:qemu-amd64-base-kernelci:
+  extends:
+    - .build_base
+  variables:
+    target: qemu-amd64
+    use_rt: disable
+    wic_targz: disable
+    targz: enable
+    deploy: disable
+    kernelci: enable
 
 build:qemu-arm64-base:
   extends:
