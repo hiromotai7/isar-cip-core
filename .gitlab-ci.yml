@@ -100,6 +100,17 @@ build:qemu-arm64-base:
     wic_targz: disable
     targz: enable
 
+build:qemu-arm64-base-kernelci:
+  extends:
+    - .build_base
+  variables:
+    target: qemu-arm64
+    use_rt: disable
+    wic_targz: disable
+    targz: enable
+    deploy: disable
+    kernelci: enable
+
 build:qemu-arm-base:
   extends:
     - .build_base
@@ -109,6 +120,17 @@ build:qemu-arm-base:
     use_rt: disable
     wic_targz: disable
     targz: enable
+
+build:qemu-arm-base-kernelci:
+  extends:
+    - .build_base
+  variables:
+    target: qemu-arm
+    use_rt: disable
+    wic_targz: disable
+    targz: enable
+    deploy: disable
+    kernelci: enable
 
 # test
 build:simatic-ipc227e-test:
