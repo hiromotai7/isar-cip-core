@@ -19,14 +19,15 @@ extension=sys.argv[3]
 if extension == "security":
     rootfs_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+".tar.gz"
     initrd_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+"-initrd.img"
-elif extension == "base":
+    initrd_gz_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+"-initrd.img.gz"
+elif extension == "kernelci":
+    rootfs_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+".tar.gz"
+    initrd_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+"-initrd.img"
+    initrd_gz_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+"-initrd.img.gz"
+else:
+    # base extension is not adding extension name in the filename
     rootfs_filename="cip-core-image-cip-core-"+release+"-"+target+".tar.gz"
     initrd_filename="cip-core-image-cip-core-"+release+"-"+target+"-initrd.img"
-
-# initrd is actually gz compressed
-if extension == "security":
-    initrd_gz_filename="cip-core-image-"+extension+"-cip-core-"+release+"-"+target+"-initrd.img.gz"
-elif extension == "base":
     initrd_gz_filename="cip-core-image-cip-core-"+release+"-"+target+"-initrd.img.gz"
 
 input_dir="build/tmp/deploy/images/"+target

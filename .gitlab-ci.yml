@@ -84,6 +84,7 @@ build:qemu-amd64-base-kernelci:
     - .build_base
   variables:
     target: qemu-amd64
+    extention: kernelci
     use_rt: disable
     wic_targz: disable
     targz: enable
@@ -105,6 +106,7 @@ build:qemu-arm64-base-kernelci:
     - .build_base
   variables:
     target: qemu-arm64
+    extention: kernelci
     use_rt: disable
     wic_targz: disable
     targz: enable
@@ -126,6 +128,7 @@ build:qemu-arm-base-kernelci:
     - .build_base
   variables:
     target: qemu-arm
+    extention: kernelci
     use_rt: disable
     wic_targz: disable
     targz: enable
