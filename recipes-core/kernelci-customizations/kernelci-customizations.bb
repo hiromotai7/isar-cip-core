@@ -18,6 +18,7 @@ DESCRIPTION = "CIP Core image demo & customizations"
 SRC_URI = " \
     file://postinst \
     file://ethernet \
+    file://dmesg.sh \
     file://99-silent-printk.conf"
 
 DEPENDS += "sshd-regen-keys"
