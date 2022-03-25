@@ -27,7 +27,7 @@ DEBIAN_BUILD_DEPENDS = " \
     python3-setuptools-scm:native, \
     "
 
-DEB_BUILD_PROFILES = "nocheck"
+export DEB_BUILD_PROFILES = "nocheck"
 
 do_prepare_build[cleandirs] += "${S}/debian"
 do_prepare_build() {
