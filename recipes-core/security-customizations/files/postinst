@@ -21,12 +21,12 @@ sed -i "0,/^password.*/s/^password.*/${pam_cracklib_config}\n&/" "${PAM_PWD_FILE
 
 # CR1.11: Unsuccessful login attempts
 # Lock user account after unsuccessful login attempts
-PAM_AUTH_FILE="/etc/pam.d/common-auth"
-pam_tally="auth   required  pam_tally2.so  deny=3 even_deny_root unlock_time=60 root_unlock_time=60"
-if grep -c "pam_tally2.so" "${PAM_AUTH_FILE}";then
-        sed -i '/pam_tally2/ s/^#*/#/'  "${PAM_AUTH_FILE}"
-fi
-sed -i "0,/^auth.*/s/^auth.*/${pam_tally}\n&/" "${PAM_AUTH_FILE}"
+#PAM_AUTH_FILE="/etc/pam.d/common-auth"
+#pam_tally="auth   required  pam_tally2.so  deny=3 even_deny_root unlock_time=60 root_unlock_time=60"
+#if grep -c "pam_tally2.so" "${PAM_AUTH_FILE}";then
+#        sed -i '/pam_tally2/ s/^#*/#/'  "${PAM_AUTH_FILE}"
+#fi
+#sed -i "0,/^auth.*/s/^auth.*/${pam_tally}\n&/" "${PAM_AUTH_FILE}"
 
 # CR2.6: Remote session termination
 # Terminate remote session after inactive time period
