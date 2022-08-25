@@ -42,6 +42,10 @@ if [ -z "${TARGET_IMAGE}" ];then
 	TARGET_IMAGE="cip-core-image"
 	if grep -s -q "IMAGE_SECURITY: true" .config.yaml; then
 		TARGET_IMAGE="cip-core-image-security"
+		if [ -f secure-image.img ]; then
+			rm secure-image.img
+		fi
+		qemu-img create secure-image.img 2G
 	fi
 fi
 
@@ -114,6 +118,10 @@ if [ -z "${DISPLAY}" ]; then
 		x86|x86_64|amd64)
 			KERNEL_CMDLINE="${KERNEL_CMDLINE} console=ttyS0"
 	esac
+fi
+
+if [ -f secure-image.img ]; then
+	QEMU_EXTRA_ARGS="${QEMU_EXTRA_ARGS} -drive file="$(dirname $0)/secure-image.img",index=1,media=disk,format=raw"
 fi
 
 QEMU_COMMON_OPTIONS=" \

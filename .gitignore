@@ -4,3 +4,4 @@ kas-docker
 kas-container
 __pycache__
 .config.yaml*
+secure-image.img
