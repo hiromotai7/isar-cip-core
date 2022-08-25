@@ -34,6 +34,7 @@ IMAGE_PREINSTALL += " \
 	sudo \
 	aide-common \
 	libpam-google-authenticator \
+	cryptsetup fdisk \
 "
 
 OVERRIDES_append = ":${BASE_DISTRO_CODENAME}"
