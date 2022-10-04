@@ -67,6 +67,10 @@ config TARGET_QEMU_RISCV64
 	bool "QEMU RISC-V 64-bit (riscv64)"
 	select ARCH_RISCV64
 
+config TARGET_RZFIVE
+	bool "RZ/Five evaluation board"
+	select ARCH_RISCV64
+
 endchoice
 
 config KAS_INCLUDE_BOARD
@@ -79,6 +83,7 @@ config KAS_INCLUDE_BOARD
 	default "kas/board/bbb.yml" if TARGET_BBB
 	default "kas/board/iwg20m.yml" if TARGET_IWG20D
 	default "kas/board/qemu-riscv64.yml" if TARGET_QEMU_RISCV64
+	default "kas/board/rzfive.yml" if TARGET_RZFIVE
 
 comment "Kernel options"
 
