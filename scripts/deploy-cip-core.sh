@@ -65,4 +65,4 @@ fi
 #     * cve-reports: folder to store the cve-reports generated from the dpkg status files
 #       * they can be linked from the release website
 DPKG_STATUS_FILENAME=${CI_JOB_NAME#build:}.dpkg_status
-aws s3 cp --no-progress $BASE_PATH.dpkg_status s3://download.cip-project.org/cip-core/cve-checks/dpkg-status/$DPKG_STATUS_FILENAME
+aws s3 cp --no-progress $BASE_PATH.dpkg_status s3://download.cip-project.org/cip-core/cve-checks/dpkg-status/$RELEASE/$DPKG_STATUS_FILENAME
