@@ -12,12 +12,16 @@
 
 echo "CIP Core Demo & Test Image (login: root/root)" > /etc/issue
 
-echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+if ! grep -e "^PermitRootLogin.*yes" -q /etc/ssh/sshd_config; then
+	echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+fi
 
 HOSTNAME=demo
 echo "$HOSTNAME" > /etc/hostname
 echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
 
 # needed for read-only rootfs with writable /home
-mv /root /home/
-ln -s /home/root /root
+if [ ! -L /root ]; then
+	mv /root /home/
+	ln -s /home/root /root
+fi
