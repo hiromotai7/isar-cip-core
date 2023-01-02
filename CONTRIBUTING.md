@@ -36,7 +36,7 @@ Contribution Checklist
 - post patches to mailing list (cip-dev@lists.cip-project.org) [**required**]
     - use `git format-patch/send-email` if possible
     - prefix patches with `[isar-cip-core]`, e.g. via
-      `git format-patch --prefix="isar-cip-core][PATCH" ...`
+      `git format-patch --subject-prefix="isar-cip-core][PATCH" ...`
     - send patches inline, do not append them
     - no HTML emails!
     - CC people who you think should look at the patches, e.g.
