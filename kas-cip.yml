@@ -37,8 +37,8 @@ local_conf_header:
     ISAR_CROSS_COMPILE = "1"
   root_password: |
     USERS += "root"
-    # 'root'
-    USER_root[password] = "oC3wEGl799tZU"
+    USER_root[password] = "root"
+    USER_root[flags] = "clear-text-password"
 
 env:
   DISTRO_APT_PREMIRRORS: ""
