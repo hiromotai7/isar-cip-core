@@ -6,7 +6,7 @@ This document describes how to generate a secure boot capable image with
 ## Description
 
 The image build signs the EFI Boot Guard bootloader (bootx64.efi) and generates
-a signed [unified kernel image](https://systemd.io/BOOT_LOADER_SPECIFICATION/).
+a signed [unified kernel image](https://uapi-group.org/specifications/specs/unified_kernel_image).
 A unified kernel image packs the kernel, initramfs and the kernel command-line
 in one binary object. As the kernel command-line is immutable after the build
 process, the previous selection of the root file system with a command-line parameter is no longer
