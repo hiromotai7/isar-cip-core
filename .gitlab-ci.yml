@@ -44,6 +44,8 @@ default:
     - if [ "${deploy_kernelci}" = "enable" ]; then scripts/deploy-kernelci.py ${release} ${target} ${extension} ${dtb}; fi
   except:
     - schedules
+# This is a draft
+  when: manual
 
 cve-checks:
   stage: cve-check
@@ -52,6 +54,8 @@ cve-checks:
     - apt update
     - apt install -y python3-pip
     - scripts/run-cve-checks.sh
+# This is a draft
+  when: manual
 
 # base image
 build:simatic-ipc227e-base:
