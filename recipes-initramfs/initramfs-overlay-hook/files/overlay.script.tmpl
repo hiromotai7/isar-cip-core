@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+# CIP Core, generic profile
+#
+# Copyright (c) Siemens AG, 2022-2023
+#
+# Authors:
+#  Jan Kiszka <jan.kiszka@siemens.com>
+#  Quirin Gylstorff <quirin.gylstorff@siemens.com>
+#
+
+PREREQ=""
+
+prereqs()
+{
+	echo "$PREREQ"
+}
+
+case $1 in
+# get pre-requisites
+prereqs)
+	prereqs
+	exit 0
+	;;
+esac
+
+. /scripts/functions
+
+
+ovl_partition_label="${INITRAMFS_OVERLAY_STORAGE_PARTITION_LABEL}"
+ovl_storage_path="${INITRAMFS_OVERLAY_STORAGE_PATH}"
+ovl_lower_dirs="${INITRAMFS_OVERLAY_PATHS}"
+
+root_mount_storage=${rootmnt}${ovl_storage_path}
+
+if ! mount -t $(get_fstype /dev/disk/by-label/${ovl_partition_label}) \
+	   /dev/disk/by-label/${ovl_partition_label} \
+	   ${rootmnt}/${ovl_partition_label}; then
+	panic "Can't mount /${ovl_partition_label} partition - overlay will not work!"
+fi
+
+for ovl_lower_dir in ${ovl_lower_dirs}; do
+	# remove the first '/' and replace all '/' with '_'
+	# on variable $ovl_lower_dir
+	work_dir_name=$(awk -v var=$ovl_lower_dir \
+		'BEGIN{subvar=substr(var,2);gsub("/","_",subvar);print subvar}')
+
+	lower_dir=${rootmnt}${ovl_lower_dir}
+	upper_dir=${root_mount_storage}${ovl_lower_dir}
+	work_dir=${root_mount_storage}/.${work_dir_name}-atomic
+
+	mkdir -p ${upper_dir}
+	mkdir -p ${work_dir}
+
+	if ! mount -t overlay \
+		   -o lowerdir=${lower_dir},upperdir=${upper_dir},workdir=${work_dir} \
+		   overlay ${lower_dir}; then
+		panic "Can't mount overlay for '$ovl_lower_dir' !"
+	fi
+done

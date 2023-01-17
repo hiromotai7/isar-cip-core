@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2021
+# Copyright (c) Siemens AG, 2021 - 2023
 #
 # Authors:
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
@@ -12,5 +12,5 @@
 inherit initramfs
 
 INITRAMFS_INSTALL += " \
-    initramfs-etc-overlay-hook \
+    initramfs-overlay-hook \
     "
