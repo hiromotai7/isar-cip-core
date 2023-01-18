@@ -26,6 +26,12 @@ TEMPLATE_FILES += "sw-description.tmpl"
 do_transform_template[vardeps] += "TARGET_IMAGE_UUID"
 addtask do_transform_template before do_swupdate_binary after do_generate_image_uuid
 
-TEMPLATE_VARS += "ROOTFS_PARTITION_NAME TARGET_IMAGE_UUID"
+TEMPLATE_VARS += "ROOTFS_PARTITION_NAME TARGET_IMAGE_UUID ABROOTFS_PART_UUID_A ABROOTFS_PART_UUID_B"
 
 SWU_ADDITIONAL_FILES += "linux.efi ${ROOTFS_PARTITION_NAME}"
+
+python() {
+    for u in ['A', 'B']:
+        if not d.getVar('ABROOTFS_PART_UUID_' + u):
+            bb.fatal('ABROOTFS_PART_UUID_' + u + ' not set')
+}
