@@ -10,9 +10,13 @@ variables:
   dtb: none
   deploy: enable
   deploy_kernelci: disable
+  repro_image1: image1
+  repro_image2: image2
 
 stages:
-  - build
+  - build1
+  - build2
+  - repro-check
 
 default:
   before_script:
@@ -42,242 +46,74 @@ default:
     - if [ "${deploy}" = "enable" ]; then scripts/deploy-cip-core.sh ${release} ${target} ${extension} ${dtb} ${CI_COMMIT_REF_SLUG}; fi
     - if [ "${deploy_kernelci}" = "enable" ]; then scripts/deploy-kernelci.py ${release} ${target} ${extension} ${dtb}; fi
 
-# base image
-build:simatic-ipc227e-base:
-  extends:
-    - .build_base
+.repro-build:
   variables:
-    target: simatic-ipc227e
-
-build:bbb-base:
+    use_rt: disable
+    wic_targz: disable
+    targz: disable
+    deploy: disable
+    deploy_kernelci: disable
+    base_yaml: "kas-cip.yml:kas/board/${target}.yml:rb.yml"
   extends:
     - .build_base
+  before_script:
+    - scripts/generate-rb-yaml.sh
+  after_script:
+    - mv build/tmp/deploy/images/${target}/cip-core-image-cip-core-${release}-${target}.tar.gz ${image_name} 
+  artifacts:
+    expire_in: 2 hour
+    paths:
+      - ${image_name}
+
+.repro-build1:
+  stage: build1
+  extends:
+    - .repro-build
   variables:
-    target: bbb
-    dtb: am335x-boneblack.dtb
+    image_name: ${repro_image1}
 
-build:iwg20m-base:
+.repro-build2:
+  stage: build2
   extends:
-    - .build_base
+    - .repro-build
   variables:
-    target: iwg20m
-    dtb: r8a7743-iwg20d-q7-dbcm-ca.dtb
+    image_name: ${repro_image2}
 
-build:hihope-rzg2m-base:
-  extends:
-    - .build_base
+.repro-test:
+  image:
+    name: debian:bullseye
+  stage: repro-check
+  tags:
+    - large
   variables:
-    target: hihope-rzg2m
-    dtb: r8a774a1-hihope-rzg2m-ex.dtb
+    GIT_STRATEGY: none
+  before_script:
+    - apt update && DEBIAN_FRONTEND=noninteractive apt install -y diffoscope
+  script:
+    - diffoscope --text diffoscope_output.txt ${repro_image1} ${repro_image2}
+  artifacts:
+    when: always
+    expire_in: 1 day
+    paths:
+      - diffoscope_output.txt
 
-build:qemu-amd64-base:
+build1:qemu-amd64-base-repro-build:
   extends:
-    - .build_base
+    - .repro-build1
   variables:
     target: qemu-amd64
-    extension: security
-    use_rt: disable
-    wic_targz: disable
     targz: enable
 
-build:qemu-amd64-base-kernelci:
+build2:qemu-amd64-base-repro-build:
   extends:
-    - .build_base
+    - .repro-build2
   variables:
     target: qemu-amd64
-    extension: kernelci
-    use_rt: disable
-    wic_targz: disable
-    targz: enable
-    deploy: disable
-    deploy_kernelci: enable
-
-build:qemu-arm64-base:
-  extends:
-    - .build_base
-  variables:
-    target: qemu-arm64
-    extension: security
-    use_rt: disable
-    wic_targz: disable
     targz: enable
 
-build:qemu-arm64-base-kernelci:
+test:qemu-amd64-base-repro-test:
   extends:
-    - .build_base
-  variables:
-    target: qemu-arm64
-    extension: kernelci
-    use_rt: disable
-    wic_targz: disable
-    targz: enable
-    deploy: disable
-    deploy_kernelci: enable
-
-build:qemu-arm-base:
-  extends:
-    - .build_base
-  variables:
-    target: qemu-arm
-    extension: security
-    use_rt: disable
-    wic_targz: disable
-    targz: enable
-
-build:qemu-arm-base-kernelci:
-  extends:
-    - .build_base
-  variables:
-    target: qemu-arm
-    extension: kernelci
-    use_rt: disable
-    wic_targz: disable
-    targz: enable
-    deploy: disable
-    deploy_kernelci: enable
-
-# test
-build:simatic-ipc227e-test:
-  extends:
-    - .build_base
-  variables:
-    target: simatic-ipc227e
-    extension: test
-
-build:bbb-test:
-  extends:
-    - .build_base
-  variables:
-    target: bbb
-    extension: test
-    dtb: am335x-boneblack.dtb
-
-build:iwg20m-test:
-  extends:
-    - .build_base
-  variables:
-    target: iwg20m
-    extension: test
-    dtb: r8a7743-iwg20d-q7-dbcm-ca.dtb
-
-build:hihope-rzg2m-test:
-  extends:
-    - .build_base
-  variables:
-    target: hihope-rzg2m
-    extension: test
-    dtb: r8a774a1-hihope-rzg2m-ex.dtb
-
-build:qemu-amd64-test:
-  extends:
-    - .build_base
-  variables:
-    target:  qemu-amd64
-    extension: test
-    wic_targz: disable
-    targz: enable
-
-build:qemu-arm64-test:
-  extends:
-    - .build_base
-  variables:
-    target:  qemu-arm64
-    extension: test
-    wic_targz: disable
-    targz: enable
-
-build:qemu-arm-test:
-  extends:
-    - .build_base
-  variables:
-    target:  qemu-arm
-    extension: test
-    wic_targz: disable
-    targz: enable
-
-# secure boot images
-build:qemu-amd64-secure-boot:
-  extends:
-    - .build_base
-  variables:
-    target: qemu-amd64
-    extension: ebg-secure-boot-snakeoil
-    use_rt: disable
-    wic_targz: disable
-    deploy: disable
-
-build:qemu-amd64-swupdate:
-  extends:
-    - .build_base
-  variables:
-    target: qemu-amd64
-    extension: ebg-swu
-    use_rt: disable
-    wic_targz: disable
-    deploy: disable
-
-# secure boot images arm64
-build:qemu-arm64-secure-boot:
-  extends:
-    - .build_base
-  variables:
-    target: qemu-arm64
-    extension: ebg-secure-boot-snakeoil
-    use_rt: disable
-    wic_targz: disable
-    deploy: disable
-
-# secure boot images arm
-build:qemu-arm-secure-boot:
-  extends:
-    - .build_base
-  variables:
-    target: qemu-arm
-    extension: ebg-secure-boot-snakeoil
-    use_rt: disable
-    wic_targz: disable
-    deploy: disable
-
-# buster images
-build:simatic-ipc227e-buster:
-  extends:
-    - .build_base
-  variables:
-    target: simatic-ipc227e
-    release: buster
-
-build:bbb-buster:
-  extends:
-    - .build_base
-  variables:
-    target: bbb
-    dtb: am335x-boneblack.dtb
-    release: buster
-
-build:iwg20m-buster:
-  extends:
-    - .build_base
-  variables:
-    target: iwg20m
-    dtb: r8a7743-iwg20d-q7-dbcm-ca.dtb
-    release: buster
-
-build:hihope-rzg2m-buster:
-  extends:
-    - .build_base
-  variables:
-    target: hihope-rzg2m
-    dtb: r8a774a1-hihope-rzg2m-ex.dtb
-    release: buster
-
-build:qemu-amd64-secure-boot-buster:
-  extends:
-    - .build_base
-  variables:
-    base_yaml: "kas-cip.yml:kas/board/${target}.yml:kas/opt/5.10.yml"
-    release: buster
-    target: qemu-amd64
-    extension: ebg-secure-boot-snakeoil
-    use_rt: disable
-    wic_targz: disable
-    deploy: disable
+    - .repro-test
+  dependencies:
+    - build1:qemu-amd64-base-repro-build
+    - build2:qemu-amd64-base-repro-build
