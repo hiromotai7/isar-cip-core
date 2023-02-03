@@ -16,14 +16,14 @@ header:
 
 local_conf_header:
   image-option-swupdate: |
-    CIP_IMAGE_OPTIONS_append = " swupdate.inc"
+    CIP_IMAGE_OPTIONS:append = " swupdate.inc"
 
   wic-swu: |
     IMAGE_CLASSES += "squashfs"
-    IMAGE_TYPEDEP_wic += "squashfs"
+    IMAGE_TYPEDEP:wic += "squashfs"
     IMAGE_FSTYPES = "wic"
     WKS_FILE ?= "${MACHINE}-${SWUPDATE_BOOTLOADER}.wks.in"
-    INITRAMFS_INSTALL_append = " initramfs-squashfs-hook"
+    INITRAMFS_INSTALL:append = " initramfs-squashfs-hook"
     WIC_DEPLOY_PARTITIONS = "1"
     ABROOTFS_PART_UUID_A ?= "fedcba98-7654-3210-cafe-5e0710000001"
     ABROOTFS_PART_UUID_B ?= "fedcba98-7654-3210-cafe-5e0710000002"

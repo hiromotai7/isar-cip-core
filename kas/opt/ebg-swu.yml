@@ -18,17 +18,17 @@ local_conf_header:
   ebg_swu_bootloader: |
     WKS_FILE ?= "${MACHINE}-efibootguard.wks.in"
     SWUPDATE_BOOTLOADER = "efibootguard"
-    IMAGE_INSTALL_remove = "u-boot-script"
+    IMAGE_INSTALL:remove = "u-boot-script"
   ebg_swu_image_options: |
-    CIP_IMAGE_OPTIONS_append = " efibootguard.inc"
+    CIP_IMAGE_OPTIONS:append = " efibootguard.inc"
   initramfs: |
-    INITRAMFS_INSTALL_append = " initramfs-abrootfs-hook"
+    INITRAMFS_INSTALL:append = " initramfs-abrootfs-hook"
   firmware-binaries: |
     # Add ovmf binaries for qemu
-    IMAGER_BUILD_DEPS_append_qemu-amd64 += "ovmf-binaries"
+    IMAGER_BUILD_DEPS:append:qemu-amd64 = " ovmf-binaries"
     # not needed for Debian 11 and later
-    DISTRO_APT_SOURCES_append_qemu-amd64_buster = " conf/distro/debian-buster-backports.list"
-    DISTRO_APT_PREFERENCES_append_qemu-amd64_buster = " conf/distro/preferences.ovmf-snakeoil.conf"
+    DISTRO_APT_SOURCES:append:qemu-amd64:buster = " conf/distro/debian-buster-backports.list"
+    DISTRO_APT_PREFERENCES:append:qemu-amd64:buster = " conf/distro/preferences.ovmf-snakeoil.conf"
     # Add U-Boot for qemu
-    IMAGER_BUILD_DEPS_append_qemu-arm64 += "u-boot-qemu-arm64"
-    IMAGER_BUILD_DEPS_append_qemu-arm += "u-boot-qemu-arm"
+    IMAGER_BUILD_DEPS:append:qemu-arm64 = " u-boot-qemu-arm64"
+    IMAGER_BUILD_DEPS:append:qemu-arm = " u-boot-qemu-arm"

@@ -15,5 +15,5 @@ local_conf_header:
   testing: |
     IMAGE_INSTALL += "ltp-full"
     IMAGE_PREINSTALL += "rt-tests stress-ng"
-    DESCRIPTION_append = " with test packages"
-    IMAGE_FULLNAME_append = "-test"
+    DESCRIPTION:append = " with test packages"
+    IMAGE_FULLNAME:append = "-test"

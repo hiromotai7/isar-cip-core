@@ -10,7 +10,7 @@ This document explains how to verify basic implementations of [CIP security requ
     ```
     local_conf_header:
         security_testing: |
-            IMAGE_PREINSTALL_append=" sshpass"
+            IMAGE_PREINSTALL:append=" sshpass"
             ROOTFS_EXTRA="5120"
     ```
 

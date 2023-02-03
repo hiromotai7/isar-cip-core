@@ -18,11 +18,11 @@ local_conf_header:
   secure-boot-image: |
     IMAGE_CLASSES += "verity"
     IMAGE_FSTYPES = "wic"
-    IMAGE_TYPEDEP_wic += "verity"
+    IMAGE_TYPEDEP:wic += "verity"
     WKS_FILE = "${MACHINE}-efibootguard-secureboot.wks.in"
-    INITRAMFS_INSTALL_append = " initramfs-verity-hook"
+    INITRAMFS_INSTALL:append = " initramfs-verity-hook"
     # abrootfs cannot be installed together with verity
-    INITRAMFS_INSTALL_remove = " initramfs-abrootfs-hook"
+    INITRAMFS_INSTALL:remove = " initramfs-abrootfs-hook"
 
   secure-boot: |
     IMAGER_BUILD_DEPS += "ebg-secure-boot-signer"

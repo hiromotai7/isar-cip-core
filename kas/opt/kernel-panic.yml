@@ -15,4 +15,4 @@ header:
 
 local_conf_header:
   kernel-panic: |
-    IMAGE_INSTALL_append = " kernel-panic"
+    IMAGE_INSTALL:append = " kernel-panic"
