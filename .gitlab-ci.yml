@@ -117,3 +117,45 @@ test:qemu-amd64-base-repro-test:
   dependencies:
     - build1:qemu-amd64-base-repro-build
     - build2:qemu-amd64-base-repro-build
+
+build1:qemu-arm64-base-repro-build:
+  extends:
+    - .repro-build1
+  variables:
+    target: qemu-arm64
+    targz: enable
+
+build2:qemu-arm64-base-repro-build:
+  extends:
+    - .repro-build2
+  variables:
+    target: qemu-arm64
+    targz: enable
+
+test:qemu-arm64-base-repro-test:
+  extends:
+    - .repro-test
+  dependencies:
+    - build1:qemu-arm64-base-repro-build
+    - build2:qemu-arm64-base-repro-build
+
+build1:qemu-arm-base-repro-build:
+  extends:
+    - .repro-build1
+  variables:
+    target: qemu-arm
+    targz: enable
+
+build2:qemu-arm-base-repro-build:
+  extends:
+    - .repro-build2
+  variables:
+    target: qemu-arm
+    targz: enable
+
+test:qemu-arm-base-repro-test:
+  extends:
+    - .repro-test
+  dependencies:
+    - build1:qemu-arm-base-repro-build
+    - build2:qemu-arm-base-repro-build
