@@ -1,2 +1,2 @@
-deb	[check-valid-until=no] https://snapshot.debian.org/archive/debian/20220925T001806Z sid main
-deb-src	[check-valid-until=no] https://snapshot.debian.org/archive/debian/20220925T001806Z sid main
+deb	[check-valid-until=no trusted=yes] https://snapshot.debian.org/archive/debian/20220925T001806Z sid main
+deb-src	[check-valid-until=no trusted=yes] https://snapshot.debian.org/archive/debian/20220925T001806Z sid main
