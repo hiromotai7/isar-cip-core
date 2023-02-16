@@ -9,20 +9,15 @@
 # SPDX-License-Identifier: MIT
 #
 
-VERITY_IMAGE_TYPE ?= "squashfs"
-
-inherit ${VERITY_IMAGE_TYPE}
-
 IMAGE_TYPEDEP:verity = "${VERITY_IMAGE_TYPE}"
 IMAGER_INSTALL:verity += "cryptsetup"
 
+VERITY_IMAGE_TYPE ?= "squashfs"
 VERITY_INPUT_IMAGE ?= "${IMAGE_FULLNAME}.${VERITY_IMAGE_TYPE}"
 VERITY_OUTPUT_IMAGE ?= "${IMAGE_FULLNAME}.verity"
 VERITY_IMAGE_METADATA = "${VERITY_OUTPUT_IMAGE}.metadata"
 VERITY_HASH_BLOCK_SIZE ?= "1024"
 VERITY_DATA_BLOCK_SIZE ?= "1024"
-
-IMAGER_INSTALL += "cryptsetup"
 
 create_verity_env_file() {
 
