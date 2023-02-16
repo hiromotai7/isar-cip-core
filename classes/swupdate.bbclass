@@ -11,7 +11,9 @@
 # SPDX-License-Identifier: MIT
 SWU_ROOTFS_TYPE ?= "squashfs"
 SWU_ROOTFS_NAME ?= "${IMAGE_FULLNAME}"
-ROOTFS_PARTITION_NAME ?= "${SWU_ROOTFS_NAME}.${SWU_ROOTFS_TYPE}.gz"
+# compression type as defined by swupdate (zlib or zstd)
+SWU_COMPRESSION_TYPE ?= "zlib"
+ROOTFS_PARTITION_NAME ?= "${SWU_ROOTFS_NAME}.${SWU_ROOTFS_TYPE}.${@get_swu_compression_type(d)}"
 
 SWU_IMAGE_FILE ?= "${DEPLOY_DIR_IMAGE}/${PN}-${DISTRO}-${MACHINE}.swu"
 SWU_DESCRIPTION_FILE ?= "sw-description"
@@ -22,12 +24,25 @@ SWU_SIGNATURE_TYPE ?= "rsa"
 
 BUILDCHROOT_IMAGE_FILE ?= "${PP_DEPLOY}/${@os.path.basename(d.getVar('SWU_IMAGE_FILE'))}"
 
-IMAGE_TYPEDEP:swu = "wic ${SWU_ROOTFS_TYPE}.gz"
+IMAGE_TYPEDEP:swu = "wic ${SWU_ROOTFS_TYPE}.${@get_swu_compression_type(d)}"
 IMAGER_INSTALL:swu += "cpio ${@'openssl' if bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}"
 
 IMAGE_SRC_URI:swu = "file://${SWU_DESCRIPTION_FILE}.tmpl"
 IMAGE_TEMPLATE_FILES:swu = "${SWU_DESCRIPTION_FILE}.tmpl"
-IMAGE_TEMPLATE_VARS:swu = "ROOTFS_PARTITION_NAME TARGET_IMAGE_UUID ABROOTFS_PART_UUID_A ABROOTFS_PART_UUID_B"
+IMAGE_TEMPLATE_VARS:swu = " \
+    ROOTFS_PARTITION_NAME \
+    TARGET_IMAGE_UUID \
+    ABROOTFS_PART_UUID_A \
+    ABROOTFS_PART_UUID_B \
+    SWU_COMPRESSION_TYPE"
+
+# convert between swupdate compressor name and imagetype extension
+def get_swu_compression_type(d):
+    swu_ct = d.getVar('SWU_COMPRESSION_TYPE', True)
+    swu_to_image = {'zlib': 'gz', 'zstd': 'zst'}
+    if swu_ct not in swu_to_image:
+        bb.fatal('requested SWU_COMPRESSION_TYPE is not supported by swupdate')
+    return swu_to_image[swu_ct]
 
 # This imagetype is neither machine nor distro specific. Hence, we cannot
 # use paths in FILESOVERRIDES. Manual modifications of this variable are
@@ -40,25 +55,6 @@ do_image_swu[cleandirs] += "${WORKDIR}/swu"
 IMAGE_CMD:swu() {
     rm -f '${SWU_IMAGE_FILE}'
     cp '${WORKDIR}/${SWU_DESCRIPTION_FILE}' '${WORKDIR}/swu/${SWU_DESCRIPTION_FILE}'
-
-    # Compress files if requested
-    for file in ${SWU_ADDITIONAL_FILES}; do
-        basefile=$(basename "$file" .gz)
-        if [ "$basefile" = "$file" ]; then
-            continue
-        fi
-        for uncompressed in "${WORKDIR}/$basefile" "${DEPLOY_DIR_IMAGE}/$basefile"; do
-            if [ -e "$uncompressed" ]; then
-                rm  -f "$uncompressed.gz"
-                if [ -x "$(command -v pigz)" ]; then
-                    pigz "$uncompressed"
-                else
-                    gzip "$uncompressed"
-                fi
-                break
-            fi
-        done
-    done
 
     # Create symlinks for files used in the update image
     for file in ${SWU_ADDITIONAL_FILES}; do
