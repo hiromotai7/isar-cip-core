@@ -151,7 +151,6 @@ header:
 
 local_conf_header:
   secure-boot-image: |
-    IMAGE_CLASSES += "verity"
     IMAGE_FSTYPES = "wic"
     WKS_FILE = "${MACHINE}-efibootguard-secureboot.wks.in"
     INITRAMFS_INSTALL:append = " initramfs-verity-hook"
