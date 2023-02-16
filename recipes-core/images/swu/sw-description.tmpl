@@ -13,7 +13,7 @@ software =
     version = "0.2";
     name = "cip software update";
     images: ({
-            filename = "${ROOTFS_PARTITION_NAME}";
+            filename = "${SWU_ROOTFS_PARTITION_NAME}";
             device = "C:BOOT0:linux.efi->${ABROOTFS_PART_UUID_A},C:BOOT1:linux.efi->${ABROOTFS_PART_UUID_B}";
             type = "roundrobin";
             compressed = "${SWU_COMPRESSION_TYPE}";
@@ -21,7 +21,7 @@ software =
                         subtype = "image";
                         configfilecheck = "/etc/os-release@not_match@IMAGE_UUID=${TARGET_IMAGE_UUID}";
             };
-            sha256 = "${ROOTFS_PARTITION_NAME}-sha256";
+            sha256 = "${SWU_ROOTFS_PARTITION_NAME}-sha256";
     });
     files: ({
             filename = "linux.efi";
