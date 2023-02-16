@@ -19,8 +19,7 @@ local_conf_header:
     CIP_IMAGE_OPTIONS:append = " swupdate.inc"
 
   wic-swu: |
-    IMAGE_TYPEDEP:wic += "squashfs"
-    IMAGE_FSTYPES = "wic"
+    IMAGE_FSTYPES += "swu"
     WKS_FILE ?= "${MACHINE}-${SWUPDATE_BOOTLOADER}.wks.in"
     INITRAMFS_INSTALL:append = " initramfs-squashfs-hook"
     WIC_DEPLOY_PARTITIONS = "1"
