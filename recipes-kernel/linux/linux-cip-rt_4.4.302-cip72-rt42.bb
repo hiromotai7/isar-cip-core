@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2019 - 2022
+# Copyright (c) Siemens AG, 2019 - 2023
 #
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
@@ -9,8 +9,8 @@
 # SPDX-License-Identifier: MIT
 #
 
-require linux-cip-common.inc
+require linux-cip-rt-common.inc
 
 KERNEL_DEFCONFIG_VERSION ?= "4.4.y-cip"
 
-SRC_URI[sha256sum] = "864d7e10e123bd0888018279d5f61257eae2c11465fb1ef2d0b10dc42b81d513"
+SRC_URI[sha256sum] = "f06c3048ec3a18e3d25268374396a74b64c55cb858d3b4eb98ecc3b87e8d871c"
