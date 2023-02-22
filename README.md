@@ -10,13 +10,10 @@ from scratch.
 
 ## Building Target Images
 
-Install `kas-container` from the [kas project](https://github.com/siemens/kas):
-
-    wget https://raw.githubusercontent.com/siemens/kas/3.1/kas-container
-    chmod a+x kas-container
-
-Furthermore, install docker and make sure you have required permissions to
-start containers.
+Install docker or podman and make sure you have required permissions to start
+privileged containers. For docker, you need to be part of respective docker
+group (`sudo usermod -aG docker <USER>`). Privileged podman requires sudo
+rights for the caller (`<USER> ALL=(root) SETENV: /usr/bin/podman` in sudoers).
 
 Open up the image configuration menu and select the desired target and its
 options:
