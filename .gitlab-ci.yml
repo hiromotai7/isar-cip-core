@@ -13,6 +13,7 @@ variables:
 
 stages:
   - build
+  - test
 
 default:
   before_script:
@@ -26,6 +27,8 @@ default:
 
 .build_base:
   stage: build
+  except:
+    - schedules
   tags:
     - large
   variables:
@@ -281,3 +284,5 @@ build:qemu-amd64-secure-boot-buster:
     use_rt: disable
     wic_targz: disable
     deploy: disable
+
+include: '.reproducible-check-ci.yml'

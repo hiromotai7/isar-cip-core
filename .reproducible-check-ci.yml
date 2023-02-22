@@ -1,0 +1,101 @@
+#
+# CIP Core, generic profile
+#
+# Copyright (c) Toshiba Corporation, 2023
+#
+# Authors:
+#  Venkata Pyla <venkata.pyla@toshiba-tsip.com>
+#
+# SPDX-License-Identifier: MIT
+#
+# extension to gitlab-ci for reproducible checks
+
+.repro-build:
+  variables:
+    use_rt: disable
+    wic_targz: disable
+    targz: enable
+    deploy: disable
+    deploy_kernelci: disable
+    artifact_suffix: ".tar.gz"
+    base_yaml: "kas-cip.yml:kas/board/${target}.yml"
+  stage: build
+  tags:
+    - large
+  only:
+    - schedules
+  script:
+    - if [ -f kas/opt/reproducible.yml ]; then base_yaml="${base_yaml}:kas/opt/reproducible.yml"; fi
+    # Build 1st time
+    - !reference [.build_base, script]
+    - mv build/tmp/deploy/images/${target}/cip-core-image-cip-core-${release}-${target}${artifact_suffix} image1
+    # clean
+    - sudo rm -rf build/tmp
+    - sudo rm -rf build/sstate-cache
+    # Build 2nd time
+    - !reference [.build_base, script]
+    - mv build/tmp/deploy/images/${target}/cip-core-image-cip-core-${release}-${target}${artifact_suffix} image2
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - image1
+      - image2
+
+.repro-test:
+  image:
+    name: debian:bullseye
+  tags:
+    - large
+  stage: test
+  only:
+    - schedules
+  variables:
+    GIT_STRATEGY: none
+  before_script:
+    - apt update && DEBIAN_FRONTEND=noninteractive apt install -y diffoscope
+  script:
+    - diffoscope --text diffoscope_output.txt image1 image2
+  artifacts:
+    when: always
+    expire_in: 1 day
+    paths:
+      - diffoscope_output.txt
+
+
+# repro build
+build:qemu-amd64-base-repro-build:
+  extends:
+    - .repro-build
+  variables:
+    target: qemu-amd64
+
+build:qemu-arm64-base-repro-build:
+  extends:
+    - .repro-build
+  variables:
+    target: qemu-arm64
+
+build:qemu-arm-base-repro-build:
+  extends:
+    - .repro-build
+  variables:
+    target: qemu-arm
+
+# repro build test
+test:qemu-amd64-base-repro-test:
+  extends:
+    - .repro-test
+  dependencies:
+    - build:qemu-amd64-base-repro-build
+
+test:qemu-arm64-base-repro-test:
+  extends:
+    - .repro-test
+  dependencies:
+    - build:qemu-arm64-base-repro-build
+
+test:qemu-arm-base-repro-test:
+  extends:
+    - .repro-test
+  dependencies:
+    - build:qemu-arm-base-repro-build
