@@ -38,12 +38,14 @@ Check which partition is booted, e.g. with lsblk:
 ```
 root@demo:~# lsblk
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-sda      8:0    0    2G  0 disk
-├─sda1   8:1    0 16.4M  0 part
+sda      8:0    0    6G  0 disk
+├─sda1   8:1    0 16.1M  0 part
 ├─sda2   8:2    0   32M  0 part
 ├─sda3   8:3    0   32M  0 part
-├─sda4   8:4    0 1000M  0 part /
-└─sda5   8:5    0 1000M  0 part
+├─sda4   8:4    0    1G  0 part /
+├─sda5   8:5    0    1G  0 part
+├─sda6   8:6    0  1.3G  0 part /home
+└─sda7   8:7    0  2.6G  0 part /var
 ```
 
 Also check that you are running the RT kernel:
@@ -66,12 +68,14 @@ Check which partition is booted, e.g. with lsblk and the rootfs should have chan
 ```
 root@demo:~# lsblk
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-sda      8:0    0    2G  0 disk
-├─sda1   8:1    0 16.4M  0 part
+sda      8:0    0    6G  0 disk
+├─sda1   8:1    0 16.1M  0 part
 ├─sda2   8:2    0   32M  0 part
 ├─sda3   8:3    0   32M  0 part
-├─sda4   8:4    0 1000M  0 part
-└─sda5   8:5    0 1000M  0 part /
+├─sda4   8:4    0    1G  0 part
+├─sda5   8:5    0    1G  0 part /
+├─sda6   8:6    0  1.3G  0 part /home
+└─sda7   8:7    0  2.6G  0 part /var
 ```
 
 Check the active kernel:
@@ -91,7 +95,7 @@ root@demo:~# bg_printenv
 in_progress:      no
 revision:         2
 kernel:           C:BOOT0:linux.efi
-kernelargs:       console=tty0 console=ttyS0,115200 rootwait earlyprintk
+kernelargs:
 watchdog timeout: 60 seconds
 ustate:           0 (OK)
 
@@ -104,7 +108,7 @@ user variables:
 in_progress:      no
 revision:         3
 kernel:           C:BOOT1:linux.efi
-kernelargs:       console=tty0 console=ttyS0,115200 rootwait earlyprintk
+kernelargs:
 watchdog timeout: 60 seconds
 ustate:           2 (TESTING)
 
@@ -155,7 +159,7 @@ root@demo:~# bg_printenv
 in_progress:      no
 revision:         2
 kernel:           C:BOOT0:linux.efi
-kernelargs:       console=tty0 console=ttyS0,115200 rootwait earlyprintk
+kernelargs:
 watchdog timeout: 60 seconds
 ustate:           0 (OK)
 
@@ -168,7 +172,7 @@ user variables:
 in_progress:      no
 revision:         3
 kernel:           C:BOOT1:linux.efi
-kernelargs:       console=tty0 console=ttyS0,115200 rootwait earlyprintk
+kernelargs:
 watchdog timeout: 60 seconds
 ustate:           1 (INSTALLED)
 
@@ -196,7 +200,7 @@ root@demo:~# bg_printenv
 in_progress:      no
 revision:         2
 kernel:           C:BOOT0:linux.efi
-kernelargs:       console=tty0 console=ttyS0,115200 rootwait earlyprintk
+kernelargs:
 watchdog timeout: 60 seconds
 ustate:           0 (OK)
 
@@ -209,7 +213,7 @@ user variables:
 in_progress:      no
 revision:         0
 kernel:           C:BOOT1:linux.efi
-kernelargs:       console=tty0 console=ttyS0,115200 rootwait earlyprintk
+kernelargs:
 watchdog timeout: 60 seconds
 ustate:           3 (FAILED)
 
