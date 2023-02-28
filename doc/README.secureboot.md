@@ -67,10 +67,9 @@ Set up a secure boot test environment with [QEMU](https://www.qemu.org/)
 ### Prerequisites
 
 - OVMF from edk2 release edk2-stable201911 or newer
-  - This documentation was tested under Debian 10 with OVMF (0.0~20200229-2) backported from Debian
-  bullseye
+  - This documentation was tested under Debian 11 with OVMF (2020.11-2+deb11u1) from Debian bullseye
 - efitools for KeyTool.efi
-  - This documentation was tested under Debian 10 with efitools (1.9.2-1) backported from Debian bullseye
+  - This documentation was tested under Debian 11 with efitools (1.9.2-2~deb11u1) from Debian bullseye
 - libnss3-tools
 
 ### Debian Snakeoil keys
@@ -80,7 +79,7 @@ You can use them as described in section [Start Image](#start-the-image).
 
 ### Generate Keys
 
-#### Reuse exiting keys
+#### Reuse existing keys
 
 It is possible to use exiting keys like /usr/share/ovmf/PkKek-1-snakeoil.pem' from Debian
 by executing the script  `scripts/generate-sb-db-from-existing-certificate.sh`, e.g.:
@@ -196,12 +195,6 @@ and the following command is sufficient:
 ./start-qemu.sh amd64
 ```
 
-The default `OVMF_VARS.snakeoil_4M.fd` boot to the EFI shell. To boot Linux enter the following command:
-```
-FS0:\EFI\BOOT\bootx64.efi
-```
-To change the boot behavior, enter `exit` in the shell to enter the bios and change the boot order.
-
 #### User-generated keys
 Start the image with the following command:
 ```
@@ -239,14 +232,17 @@ scp -P 22222 /tmp/cip-core-image-cip-core-bullseye-qemu-amd64.swu root@127.0.0.1
 ```
 - check which partition is booted, e.g. with `lsblk`:
 ```
-root@demo:/mnt# lsblk
-NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-sda      8:0    0    2G  0 disk
-├─sda1   8:1    0 16.4M  0 part
-├─sda2   8:2    0   32M  0 part
-├─sda3   8:3    0   32M  0 part
-├─sda4   8:4    0 1000M  0 part /
-└─sda5   8:5    0 1000M  0 part
+root@demo:~# lsblk
+NAME           MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+sda              8:0    0     6G  0 disk
+├─sda1           8:1    0  16.1M  0 part
+├─sda2           8:2    0    32M  0 part
+├─sda3           8:3    0    32M  0 part
+├─sda4           8:4    0     1G  0 part
+│ └─verityroot 252:0    0 110.9M  1 crypt /
+├─sda5           8:5    0     1G  0 part
+├─sda6           8:6    0   1.3G  0 part  /home
+└─sda7           8:7    0   2.6G  0 part  /var
 ```
 
 - install the swupdate and reboot the image
@@ -257,11 +253,14 @@ root@demo:~# reboot
 - check which partition is booted, e.g. with `lsblk`. The rootfs should have changed:
 ```
 root@demo:~# lsblk
-NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-sda      8:0    0    2G  0 disk
-├─sda1   8:1    0 16.4M  0 part
-├─sda2   8:2    0   32M  0 part
-├─sda3   8:3    0   32M  0 part
-├─sda4   8:4    0 1000M  0 part
-└─sda5   8:5    0 1000M  0 part /
+NAME           MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
+sda              8:0    0     6G  0 disk
+├─sda1           8:1    0  16.1M  0 part
+├─sda2           8:2    0    32M  0 part
+├─sda3           8:3    0    32M  0 part
+├─sda4           8:4    0     1G  0 part
+├─sda5           8:5    0     1G  0 part
+│ └─verityroot 252:0    0 110.9M  1 crypt /
+├─sda6           8:6    0   1.3G  0 part  /home
+└─sda7           8:7    0   2.6G  0 part  /var
 ```
