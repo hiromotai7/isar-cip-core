@@ -20,7 +20,11 @@ SRC_URI += "file://abrootfs.hook \
 
 ABROOTFS_IMAGE_RECIPE ?= "cip-core-image"
 
-IMAGE_UUID_ENV_FILE = "${DEPLOY_DIR_IMAGE}/${ABROOTFS_IMAGE_RECIPE}-${DISTRO}-${MACHINE}.uuid.env"
+# This is defined in image.bbclass which cannot be used in a package recipe.
+# However, we need to use IMAGE_FULLNAME to pick up any extensions of it.
+IMAGE_FULLNAME ??= "${ABROOTFS_IMAGE_RECIPE}-${DISTRO}-${MACHINE}"
+
+IMAGE_UUID_ENV_FILE = "${DEPLOY_DIR_IMAGE}/${IMAGE_FULLNAME}.uuid.env"
 
 do_install[depends] += "${ABROOTFS_IMAGE_RECIPE}:do_generate_image_uuid"
 do_install[cleandirs] += " \

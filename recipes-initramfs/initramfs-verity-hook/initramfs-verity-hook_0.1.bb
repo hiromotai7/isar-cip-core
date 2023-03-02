@@ -27,7 +27,11 @@ DEBIAN_CONFLICTS = "initramfs-abrootfs-hook"
 
 VERITY_IMAGE_RECIPE ?= "cip-core-image"
 
-VERITY_ENV_FILE = "${DEPLOY_DIR_IMAGE}/${VERITY_IMAGE_RECIPE}-${DISTRO}-${MACHINE}.verity.env"
+# This is defined in image.bbclass which cannot be used in a package recipe.
+# However, we need to use IMAGE_FULLNAME to pick up any extensions of it.
+IMAGE_FULLNAME ??= "${VERITY_IMAGE_RECIPE}-${DISTRO}-${MACHINE}"
+
+VERITY_ENV_FILE = "${DEPLOY_DIR_IMAGE}/${IMAGE_FULLNAME}.verity.env"
 
 do_install[depends] += "${VERITY_IMAGE_RECIPE}:do_image_verity"
 do_install[cleandirs] += " \
