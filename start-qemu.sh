@@ -50,6 +50,10 @@ if [ -z "${TARGET_IMAGE}" ];then
 	fi
 fi
 
+if grep -s -q "IMAGE_TESTING: true" .config.yaml; then
+	TEST_IMAGE="-test"
+fi
+
 arch="$1"
 shift 1
 
@@ -125,7 +129,7 @@ case "${arch}" in
 		;;
 esac
 
-IMAGE_PREFIX="$(dirname $0)/build/tmp/deploy/images/qemu-${QEMU_ARCH}/${TARGET_IMAGE}-cip-core-${DISTRO_RELEASE}-qemu-${QEMU_ARCH}"
+IMAGE_PREFIX="$(dirname $0)/build/tmp/deploy/images/qemu-${QEMU_ARCH}/${TARGET_IMAGE}-cip-core-${DISTRO_RELEASE}-qemu-${QEMU_ARCH}${TEST_IMAGE}"
 
 if [ -z "${DISPLAY}" ]; then
 	QEMU_EXTRA_ARGS="${QEMU_EXTRA_ARGS} -nographic"
