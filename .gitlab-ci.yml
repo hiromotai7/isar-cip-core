@@ -301,7 +301,7 @@ build:qemu-amd64-secure-boot-buster:
     deploy: disable
 
 # riscv64 (sid-ports)
-build:qemu-risv64:
+build:qemu-riscv64:
   extends:
     - .build_base
   variables:
