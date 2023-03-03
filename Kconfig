@@ -97,6 +97,9 @@ config KERNEL_4_19
 config KERNEL_5_10
 	bool "Kernel 5.10.x-cip"
 
+config KERNEL_6_1_MAINLINE
+	bool "Kernel 6.1.x-mainline"
+
 endchoice
 
 config KAS_INCLUDE_KERNEL
@@ -104,6 +107,7 @@ config KAS_INCLUDE_KERNEL
 	default "kas/opt/4.4.yml" if KERNEL_4_4
 	default "kas/opt/4.19.yml" if KERNEL_4_19
 	default "kas/opt/5.10.yml" if KERNEL_5_10
+	default "kas/opt/6.1-mainline.yml" if KERNEL_6_1_MAINLINE
 
 config KERNEL_RT
 	bool "Real-time CIP kernel"
