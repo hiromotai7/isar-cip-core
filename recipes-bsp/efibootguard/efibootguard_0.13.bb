@@ -21,6 +21,9 @@ SRC_URI = " \
     file://debian \
     "
 SRC_URI[sha256sum] = "639a6d8f687cb099b2e9b01eb08ad1494267fe26b5d903b4d405d0737feb989b"
+# add riscv64 support
+SRC_URI += "file://0001-add-machine-type-name-for-riscv64.patch"
+CHANGELOG_V = "${PV}+cip"
 
 PROVIDES = "${PN}"
 PROVIDES += "${PN}-dev"

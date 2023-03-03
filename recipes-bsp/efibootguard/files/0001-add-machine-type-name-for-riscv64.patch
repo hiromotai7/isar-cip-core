@@ -1,0 +1,39 @@
+From 391dd5e04b17be6f5184afb2de4853795f1d5620 Mon Sep 17 00:00:00 2001
+From: Felix Moessbauer <felix.moessbauer@siemens.com>
+Date: Tue, 31 Jan 2023 09:27:31 +0100
+Subject: [PATCH 1/1] add machine type name for riscv64
+
+By adding the machine type name, the generated efi binary for
+riscv64 is suffixed with the corresponding efi machine name.
+
+Signed-off-by: Felix Moessbauer <felix.moessbauer@siemens.com>
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+ configure.ac | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/configure.ac b/configure.ac
+index d8f9d3a..90d70b0 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -87,6 +87,7 @@ SET_ARCH(X86_64, x86_64*)
+ SET_ARCH(IA64, ia64*)
+ SET_ARCH(AARCH64, aarch64*)
+ SET_ARCH(ARM, arm*)
++SET_ARCH(RISCV64, riscv64*)
+ 
+ ARCH=$(echo $host | sed "s/\(-\).*$//")
+ 
+@@ -103,6 +104,9 @@ AM_COND_IF(ARCH_AARCH64, [
+ AM_COND_IF(ARCH_ARM, [
+ 	   MACHINE_TYPE_NAME=arm])
+ 
++AM_COND_IF(ARCH_RISCV64, [
++	   MACHINE_TYPE_NAME=riscv64])
++
+ AC_SUBST([ARCH])
+ AC_SUBST([MACHINE_TYPE_NAME])
+ AM_CONDITIONAL([ARCH_IS_X86], [test "$ARCH" = "ia32" -o "$ARCH" = "x86_64"])
+-- 
+2.30.2
+
