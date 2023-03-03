@@ -185,13 +185,15 @@ class EfibootguardBootPlugin(SourcePlugin):
             "amd64": "x64",
             "arm64": "aa64",
             "armhf": "arm",
-            "i386": "ia32"
+            "i386": "ia32",
+            "riscv64" : "riscv64"
         }
         distro_to_lib_arch = {
             "amd64": "x86_64-linux-gnu",
             "arm64": "aarch64-linux-gnu",
             "armhf": "arm-linux-gnueabihf",
-            "i386": "i386-linux-gnu"
+            "i386": "i386-linux-gnu",
+            "riscv64": "riscv64-linux-gnu",
         }
         rootfs_path = rootfs_dir.get('ROOTFS_DIR')
         distro_arch = get_bitbake_var("DISTRO_ARCH")
