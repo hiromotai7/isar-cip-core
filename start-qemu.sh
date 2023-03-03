@@ -176,6 +176,14 @@ if [ -n "${SECURE_BOOT}${SWUPDATE_BOOT}" ]; then
 				-bios ${u_boot_bin} \
 				${QEMU_COMMON_OPTIONS} "$@"
 			;;
+		rv64|riscv64)
+			opensbi_bin=${FIRMWARE_BIN:-./build/tmp/deploy/images/qemu-${QEMU_ARCH}/fw_payload.bin}
+
+			${QEMU_PATH}${QEMU} \
+				-drive file=${IMAGE_PREFIX}.wic,discard=unmap,if=none,id=disk,format=raw \
+				-bios ${opensbi_bin} \
+				${QEMU_COMMON_OPTIONS} "$@"
+			;;
 		*)
 			echo "Unsupported architecture: ${arch}"
 			exit 1
