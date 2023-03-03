@@ -32,3 +32,4 @@ local_conf_header:
     # Add U-Boot for qemu
     IMAGER_BUILD_DEPS:append:qemu-arm64 = " u-boot-qemu-arm64"
     IMAGER_BUILD_DEPS:append:qemu-arm = " u-boot-qemu-arm"
+    IMAGER_BUILD_DEPS:append:qemu-riscv64 = " opensbi-qemu-riscv64"
