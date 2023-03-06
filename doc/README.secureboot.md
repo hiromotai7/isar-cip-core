@@ -154,7 +154,7 @@ local_conf_header:
     WKS_FILE = "${MACHINE}-efibootguard-secureboot.wks.in"
     INITRAMFS_INSTALL:append = " initramfs-verity-hook"
     # abrootfs cannot be installed together with verity
-    INITRAMFS_INSTALL:remove = " initramfs-abrootfs-hook"
+    INITRAMFS_INSTALL:remove = "initramfs-abrootfs-hook"
 
 local_conf_header:
   secure-boot: |
