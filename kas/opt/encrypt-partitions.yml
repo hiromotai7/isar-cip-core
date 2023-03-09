@@ -16,3 +16,5 @@ local_conf_header:
   systemd-cryptenroll: |
     DISTRO_APT_SOURCES:append:bullseye = " conf/distro/debian-bullseye-backports.list"
     DISTRO_APT_PREFERENCES:append:bullseye = " conf/distro/preferences.bullseye-backports.tpm.conf"
+  initramfs-option-encrypt-partitions: |
+    OVERRIDES .= ":encrypt-partitions"

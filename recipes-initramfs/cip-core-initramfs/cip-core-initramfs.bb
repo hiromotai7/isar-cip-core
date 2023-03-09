@@ -14,3 +14,5 @@ inherit initramfs
 INITRAMFS_INSTALL += " \
     initramfs-overlay-hook \
     "
+
+INITRAMFS_INSTALL:append:encrypt-partitions = " initramfs-crypt-hook"

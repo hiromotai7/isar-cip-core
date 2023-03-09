@@ -1,0 +1,53 @@
+#!/bin/sh
+# Copyright (C) Siemens AG, 2020-2023
+#
+# SPDX-License-Identifier: MIT
+
+PREREQ=""
+
+prereqs()
+{
+     echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+     prereqs
+     exit 0
+     ;;
+esac
+
+. /usr/share/initramfs-tools/hook-functions
+
+hook_error() {
+    echo "(ERROR): $2" >&2
+    exit 1
+}
+
+manual_add_modules tpm
+manual_add_modules tpm_tis_core
+manual_add_modules tpm_tis
+manual_add_modules tpm_crb
+manual_add_modules dm_mod
+manual_add_modules dm_crypt
+
+copy_exec /usr/bin/openssl || hook_error "/usr/bin/openssl not found"
+copy_exec /usr/sbin/mke2fs || hook_error "/usr/sbin/mke2fs not found"
+copy_exec /usr/bin/grep || hook_error "/usr/bin/grep not found"
+copy_exec /usr/bin/awk || hook_error "/usr/bin/awk not found"
+copy_exec /usr/bin/expr || hook_error "/usr/bin/expr not found"
+copy_exec /usr/sbin/e2fsck || hook_error "/usr/sbin/e2fsck not found"
+copy_exec /usr/sbin/resize2fs || hook_error "/usr/sbin/resize2fs not found"
+copy_exec /usr/sbin/cryptsetup || hook_error "/usr/sbin/cryptsetup not found"
+copy_exec /usr/bin/systemd-cryptenroll || hook_error "/usr/bin/systemd-cryptenroll not found"
+copy_exec /usr/lib/systemd/systemd-cryptsetup || hook_error "/usr/lib/systemd/systemd-cryptsetup not found"
+
+if [ -x cryptsetup-reencrypt ]; then
+    copy_exec /usr/sbin/cryptsetup-reencrypt
+fi
+
+for _LIBRARY in /usr/lib/*/libtss2*; do
+    copy_exec "$_LIBRARY"
+done
+
+copy_file library /usr/share/encrypt_partition/encrypt_partition.env /usr/share/encrypt_partition/encrypt_partition.env
