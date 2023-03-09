@@ -19,6 +19,7 @@ variables:
   release: bullseye
   extension: none
   use_rt: enable
+  encrypt: disable
   wic_targz: enable
   targz: disable
   dtb: none
@@ -55,6 +56,7 @@ default:
     - if [ "${release}" = "buster" ]; then base_yaml="${base_yaml}:kas/opt/buster.yml"; fi
     - if [ "${release}" = "bullseye" ]; then base_yaml="${base_yaml}:kas/opt/bullseye.yml"; fi
     - if [ "${release}" = "sid-ports" ]; then base_yaml="${base_yaml}:kas/opt/sid-ports.yml"; fi
+    - if [ "${encrypt}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/encrypt-partitions.yml"; fi
     - echo "Building ${base_yaml}"
     - kas build ${base_yaml}
     - if [ "${deploy}" = "enable" ]; then scripts/deploy-cip-core.sh ${release} ${target} ${extension} ${dtb} ${CI_COMMIT_REF_SLUG}; fi
@@ -223,6 +225,17 @@ build:qemu-amd64-secure-boot:
     use_rt: disable
     wic_targz: disable
     deploy: disable
+
+build:qemu-amd64-secure-boot-encrypt:
+  extends:
+    - .build_base
+  variables:
+    target: qemu-amd64
+    extension: ebg-secure-boot-snakeoil
+    use_rt: disable
+    wic_targz: disable
+    deploy: disable
+    encrypt: enable
 
 build:qemu-amd64-swupdate:
   extends:
