@@ -23,4 +23,5 @@ esac
 . /usr/share/initramfs-tools/hook-functions
 
 manual_add_modules overlay
+copy_exec /usr/bin/mountpoint
 copy_exec /usr/bin/awk

@@ -26,7 +26,7 @@ TEMPLATE_VARS += " INITRAMFS_OVERLAY_STORAGE_PATH \
     INITRAMFS_OVERLAY_PATHS \
     INITRAMFS_OVERLAY_STORAGE_PARTITION_LABEL"
 
-DEBIAN_DEPENDS = "initramfs-tools, awk, coreutils"
+DEBIAN_DEPENDS = "initramfs-tools, awk, coreutils, util-linux"
 
 do_install[cleandirs] += " \
     ${D}/usr/share/initramfs-tools/hooks \

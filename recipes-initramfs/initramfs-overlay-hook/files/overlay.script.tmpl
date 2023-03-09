@@ -9,7 +9,7 @@
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
 #
 
-PREREQ=""
+PREREQ="encrypt_partition"
 
 prereqs()
 {
@@ -33,10 +33,12 @@ ovl_lower_dirs="${INITRAMFS_OVERLAY_PATHS}"
 
 root_mount_storage=${rootmnt}${ovl_storage_path}
 
-if ! mount -t $(get_fstype /dev/disk/by-label/${ovl_partition_label}) \
-	   /dev/disk/by-label/${ovl_partition_label} \
-	   ${rootmnt}/${ovl_partition_label}; then
-	panic "Can't mount /${ovl_partition_label} partition - overlay will not work!"
+if ! mountpoint -q "${rootmnt}/${ovl_partition_label}"; then
+	if ! mount -t $(get_fstype /dev/disk/by-label/${ovl_partition_label}) \
+		 /dev/disk/by-label/${ovl_partition_label} \
+		 ${rootmnt}/${ovl_partition_label}; then
+		panic "Can't mount /${ovl_partition_label} partition - overlay will not work!"
+	fi
 fi
 
 for ovl_lower_dir in ${ovl_lower_dirs}; do
