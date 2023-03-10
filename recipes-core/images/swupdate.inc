@@ -12,5 +12,9 @@
 inherit image_uuid
 inherit read-only-rootfs
 
-IMAGE_INSTALL += " swupdate"
+IMAGE_PREINSTALL:append:sid = " swupdate"
+IMAGE_PREINSTALL:append:bookworm = " swupdate"
+IMAGE_INSTALL:append:bullseye = " swupdate"
+IMAGE_INSTALL:append:buster = " swupdate"
+
 IMAGE_INSTALL += " swupdate-handler-roundrobin"

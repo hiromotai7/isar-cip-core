@@ -132,6 +132,10 @@ config DEBIAN_BULLSEYE
 	bool "bullseye (11)"
 	depends on !ARCH_RISCV64
 
+config DEBIAN_BOOKWORM
+	bool "bookworm (12)"
+	depends on !ARCH_RISCV64
+
 config DEBIAN_SID_PORTS
 	bool "sid (unstable) with unofficial ports"
 	depends on ARCH_RISCV64
@@ -142,6 +146,7 @@ config KAS_INCLUDE_DEBIAN
 	string
 	default "kas/opt/buster.yml" if DEBIAN_BUSTER
 	default "kas/opt/bullseye.yml" if DEBIAN_BULLSEYE
+	default "kas/opt/bookworm.yml" if DEBIAN_BOOKWORM
 	default "kas/opt/sid-ports.yml" if DEBIAN_SID_PORTS
 
 comment "Image features"
