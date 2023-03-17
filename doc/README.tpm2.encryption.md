@@ -6,10 +6,6 @@ passphrase on the device.
 
 ## Requirements
 
-To enroll the keys Debian 12(bookworm) or Debian 11(bullseye) with backports is required.
-The implementation in Debian 11 is for *demonstration purpose only* as we need backports for
-systemd >= 248. [systemd version 248](https://github.com/systemd/systemd/blob/a41ac8ac407a1a58612059a45229f0d440f58e28/NEWS#L3391) adds the necessary systemd-cryptenroll functionality.
-
 Testing with qemu-amd64 requires the package `swtpm`. Under Debian/Ubuntu this can be installed
 
 ``` shell
@@ -18,7 +14,8 @@ apt-get install swtpm
 
 ## TPM2 protected LUKS passphrase
 
-The recipe `initramfs-crypt-hook` uses `systemd-cryptenroll` to enroll a TPM2 protected LUKS passphrase.
+The recipe `initramfs-crypt-hook` uses `systemd-cryptenroll` (Debian 12 and later)
+or `clevis` (Debian 10 and Debian 11) to enroll a TPM2 protected LUKS passphrase.
 The procedure for storing a key is described in [systemd/src/shared/tpm2-util.c](https://github.com/systemd/systemd/blob/0254e4d66af7aa893b31b2326335ded5dde48b51/src/shared/tpm2-util.c#L1395).
 
 ## How to build an QEMU image with TPM encryption
