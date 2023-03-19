@@ -156,10 +156,16 @@ if [ "$TPM2_ENCRYPTION" = "true" ] && [ -x /usr/bin/swtpm ]; then
 	if swtpm socket -d --tpmstate dir="${SWTPM_DIR}" \
 			 --ctrl type=unixio,path=/tmp/qemu-swtpm.sock \
 			 --tpm2; then
+		TPM_DEVICE=tpm-tis-device
+		case "${arch}" in
+			x86|x86_64|amd64)
+				TPM_DEVICE=tpm-tis
+				;;
+		esac
 		QEMU_EXTRA_ARGS="${QEMU_EXTRA_ARGS} \
 			 -chardev socket,id=chrtpm,path=/tmp/qemu-swtpm.sock \
 			 -tpmdev emulator,id=tpm0,chardev=chrtpm \
-			 -device tpm-tis,tpmdev=tpm0"
+			 -device ${TPM_DEVICE},tpmdev=tpm0"
 	fi
 fi
 
