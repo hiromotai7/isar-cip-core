@@ -1,3 +1,5 @@
 #!/bin/sh
 
+set -e
+
 deb-systemd-helper enable home.mount  || true

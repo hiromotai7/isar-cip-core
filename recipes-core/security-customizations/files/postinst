@@ -4,6 +4,8 @@
 # Security Package configurations
 #
 
+set -e
+
 echo "CIP Core Security Image (login: root/Cipsecurity@123)" > /etc/issue
 
 HOSTNAME=demo
