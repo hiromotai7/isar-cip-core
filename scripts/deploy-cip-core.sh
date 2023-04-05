@@ -17,8 +17,8 @@ DTB=$4
 REF=$5
 
 BASE_FILENAME=cip-core-image-cip-core-$RELEASE-$TARGET
-if [ "${EXTENSION}" != "none" ] ; then
-	if [ "${EXTENSION}" = "security" ] ; then
+if [ "${EXTENSION}" != "none" ]; then
+	if [ "${EXTENSION}" = "security" ]; then
 		BASE_FILENAME=cip-core-image-$EXTENSION-cip-core-$RELEASE-$TARGET
 	else
 		BASE_FILENAME=cip-core-image-cip-core-$RELEASE-$TARGET-$EXTENSION
@@ -28,7 +28,7 @@ fi
 BASE_PATH=build/tmp/deploy/images/$TARGET/$BASE_FILENAME
 S3_TARGET=s3://download2.cip-project.org/cip-core/$REF/$TARGET/
 
-if [ -f $BASE_PATH.wic ] ; then
+if [ -f $BASE_PATH.wic ]; then
 	echo "Compressing $BASE_FILENAME.wic..."
 	xz -9 -k -T0 $BASE_PATH.wic
 
