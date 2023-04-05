@@ -1,4 +1,7 @@
 #!/bin/sh
+
+set -e
+
 name=${SB_NAME:-snakeoil}
 keydir=${SB_KEYDIR:-./keys}
 if [ ! -d  ${keydir} ]; then

@@ -1,4 +1,7 @@
 #!/bin/sh
+
+set -e
+
 ovmf_code=${OVMF_CODE:-/usr/share/OVMF/OVMF_CODE_4M.secboot.fd}
 ovmf_vars=${OVMF_VARS:-./OVMF_VARS_4M.fd}
 DISK=$1
