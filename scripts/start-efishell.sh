@@ -10,6 +10,6 @@ qemu-system-x86_64 -enable-kvm -M q35 -nographic \
                    -global ICH9-LPC.disable_s3=1 \
                    -global isa-fdc.driveA= \
                    -boot menu=on \
-                   -drive if=pflash,format=raw,unit=0,readonly=on,file=${ovmf_code} \
-                   -drive if=pflash,format=raw,file=${ovmf_vars} \
-                   -drive file=fat:rw:$DISK
+                   -drive if=pflash,format=raw,unit=0,readonly=on,file="${ovmf_code}" \
+                   -drive if=pflash,format=raw,file="${ovmf_vars}" \
+                   -drive file=fat:rw:"$DISK"
