@@ -17,6 +17,10 @@ SWU_ROOTFS_NAME ?= "${IMAGE_FULLNAME}"
 # compression type as defined by swupdate (zlib or zstd)
 SWU_COMPRESSION_TYPE ?= "zlib"
 SWU_ROOTFS_PARTITION_NAME ?= "${SWU_ROOTFS_NAME}.${SWU_ROOTFS_TYPE}.${@get_swu_compression_type(d)}"
+SWU_VERSION ?= "0.2"
+SWU_NAME ?= "cip software update"
+# space separated list of supported hw. Leave empty to leave out
+SWU_HW_COMPAT ?= ""
 
 SWU_IMAGE_FILE ?= "${DEPLOY_DIR_IMAGE}/${IMAGE_FULLNAME}.swu"
 SWU_DESCRIPTION_FILE ?= "sw-description"
@@ -37,7 +41,22 @@ IMAGE_TEMPLATE_VARS:swu = " \
     TARGET_IMAGE_UUID \
     ABROOTFS_PART_UUID_A \
     ABROOTFS_PART_UUID_B \
-    SWU_COMPRESSION_TYPE"
+    SWU_COMPRESSION_TYPE \
+    SWU_HW_COMPAT_NODE \
+    SWU_VERSION \
+    SWU_NAME"
+
+python(){
+    # create SWU_HW_COMPAT_NODE based on list of supported hw
+    hw_compat = d.getVar('SWU_HW_COMPAT')
+    if hw_compat:
+        hw_entries = ', '. join(['"' + h + '"' for h in hw_compat.split()])
+        d.setVar('SWU_HW_COMPAT_NODE',
+            'hardware-compatibility: [ ' + hw_entries +' ];')
+    else:
+        d.setVar('SWU_HW_COMPAT_NODE', '')
+}
+
 
 # convert between swupdate compressor name and imagetype extension
 def get_swu_compression_type(d):

@@ -10,8 +10,9 @@
 #
 software =
 {
-    version = "0.2";
-    name = "cip software update";
+    version = "${SWU_VERSION}";
+    name = "${SWU_NAME}";
+    ${SWU_HW_COMPAT_NODE}
     images: ({
             filename = "${SWU_ROOTFS_PARTITION_NAME}";
             device = "C:BOOT0:linux.efi->${ABROOTFS_PART_UUID_A},C:BOOT1:linux.efi->${ABROOTFS_PART_UUID_B}";
