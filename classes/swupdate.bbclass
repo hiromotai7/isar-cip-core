@@ -14,9 +14,9 @@ inherit template
 
 SWU_ROOTFS_TYPE ?= "squashfs"
 SWU_ROOTFS_NAME ?= "${IMAGE_FULLNAME}"
-# compression type as defined by swupdate (zlib or zstd)
+# compression type as defined by swupdate (zlib or zstd). Set to empty string to disable compression
 SWU_COMPRESSION_TYPE ?= "zlib"
-SWU_ROOTFS_PARTITION_NAME ?= "${SWU_ROOTFS_NAME}.${SWU_ROOTFS_TYPE}.${@get_swu_compression_type(d)}"
+SWU_ROOTFS_PARTITION_NAME ?= "${SWU_ROOTFS_NAME}.${SWU_ROOTFS_TYPE}${@get_swu_compression_type(d)}"
 SWU_VERSION ?= "0.2"
 SWU_NAME ?= "cip software update"
 # space separated list of supported hw. Leave empty to leave out
@@ -31,7 +31,7 @@ SWU_SIGNATURE_TYPE ?= "rsa"
 
 SWU_BUILDCHROOT_IMAGE_FILE ?= "${PP_DEPLOY}/${@os.path.basename(d.getVar('SWU_IMAGE_FILE'))}"
 
-IMAGE_TYPEDEP:swu = "wic ${SWU_ROOTFS_TYPE}.${@get_swu_compression_type(d)}"
+IMAGE_TYPEDEP:swu = "wic ${SWU_ROOTFS_TYPE}${@get_swu_compression_type(d)}"
 IMAGER_INSTALL:swu += "cpio ${@'openssl' if bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}"
 
 IMAGE_SRC_URI:swu = "file://${SWU_DESCRIPTION_FILE}.tmpl"
@@ -41,8 +41,8 @@ IMAGE_TEMPLATE_VARS:swu = " \
     TARGET_IMAGE_UUID \
     ABROOTFS_PART_UUID_A \
     ABROOTFS_PART_UUID_B \
-    SWU_COMPRESSION_TYPE \
     SWU_HW_COMPAT_NODE \
+    SWU_COMPRESSION_NODE \
     SWU_VERSION \
     SWU_NAME"
 
@@ -55,13 +55,22 @@ python(){
             'hardware-compatibility: [ ' + hw_entries +' ];')
     else:
         d.setVar('SWU_HW_COMPAT_NODE', '')
+
+    # create SWU_COMPRESSION_NODE node if compression is enabled
+    calgo = d.getVar('SWU_COMPRESSION_TYPE')
+    if calgo:
+        d.setVar('SWU_COMPRESSION_NODE', 'compressed = "' + calgo + '";')
+    else:
+        d.setVar('SWU_COMPRESSION_NODE', '')
 }
 
 
 # convert between swupdate compressor name and imagetype extension
 def get_swu_compression_type(d):
     swu_ct = d.getVar('SWU_COMPRESSION_TYPE', True)
-    swu_to_image = {'zlib': 'gz', 'zstd': 'zst'}
+    if not swu_ct:
+        return ''
+    swu_to_image = {'zlib': '.gz', 'zstd': '.zst'}
     if swu_ct not in swu_to_image:
         bb.fatal('requested SWU_COMPRESSION_TYPE is not supported by swupdate')
     return swu_to_image[swu_ct]
