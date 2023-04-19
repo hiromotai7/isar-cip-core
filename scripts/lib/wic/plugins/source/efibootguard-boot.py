@@ -60,9 +60,9 @@ class EfibootguardBootPlugin(SourcePlugin):
             kernel_image = "vmlinuz"
         boot_image = kernel_image
 
-        initrd_image = get_bitbake_var("INITRD_IMAGE")
+        initrd_image = get_bitbake_var("INITRD_DEPLOY_FILE")
         if not initrd_image:
-            msger.warning("INITRD_IMAGE not set\n")
+            msger.warning("INITRD_DEPLOY_FILE not set\n")
             initrd_image = "initrd.img"
         bootloader = creator.ks.bootloader
 
