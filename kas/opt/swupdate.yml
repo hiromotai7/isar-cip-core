@@ -20,7 +20,7 @@ local_conf_header:
 
   wic-swu: |
     IMAGE_TYPEDEP:wic += "squashfs"
-    IMAGE_FSTYPES += "swu"
+    IMAGE_FSTYPES:append = " swu"
     # squashfs is already compressed
     SWU_COMPRESSION_TYPE = ""
     WKS_FILE ?= "${MACHINE}-${SWUPDATE_BOOTLOADER}.wks.in"
