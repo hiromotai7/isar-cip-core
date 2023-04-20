@@ -29,7 +29,7 @@ PROVIDES = "${PN}"
 PROVIDES += "${PN}-dev"
 
 DEPENDS = "python3-shtab"
-BUILD_DEB_DEPENDS = "debhelper,autoconf-archive,check,gnu-efi,libpci-dev,pkg-config,python3-shtab,zlib1g-dev"
+BUILD_DEB_DEPENDS = "debhelper,autoconf-archive,check,gnu-efi,libpci-dev,pkg-config,python3-shtab:native,zlib1g-dev"
 BUILD_DEB_DEPENDS:append:amd64 = ",libc6-dev-i386"
 BUILD_DEB_DEPENDS:append:i386 = ",libc6-dev-i386"
 

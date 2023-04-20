@@ -1,0 +1,33 @@
+From 661472b5fb651a140cd9852fef4b797b8535fedf Mon Sep 17 00:00:00 2001
+From: Srinuvasan A <srinuvasan.a@siemens.com>
+Date: Mon, 16 Jan 2023 13:55:23 +0530
+Subject: [PATCH] debian/control: Fix cross build issue for bullseye images
+
+Fix cross build issues for bullseye images.
+
+Signed-off-by: Srinuvasan A <srinuvasan.a@siemens.com>
+---
+ debian/control | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/debian/control b/debian/control
+index b30beb1..a63e366 100644
+--- a/debian/control
++++ b/debian/control
+@@ -6,9 +6,11 @@ Uploaders: Felix Moessbauer <felix.moessbauer@siemens.com>
+ Build-Depends: debhelper-compat (= 13),
+  dh-python,
+  python3-setuptools (>=42),
+- python3-setuptools-scm (>=3.4),
+- python3-all (>=3.2),
+- python3-wheel,
++ python3-setuptools-scm:native (>=3.4),
++ libpython3-all-dev (>=3.2),
++ python3-all-dev:any (>=3.2),
++ python3-wheel:native,
++ python3-toml:native,
+  python3-pytest <!nocheck>,
+  python3-pytest-cov <!nocheck>,
+  python3-pytest-timeout <!nocheck>,
+-- 
+2.34.1
