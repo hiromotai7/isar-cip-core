@@ -26,7 +26,7 @@ DEB_BUILD_PROFILES += "${@get_bootloader_build_profile(d)}"
 def get_bootloader_dependencies(d):
     bootloader = d.getVar("SWUPDATE_BOOTLOADER") or ""
     if bootloader == "efibootguard":
-        return "efibootguard-dev"
+        return "libebgenv-dev"
     if bootloader == "u-boot":
         if d.getVar("U_BOOT_CONFIG_PACKAGE") == "1":
             return "libubootenv u-boot-{}-config".format(d.getVar("MACHINE"))

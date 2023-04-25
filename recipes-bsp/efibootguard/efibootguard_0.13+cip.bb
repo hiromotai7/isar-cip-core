@@ -17,24 +17,27 @@ LIC_FILES_CHKSUM = "file://${LAYERDIR_isar}/licenses/COPYING.GPLv2;md5=751419260
 MAINTAINER = "Jan Kiszka <jan.kiszka@siemens.com>"
 
 SRC_URI = " \
-    https://github.com/siemens/efibootguard/archive/refs/tags/v${PV}.tar.gz;downloadfilename=efitbootguard-v${PV}.tar.gz \
-    file://debian \
+    https://github.com/siemens/efibootguard/archive/refs/tags/v0.13.tar.gz;downloadfilename=efibootguard_0.13.orig.tar.gz;unpack=0;name=tarball \
+    git://salsa.debian.org/debian/efibootguard.git;protocol=https;branch=master;name=debian \
+    file://debian-patches/0001-d-control-Make-compatible-with-debian-buster.patch \
     "
-SRC_URI[sha256sum] = "639a6d8f687cb099b2e9b01eb08ad1494267fe26b5d903b4d405d0737feb989b"
+SRC_URI[tarball.sha256sum] = "639a6d8f687cb099b2e9b01eb08ad1494267fe26b5d903b4d405d0737feb989b"
+SRCREV_debian = "e39728f63946d1af2d5edbecd89a30706dc31a9a"
+
 # add riscv64 support
-SRC_URI += "file://0001-add-machine-type-name-for-riscv64.patch"
+SRC_URI += "file://src-patches"
+
 CHANGELOG_V = "${PV}+cip"
 
-PROVIDES = "${PN}"
-PROVIDES += "${PN}-dev"
+PROVIDES = "libebgenv-dev libebgenv0 efibootguard"
 
-DEPENDS = "python3-shtab"
-BUILD_DEB_DEPENDS = "debhelper,autoconf-archive,check,gnu-efi,libpci-dev,pkg-config,python3-shtab,zlib1g-dev"
-BUILD_DEB_DEPENDS:append:amd64 = ",libc6-dev-i386"
-BUILD_DEB_DEPENDS:append:i386 = ",libc6-dev-i386"
+S = "${WORKDIR}/git"
+
+PATCHTOOL = "git"
 
 inherit dpkg
 
+DEPENDS = "python3-shtab"
 # needed for buster, bullseye could use compat >= 13
 python() {
     arch = d.getVar('DISTRO_ARCH')
@@ -43,10 +46,10 @@ python() {
         d.setVar('DEB_HOST_MULTIARCH', proc.read())
 }
 
-TEMPLATE_FILES = "debian/control.tmpl debian/efibootguard-dev.install.tmpl"
-TEMPLATE_VARS += "DESCRIPTION_DEV BUILD_DEB_DEPENDS DEB_HOST_MULTIARCH"
+CHANGELOG_V = "<orig-version>+isar"
 
 do_prepare_build() {
-    cp -R ${WORKDIR}/debian ${S}
     deb_add_changelog
+    cd ${S}/debian
+    quilt import ${WORKDIR}/src-patches/*.patch
 }

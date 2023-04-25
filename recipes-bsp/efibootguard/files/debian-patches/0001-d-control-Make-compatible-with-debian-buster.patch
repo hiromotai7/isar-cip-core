@@ -1,0 +1,36 @@
+From 299b2fecb4be67b3b669762a88cb3376a9fd5628 Mon Sep 17 00:00:00 2001
+From: Quirin Gylstorff <quirin.gylstorff@siemens.com>
+Date: Tue, 14 Feb 2023 10:30:34 +0100
+Subject: [PATCH 1/2] d/control: Make compatible with debian buster
+
+Signed-off-by: Quirin Gylstorff <quirin.gylstorff@siemens.com>
+---
+ debian/compat  | 1 +
+ debian/control | 2 +-
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+ create mode 100644 debian/compat
+
+diff --git a/debian/compat b/debian/compat
+new file mode 100644
+index 0000000..9a03714
+--- /dev/null
++++ b/debian/compat
+@@ -0,0 +1 @@
++10
+\ No newline at end of file
+diff --git a/debian/control b/debian/control
+index fa7867c..8b92019 100644
+--- a/debian/control
++++ b/debian/control
+@@ -2,7 +2,7 @@ Source: efibootguard
+ Section: admin
+ Priority: optional
+ Maintainer: Quirin Gylstorff <quirin.gylstorff@siemens.com>
+-Build-Depends: debhelper-compat (= 13),
++Build-Depends: debhelper,
+  autoconf-archive,
+  check,
+  gnu-efi,
+-- 
+2.39.2
+

@@ -10,11 +10,6 @@
 #
 
 IMAGE_INSTALL:append = " efibootguard"
-IMAGE_PREINSTALL:append:sid = " efibootguard"
-IMAGE_PREINSTALL:append:bookworm = " efibootguard"
-IMAGE_INSTALL:append:bullseye = " efibootguard"
-IMAGE_INSTALL:append:buster = " efibootguard"
-
 WIC_IMAGER_INSTALL:append = " efibootguard:${DISTRO_ARCH}"
 WDOG_TIMEOUT ?= "60"
 WICVARS += "WDOG_TIMEOUT KERNEL_IMAGE INITRD_DEPLOY_FILE DTB_FILES"

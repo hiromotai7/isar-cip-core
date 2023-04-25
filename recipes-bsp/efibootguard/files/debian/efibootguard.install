@@ -1,5 +1,0 @@
-usr/bin
-usr/lib/*/efibootguard/kernel-stub*.efi
-usr/lib/*/efibootguard/efibootguard*.efi
-usr/lib/*/libebgenv.so.0*
-usr/share/efibootguard/completion
