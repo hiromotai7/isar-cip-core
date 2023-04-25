@@ -4,12 +4,10 @@
 # SPDX-License-Identifier: MIT
 
 inherit dpkg
+inherit deploy-firmware
 
 U_BOOT_PACKAGE ?= "u-boot-${MACHINE}"
 PLATFORM ?= "generic"
-
-DEPLOYDIR_FIRMWARE = "${WORKDIR}/deploy-fw"
-SSTATETASKS += "do_deploy"
 
 SRC_URI = " \
     https://github.com/riscv/opensbi/archive/v${PV}.tar.gz;downloadfilename=opensbi-${PV}.tar.gz;name=opensbi"
@@ -27,18 +25,8 @@ do_prepare_build() {
     echo "build/platform/${PLATFORM}/firmware/fw_payload.bin /usr/lib/opensbi/${MACHINE}/" > ${S}/debian/install
 }
 
-do_deploy[cleandirs] += "${DEPLOYDIR_FIRMWARE}"
-do_deploy[sstate-inputdirs] = "${DEPLOYDIR_FIRMWARE}"
-do_deploy[sstate-outputdirs] = "${DEPLOY_DIR_IMAGE}"
-do_deploy() {
+do_deploy_firmware() {
     dpkg --fsys-tarfile "${WORKDIR}/${PN}_${PV}_${DISTRO_ARCH}.deb" | \
         tar xOf - "./usr/lib/opensbi/${MACHINE}/fw_payload.bin" \
         > "${DEPLOYDIR_FIRMWARE}/fw_payload.bin"
 }
-
-python do_deploy_setscene () {
-    sstate_setscene(d)
-}
-addtask do_deploy_setscene
-
-addtask deploy after do_dpkg_build before do_deploy_deb
