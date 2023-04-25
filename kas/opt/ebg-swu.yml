@@ -25,7 +25,7 @@ local_conf_header:
     INITRAMFS_INSTALL:append = " initramfs-abrootfs-hook"
   firmware-binaries: |
     # Add ovmf binaries for qemu
-    IMAGER_BUILD_DEPS:append:qemu-amd64 = " ovmf-binaries"
+    CIP_IMAGE_OPTIONS:append:qemu-amd64 = " deploy-ovmf.inc"
     # not needed for Debian 11 and later
     DISTRO_APT_SOURCES:append:qemu-amd64:buster = " conf/distro/debian-buster-backports.list"
     DISTRO_APT_PREFERENCES:append:qemu-amd64:buster = " conf/distro/preferences.ovmf-snakeoil.conf"
