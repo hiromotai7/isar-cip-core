@@ -10,11 +10,12 @@
 
 inherit dpkg-raw
 DEBIAN_DEPENDS = "initramfs-tools, cryptsetup, \
-    awk, openssl, libtss2-esys-3.0.2-0, libtss2-rc0, libtss2-mu0, e2fsprogs"
+    awk, openssl, libtss2-esys-3.0.2-0 | libtss2-esys0, \
+    libtss2-rc0 | libtss2-esys0, libtss2-mu0 | libtss2-esys0, e2fsprogs"
 
 CLEVIS_DEPEND = ", clevis-luks, jose, bash, luksmeta, file, libpwquality-tools"
 
-DEBIAN_DEPENDS:append:buster = "${CLEVIS_DEPEND}"
+DEBIAN_DEPENDS:append:buster = "${CLEVIS_DEPEND}, libgcc-7-dev"
 DEBIAN_DEPENDS:append:bullseye = "${CLEVIS_DEPEND}"
 DEBIAN_DEPENDS:append = ", systemd (>= 251) | clevis-tpm2"
 
