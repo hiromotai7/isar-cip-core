@@ -27,7 +27,7 @@ An example for qemu-amd64 can be build with by selecting the option after callin
 or by adding using the following command line build:
 
 ```
-./kas-container build kas-cip.yml:kas/board/qemu-amd64.yml:kas/opt/ebg-swu.yml:kas/opt/tpm.yml
+./kas-container build kas-cip.yml:kas/board/qemu-amd64.yml:kas/opt/ebg-swu.yml:kas/opt/encrypt-partitions.yml
 ```
 ## initramfs-crypt-hook configuration
 
