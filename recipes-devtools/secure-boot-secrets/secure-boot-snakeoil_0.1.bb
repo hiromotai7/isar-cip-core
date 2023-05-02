@@ -11,7 +11,7 @@
 
 require secure-boot-secrets.inc
 
-SB_KEY = "PkKek-1-snakeoil.key"
-SB_CERT = "PkKek-1-snakeoil.pem"
+SB_KEY = "${BASE_DISTRO_CODENAME}/PkKek-1-snakeoil.key"
+SB_CERT = "${BASE_DISTRO_CODENAME}/PkKek-1-snakeoil.pem"
 
 DEBIAN_CONFLICTS = "secure-boot-key"
