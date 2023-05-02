@@ -313,6 +313,7 @@ build:qemu-amd64-secure-boot-buster:
     use_rt: disable
     wic_targz: disable
     deploy: disable
+    encrypt: enable
 
 # riscv64 (sid-ports)
 build:qemu-riscv64:
