@@ -41,7 +41,7 @@ partition_sets="$PARTITIONS"
 create_file_system_cmd="$CREATE_FILE_SYSTEM_CMD"
 
 if [ -z "${create_file_system_cmd}" ]; then
-	create_file_system_cmd = "mke2fs -t ext4"
+	create_file_system_cmd="mke2fs -t ext4"
 fi
 
 open_tpm2_partition() {
@@ -73,17 +73,17 @@ enroll_tpm2_token() {
 
 reencrypt_existing_partition() {
 	part_device=$(readlink -f "$partition")
-	part_size_blocks=$(cat /sys/class/block/"$(awk -v dev=$part_device 'BEGIN{split(dev,a,"/"); print a[3]}' )"/size)
+	part_size_blocks=$(cat /sys/class/block/"$(awk -v dev="$part_device" 'BEGIN{split(dev,a,"/"); print a[3]}' )"/size)
 	# reduce the filesystem and partition by 32M to fit the LUKS header
 	reduce_device_size=32768
-	reduced_size=$(expr $part_size_blocks - 65536 )
-	reduced_size_in_byte=$(expr $reduced_size \* 512)
-	reduced_size_in_kb=$(expr $reduced_size_in_byte / 1024)K
+	reduced_size=$(expr "$part_size_blocks" - 65536 )
+	reduced_size_in_byte=$(expr "$reduced_size" \* 512)
+	reduced_size_in_kb=$(expr "$reduced_size_in_byte" / 1024)K
 	resize2fs "$1" "${reduced_size_in_kb}"
-	if [ -x cryptsetup-reencrypt ]; then
-		/usr/sbin/cryptsetup-reencrypt --new --reduce-device-size "$reduce_device_size"k $1 < $2
+	if [ -x /usr/sbin/cryptsetup-reencrypt ]; then
+		/usr/sbin/cryptsetup-reencrypt --new --reduce-device-size "$reduce_device_size"k "$1" < "$2"
 	else
-		/usr/sbin/cryptsetup reencrypt --encrypt --reduce-device-size "$reduce_device_size"k $1 < $2
+		/usr/sbin/cryptsetup reencrypt --encrypt --reduce-device-size "$reduce_device_size"k "$1" < "$2"
 	fi
 
 }
@@ -93,10 +93,10 @@ if [ ! -e "$tpm_device" ]; then
 fi
 
 for partition_set in $partition_sets; do
-	partition_label=$(awk -v var=$partition_set 'BEGIN{split(var,a,":"); print a[1]}')
-	partition_mountpoint=$(awk -v var=$partition_set 'BEGIN{split(var,a,":"); print a[2]}')
-	partition_format=$(awk -v var=$partition_set 'BEGIN{split(var,a,":"); print a[3]}')
-	partition=/dev/disk/by-partlabel/$partition_label
+	partition_label=$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[1]}')
+	partition_mountpoint=$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[2]}')
+	partition_format=$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[3]}')
+	partition=/dev/disk/by-partlabel/"$partition_label"
 	crypt_mount_name="encrypted_$partition_label"
 	decrypted_part=/dev/mapper/"$crypt_mount_name"
 
@@ -104,7 +104,7 @@ for partition_set in $partition_sets; do
 	if /usr/sbin/cryptsetup luksDump --batch-mode "$partition" \
 			| grep -q "systemd-tpm2"; then
 		open_tpm2_partition "$partition"
-		if ! mount -t $(get_fstype "${decrypted_part}") "${decrypted_part}" \
+		if ! mount -t "$(get_fstype "${decrypted_part}")" "${decrypted_part}" \
 			 "${rootmnt}${partition_mountpoint}"; then
 			panic "Can't mount encrypted partition '${decrypted_part}'!"
 		fi
@@ -134,7 +134,7 @@ for partition_set in $partition_sets; do
 		 ;;
 	esac
 
-	if ! mount -t $(get_fstype "${decrypted_part}") "${decrypted_part}" \
+	if ! mount -t "$(get_fstype "${decrypted_part}")" "${decrypted_part}" \
 		 "${rootmnt}${partition_mountpoint}"; then
 		panic "Can't mount encrypted partition '${decrypted_part}'!"
 	fi
