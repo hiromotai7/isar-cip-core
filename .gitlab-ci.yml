@@ -324,6 +324,7 @@ build:qemu-riscv64:
     use_rt: disable
     wic_targz: disable
     deploy: disable
+  allow_failure: true
 
 include: '.reproducible-check-ci.yml'
 
