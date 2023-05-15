@@ -17,6 +17,7 @@ header:
 local_conf_header:
   image-option-swupdate: |
     CIP_IMAGE_OPTIONS:append = " swupdate.inc"
+    OVERRIDES .= ":swupdate"
 
   wic-swu: |
     IMAGE_TYPEDEP:wic += "squashfs"
