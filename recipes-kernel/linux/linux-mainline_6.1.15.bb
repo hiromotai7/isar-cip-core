@@ -5,8 +5,11 @@
 # SPDX-License-Identifier: MIT
 
 require recipes-kernel/linux/linux-custom.inc
+require recipes-kernel/linux/cip-kernel-config.inc
 
 ARCHIVE_VERSION = "${@ d.getVar('PV')[:-2] if d.getVar('PV').endswith('.0') else d.getVar('PV') }"
+
+KERNEL_DEFCONFIG_VERSION ?= "6.1.y-cip"
 
 SRC_URI += " \
     https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-${ARCHIVE_VERSION}.tar.xz \
