@@ -14,5 +14,4 @@ header:
 
 local_conf_header:
   kernel-version: |
-    KERNEL_DEFCONFIG = ""
     KERNEL_NAME = "mainline"
