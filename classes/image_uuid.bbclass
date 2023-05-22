@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2020-2022
+# Copyright (c) Siemens AG, 2020-2023
 #
 # Authors:
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
@@ -10,7 +10,6 @@
 # SPDX-License-Identifier: MIT
 #
 
-inherit rootfs
 inherit image
 
 # Generate the uuid from BB_TASKHASH to ensure a new
