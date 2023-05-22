@@ -97,8 +97,6 @@ IMAGE_CMD:swu() {
         fi
     done
 
-    image_do_mounts
-
     # Prepare for signing
     export sign='${@'x' if bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}'
     if [ -n "$sign" ]; then
