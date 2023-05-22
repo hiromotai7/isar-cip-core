@@ -46,6 +46,9 @@ IMAGE_TEMPLATE_VARS:swu = " \
     SWU_VERSION \
     SWU_NAME"
 
+# TARGET_IMAGE_UUID needs to be generated before completing the template
+addtask do_transform_template after do_generate_image_uuid
+
 python(){
     # create SWU_HW_COMPAT_NODE based on list of supported hw
     hw_compat = d.getVar('SWU_HW_COMPAT')
