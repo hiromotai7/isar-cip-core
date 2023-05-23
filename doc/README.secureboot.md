@@ -112,7 +112,7 @@ cp /lib/efitools/x86_64-linux-gnu/KeyTool.efi secureboot-tools
 to the current directory. OVMF_VARS_4M.fd contains no keys can be instrumented for secureboot.
 3. Start QEMU with the script scripts/start-efishell.sh
 ```
-scripts/start-efishell.sh secureboot-tools
+./scripts/start-efishell.sh secureboot-tools
 ```
 4. Start the KeyTool.efi FS0:\KeyTool.efi and execute the the following steps:
 ```
@@ -120,15 +120,15 @@ scripts/start-efishell.sh secureboot-tools
              -> "The Allowed Signatures Database (db)"
                 -> "Add New Key"
                 -> Change/Confirm device
-                -> Select "DB.esl" file
+                -> Select "demoDB.esl" file
              -> "The Key Exchange Key Database (KEK)"
                 -> "Add New Key"
                 -> Change/Confirm device
-                -> Select "KEK.esl" file
+                -> Select "demoKEK.esl" file
              -> "The Platform Key (PK)
                 -> "Replace Key(s)"
                 -> Change/Confirm device
-                -> Select "PK.auth" file
+                -> Select "demoPK.auth" file
 ```
 5. quit QEMU
 
@@ -151,22 +151,26 @@ header:
 local_conf_header:
   secure-boot-image: |
     IMAGE_FSTYPES = "wic"
+    IMAGE_TYPEDEP:wic += "verity"
+    SWU_ROOTFS_TYPE = "verity"
     WKS_FILE = "${MACHINE}-efibootguard-secureboot.wks.in"
     INITRAMFS_INSTALL:append = " initramfs-verity-hook"
     # abrootfs cannot be installed together with verity
     INITRAMFS_INSTALL:remove = "initramfs-abrootfs-hook"
 
-local_conf_header:
   secure-boot: |
     IMAGER_BUILD_DEPS += "ebg-secure-boot-signer"
     IMAGER_INSTALL += "ebg-secure-boot-signer"
 
-# Use user-generated keys
+    # Use user-generated keys
     PREFERRED_PROVIDER_secure-boot-secrets = "secure-boot-key"
 
+  secureboot_override: |
+    OVERRIDES .= ":secureboot"
+
   user-keys: |
-    SB_CERT = "demo.crt"
-    SB_KEY = "demo.key"
+    SB_CERT = "demoDB.crt"
+    SB_KEY = "demoDB.key"
 ```
 
 Replace `demo` with the name of the user-generated certificates. The user-generated certificates
