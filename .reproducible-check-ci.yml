@@ -28,16 +28,17 @@
     - if [ -f kas/opt/reproducible.yml ]; then base_yaml="${base_yaml}:kas/opt/reproducible.yml"; fi
     # Build 1st time
     - !reference [.build_base, script]
-    - mv build/tmp/deploy/images/${target}/cip-core-image-cip-core-${release}-${target}${artifact_suffix} image1
+    - mv build/tmp/deploy/images/${target} image1
     # clean
     - sudo rm -rf build/tmp
     - sudo rm -rf build/sstate-cache
     # Build 2nd time
     - !reference [.build_base, script]
-    - mv build/tmp/deploy/images/${target}/cip-core-image-cip-core-${release}-${target}${artifact_suffix} image2
+    - mv build/tmp/deploy/images/${target} image2
   artifacts:
     expire_in: 1 day
     paths:
+      - scripts/repro-tests.sh
       - image1
       - image2
 
@@ -54,12 +55,12 @@
   before_script:
     - apt update && DEBIAN_FRONTEND=noninteractive apt install -y diffoscope
   script:
-    - diffoscope --text diffoscope_output.txt image1 image2
+    - ./scripts/repro-tests.sh --release ${release} --target ${target} image1 image2
   artifacts:
     when: always
     expire_in: 1 day
     paths:
-      - diffoscope_output.txt
+      - "./*diffoscope_output.txt"
 
 
 # repro build
@@ -85,17 +86,23 @@ build:qemu-arm-base-repro-build:
 test:qemu-amd64-base-repro-test:
   extends:
     - .repro-test
+  variables:
+    target: qemu-amd64
   dependencies:
     - build:qemu-amd64-base-repro-build
 
 test:qemu-arm64-base-repro-test:
   extends:
     - .repro-test
+  variables:
+    target: qemu-arm64
   dependencies:
     - build:qemu-arm64-base-repro-build
 
 test:qemu-arm-base-repro-test:
   extends:
     - .repro-test
+  variables:
+    target: qemu-arm
   dependencies:
     - build:qemu-arm-base-repro-build
