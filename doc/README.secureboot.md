@@ -103,18 +103,23 @@ execute the script `scripts/generate_secure_boot_keys.sh`
 ##### Add Keys to OVMF
 1. Create a folder and copy the generated keys and KeyTool.efi
 (in Debian the file can be found at: /lib/efitools/x86_64-linux-gnu/KeyTool.efi) to the folder
-```
+
+```bash
 mkdir secureboot-tools
 cp -r keys secureboot-tools
 cp /lib/efitools/x86_64-linux-gnu/KeyTool.efi secureboot-tools
 ```
+
 2. Copy the file OVMF_VARS_4M.fd (in Debian the file can be found at /usr/share/OVMF/OVMF_VARS_4M.fd)
 to the current directory. OVMF_VARS_4M.fd contains no keys can be instrumented for secureboot.
 3. Start QEMU with the script scripts/start-efishell.sh
-```
+
+```bash
 ./scripts/start-efishell.sh secureboot-tools
 ```
+
 4. Start the KeyTool.efi FS0:\KeyTool.efi and execute the the following steps:
+
 ```
           -> "Edit Keys"
              -> "The Allowed Signatures Database (db)"
@@ -130,6 +135,7 @@ to the current directory. OVMF_VARS_4M.fd contains no keys can be instrumented f
                 -> Change/Confirm device
                 -> Select "demoPK.auth" file
 ```
+
 5. quit QEMU
 
 ### Build image
@@ -137,12 +143,13 @@ to the current directory. OVMF_VARS_4M.fd contains no keys can be instrumented f
 Build the image with a signed EFI Boot Guard and unified kernel image
 with the snakeoil keys by executing:
 
-```
+```bash
 kas-container build kas-cip.yml:kas/board/qemu-amd64.yml:kas/opt/ebg-secure-boot-snakeoil.yml
 ```
 
 For user-generated keys, create a new option file in the repository. This option file could look like this:
-```
+
+```yaml
 header:
   version: 12
   includes:
@@ -178,7 +185,7 @@ need to stored in the folder `recipes-devtools/ebg-secure-boot-secrets/files`.
 
 Build the image with user-generated keys by executing the command:
 
-```
+```bash
 kas-container build kas-cip.yml:kas/board/qemu-amd64.yml:<path to the new option>.yml
 ```
 
@@ -187,7 +194,8 @@ kas-container build kas-cip.yml:kas/board/qemu-amd64.yml:<path to the new option
 #### Debian snakeoil
 
 Start the image with the following command:
-```
+
+```bash
 SECURE_BOOT=y \
 ./start-qemu.sh amd64
 ```
@@ -195,13 +203,14 @@ SECURE_BOOT=y \
 The image configuration menu will set default values for start-qemu.sh for secureboot
 and the following command is sufficient:
 
-```
+```bash
 ./start-qemu.sh amd64
 ```
 
 #### User-generated keys
 Start the image with the following command:
-```
+
+```bash
 SECURE_BOOT=y \
 OVMF_CODE=./build/tmp/deploy/images/qemu-amd64/OVMF/OVMF_CODE_4M.secboot.fd \
 OVMF_VARS=<path to the modified OVMF_VARS.fd> \
@@ -209,12 +218,15 @@ OVMF_VARS=<path to the modified OVMF_VARS.fd> \
 ```
 
 After boot check the dmesg for secure boot status like below:
-```
+
+```bash
 root@demo:~# dmesg | grep Secure
 [    0.008368] Secure boot enabled
 ```
+
 In case of arm64 or armhf architectures, the secure boot status can be found in bootloader logs like below:
-```
+
+```bash
 EFI stub: UEFI Secure Boot is enabled.
 ```
 ## Example: Update the image
@@ -223,19 +235,26 @@ For updating the image, the following steps are necessary:
 - [Build the image with snakeoil keys](#build-image)
 - save the generated swu `build/tmp/deploy/images/qemu-amd64/cip-core-image-cip-core-bullseye-qemu-amd64.swu` to /tmp
 - modify the image for example, switch to the RT kernel as modification:
-```
+
+```bash
 kas-container build kas-cip.yml:kas/board/qemu-amd64.yml:kas/opt/ebg-secure-boot-snakeoil.yml:kas/opt/rt.yml
 ```
+
 - start the new target
-```
+
+```bash
 SECURE_BOOT=y ./start-qemu.sh amd64
 ```
+
 Copy the swu cip-core-image-cip-core-bullseye-qemu-amd64.swu to the running system
-```
+
+```bash
 scp -P 22222 /tmp/cip-core-image-cip-core-bullseye-qemu-amd64.swu root@127.0.0.1:/home/
 ```
+
 - check which partition is booted, e.g. with `lsblk`:
-```
+
+```bash
 root@demo:~# lsblk
 NAME           MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
 sda              8:0    0     6G  0 disk
@@ -250,12 +269,15 @@ sda              8:0    0     6G  0 disk
 ```
 
 - install the swupdate and reboot the image
-```
+
+```bash
 root@demo:~# swupdate -i /home/cip-core-image-cip-core-bullseye-qemu-amd64.swu`
 root@demo:~# reboot
 ```
+
 - check which partition is booted, e.g. with `lsblk`. The rootfs should have changed:
-```
+
+```bash
 root@demo:~# lsblk
 NAME           MAJ:MIN RM   SIZE RO TYPE  MOUNTPOINT
 sda              8:0    0     6G  0 disk
