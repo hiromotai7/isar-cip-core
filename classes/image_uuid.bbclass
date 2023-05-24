@@ -17,7 +17,7 @@ inherit image
 def generate_image_uuid(d):
     import uuid
 
-    base_hash = d.getVar("BB_TASKHASH", True)
+    base_hash = d.getVar("BB_TASKHASH")
     if base_hash is None:
         return None
     return str(uuid.UUID(base_hash[:32], version=4))

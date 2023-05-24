@@ -70,7 +70,7 @@ python(){
 
 # convert between swupdate compressor name and imagetype extension
 def get_swu_compression_type(d):
-    swu_ct = d.getVar('SWU_COMPRESSION_TYPE', True)
+    swu_ct = d.getVar('SWU_COMPRESSION_TYPE')
     if not swu_ct:
         return ''
     swu_to_image = {'zlib': '.gz', 'zstd': '.zst'}
