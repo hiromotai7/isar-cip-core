@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2021-2022
+# Copyright (c) Siemens AG, 2021-2023
 #
 # Authors:
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
@@ -16,11 +16,9 @@ SQUASHFS_CONTENT ?= "${PP_ROOTFS}"
 SQUASHFS_CREATION_ARGS ?= ""
 
 SQUASHFS_THREADS ?= "${@oe.utils.cpu_count(at_least=2)}"
-SQUASHFS_THREADS[vardepvalue] = "1"
 # default according to mksquasfs docs
 SQUASHFS_MEMLIMIT ?= "7982M"
-SQUASHFS_DEFAULTS ?= "-mem ${SQUASHFS_MEMLIMIT} -processors ${SQUASHFS_THREADS}"
-SQUASHFS_DEFAULTS[vardepsexclude] += "SQUASHFS_MEMLIMIT SQUASHFS_THREADS"
+SQUASHFS_CREATION_LIMITS = "-mem ${SQUASHFS_MEMLIMIT} -processors ${SQUASHFS_THREADS}"
 
 python __anonymous() {
     exclude_directories = d.getVar('SQUASHFS_EXCLUDE_DIRS').split()
@@ -35,8 +33,9 @@ python __anonymous() {
 }
 
 IMAGE_CMD:squashfs[depends] = "${PN}:do_transform_template"
+IMAGE_CMD:squashfs[vardepsexclude] += "SQUASHFS_CREATION_LIMITS"
 IMAGE_CMD:squashfs() {
     ${SUDO_CHROOT} /bin/mksquashfs \
         '${SQUASHFS_CONTENT}' '${IMAGE_FILE_CHROOT}' \
-        -noappend ${SQUASHFS_DEFAULTS} ${SQUASHFS_CREATION_ARGS}
+        -noappend ${SQUASHFS_CREATION_LIMITS} ${SQUASHFS_CREATION_ARGS}
 }
