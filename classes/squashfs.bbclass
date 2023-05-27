@@ -9,6 +9,17 @@
 # SPDX-License-Identifier: MIT
 #
 
+def get_free_mem():
+    try:
+        with open('/proc/meminfo') as meminfo:
+            lines = meminfo.readlines()
+            for line in lines:
+                if line.startswith('MemAvailable:'):
+                    return int(line.split()[1]) * 1024
+    except FileNotFoundError:
+        pass
+    return 4*1024*1024*1024  # 4G
+
 IMAGER_INSTALL:squashfs += "squashfs-tools"
 
 SQUASHFS_EXCLUDE_DIRS ?= ""
@@ -16,8 +27,7 @@ SQUASHFS_CONTENT ?= "${PP_ROOTFS}"
 SQUASHFS_CREATION_ARGS ?= ""
 
 SQUASHFS_THREADS ?= "${@oe.utils.cpu_count(at_least=2)}"
-# default according to mksquasfs docs
-SQUASHFS_MEMLIMIT ?= "7982M"
+SQUASHFS_MEMLIMIT ?= "${@int(get_free_mem() * 3/4)}"
 SQUASHFS_CREATION_LIMITS = "-mem ${SQUASHFS_MEMLIMIT} -processors ${SQUASHFS_THREADS}"
 
 python __anonymous() {
