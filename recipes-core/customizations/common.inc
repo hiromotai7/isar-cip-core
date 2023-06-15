@@ -19,6 +19,8 @@ SRC_URI = " \
     file://99-silent-printk.conf \
     file://99-watchdog.conf"
 
+SRC_URI:append:swupdate = " file://swupdate.cfg"
+
 WIRELESS_FIRMWARE_PACKAGE ?= ""
 INSTALL_WIRELESS_TOOLS ??= "0"
 
@@ -39,4 +41,8 @@ do_install() {
 
 	install -v -d ${D}/etc/systemd/system.conf.d
 	install -v -m 644 ${WORKDIR}/99-watchdog.conf ${D}/etc/systemd/system.conf.d/
+}
+
+do_install:append:swupdate() {
+	install -v -m 644 ${WORKDIR}/swupdate.cfg ${D}/etc/
 }
