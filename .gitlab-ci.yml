@@ -101,11 +101,38 @@ build:qemu-amd64-base:
     wic_targz: disable
     targz: enable
 
-build:qemu-amd64-base-kernelci:
+build:qemu-amd64-base-kernelci-buster:
   extends:
     - .build_base
   variables:
     target: qemu-amd64
+    extension: kernelci
+    release: buster
+    use_rt: disable
+    wic_targz: disable
+    targz: enable
+    deploy: disable
+    deploy_kernelci: enable
+
+build:qemu-amd64-base-kernelci-bullseye:
+  extends:
+    - .build_base
+  variables:
+    target: qemu-amd64
+    extension: kernelci
+    release: bullseye
+    use_rt: disable
+    wic_targz: disable
+    targz: enable
+    deploy: disable
+    deploy_kernelci: enable
+
+build:qemu-amd64-base-kernelci-bookworm:
+  extends:
+    - .build_base
+  variables:
+    target: qemu-amd64
+    release: bookworm
     extension: kernelci
     use_rt: disable
     wic_targz: disable
