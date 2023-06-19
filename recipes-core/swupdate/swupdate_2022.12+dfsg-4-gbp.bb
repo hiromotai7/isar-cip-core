@@ -20,6 +20,7 @@ DEB_BUILD_OPTIONS += "nodoc"
 SRC_URI = "git://salsa.debian.org/debian/swupdate.git;protocol=https;branch=debian/master"
 SRCREV ="aa9edf070567fa5b3e942c270633a8feef49dad8"
 SRC_URI += "file://0001-d-rules-Add-option-for-suricatta_lua.patch"
+SRC_URI += "file://0001-d-patches-Add-patch-to-add-the-build-version-to-swup.patch"
 
 # deactivate signing and hardware compability for simple a/b rootfs update
 DEB_BUILD_PROFILES += "pkg.swupdate.nosigning"
@@ -37,3 +38,9 @@ DEB_BUILD_PROFILES += "cross nocheck"
 
 # use backport build profile for bullseye
 DEB_BUILD_PROFILES:append:bullseye = " pkg.swupdate.bpo"
+
+CHANGELOG_V ?= "2022.12+dfsg-4+cip+${SRCREV}"
+
+do_prepare_build() {
+    deb_add_changelog
+}
