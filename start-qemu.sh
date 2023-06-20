@@ -12,9 +12,12 @@
 
 usage()
 {
-	echo "Usage: $0 ARCHITECTURE [QEMU_OPTIONS]"
+	echo "Usage: $0 [ARCHITECTURE [QEMU_OPTIONS]]"
 	echo
-	echo "Environment variables (default to settings in .config.yml):"
+	echo "The architecture defaults to the setting in .config.yaml and can be left out"
+	echo "if the built was done via \"kas-container menu\"."
+	echo
+	echo "Environment variables (default to settings in .config.yaml):"
 	echo "  QEMU_PATH         use a locally built QEMU version"
 	echo "  SWUPDATE_BOOT     boot swupdate image"
 	echo "  SECURE_BOOT       start a secure boot environment"
@@ -59,8 +62,20 @@ if grep -s -q "IMAGE_TESTING: true" .config.yaml; then
 	TEST_IMAGE="-test"
 fi
 
-arch="$1"
-shift 1
+if [ -n "$1" ]; then
+	arch="$1"
+	shift 1
+else
+	if grep -s -q "TARGET_QEMU_AMD64: true" .config.yaml; then
+		arch=amd64
+	elif grep -s -q "TARGET_QEMU_ARM64: true" .config.yaml; then
+		arch=arm64
+	elif grep -s -q "TARGET_QEMU_ARM: true" .config.yaml; then
+		arch=arm
+	elif grep -s -q "TARGET_QEMU_RISCV64: true" .config.yaml; then
+		arch=riscv64
+	fi
+fi
 
 case "${arch}" in
 	x86|x86_64|amd64)
