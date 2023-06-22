@@ -47,7 +47,7 @@ if [ -x /usr/sbin/cryptsetup-reencrypt ]; then
     copy_exec /usr/sbin/cryptsetup-reencrypt
 fi
 
-for _LIBRARY in /usr/lib/*/libtss2*; do
+for _LIBRARY in /usr/lib/*/libtss2* /usr/lib/*/libgcc_s.so.1; do
     copy_exec "$_LIBRARY"
 done
 
