@@ -74,5 +74,11 @@ if grep -c "pam_google_authenticator.so" "${SSHD_AUTH_CONFIG}";then
 fi
 echo "auth required pam_google_authenticator.so nullok" | tee -a "${SSHD_AUTH_CONFIG}"
 # Enable PAM configuration for Remote Session
-sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' "${SSHD_CONFIG}"
+if grep -s -q "ChallengeResponseAuthentication" "${SSHD_CONFIG}";then
+       sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' "${SSHD_CONFIG}"
+fi
+
+if grep -s -q "KbdInteractiveAuthentication" "${SSHD_CONFIG}";then
+       sed -i 's/KbdInteractiveAuthentication no/KbdInteractiveAuthentication yes/g' "${SSHD_CONFIG}"
+fi
 echo "AuthenticationMethods keyboard-interactive" | tee -a "${SSHD_CONFIG}"
