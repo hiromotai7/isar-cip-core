@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2019
+# Copyright (c) Siemens AG, 2019-2023
 #
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
@@ -12,3 +12,5 @@
 KERNEL_NAME ?= "cip"
 
 WKS_FILE ?= "${MACHINE}.wks"
+
+CIP_IMAGE_OPTIONS ?= ""
