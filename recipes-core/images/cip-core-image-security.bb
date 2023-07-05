@@ -27,7 +27,6 @@ IMAGE_PREINSTALL += " \
 	chrony \
 	tpm2-tools \
 	tpm2-abrmd \
-	libpam-cracklib \
 	acl \
 	audispd-plugins auditd \
 	uuid-runtime \
@@ -41,8 +40,12 @@ IMAGE_PREINSTALL += " \
 "
 
 # Package names based on the distro version
-IMAGE_PREINSTALL:append:buster = " libtss2-esys0"
-IMAGE_PREINSTALL:append:bullseye = " libtss2-esys-3.0.2-0"
+IMAGE_PREINSTALL:append:buster = " libtss2-esys0 \
+                                   libpam-cracklib"
+IMAGE_PREINSTALL:append:bullseye = " libtss2-esys-3.0.2-0 \
+                                     libpam-cracklib"
+IMAGE_PREINSTALL:append:bookworm = " libtss2-esys-3.0.2-0 \
+                                     libpam-passwdqc"
 
 CIP_IMAGE_OPTIONS ?= ""
 require ${CIP_IMAGE_OPTIONS}

@@ -15,11 +15,22 @@ echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
 # CR1.7: Strength of password-based authentication
 # Pam configuration to  enforce password strength
 PAM_PWD_FILE="/etc/pam.d/common-password"
-pam_cracklib_config="password  requisite    pam_cracklib.so retry=3 minlen=8 maxrepeat=3 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1  difok=3 gecoscheck=1 reject_username  enforce_for_root"
-if grep -c "pam_cracklib.so" "${PAM_PWD_FILE}";then
+if grep -c "pam_passwdqc.so" "${PAM_PWD_FILE}";then
+	# Password strength is defined as it should have atleast 8 characters length and with 4 character classes (uppercase, lowercase, digit and other characters)
+	# Same is set in passwdqc configuration with `min=N0,N1,N2,N3,N4`
+	# N0, N1, N3  are disabled, to not to accept password with only one, two or three character classes
+	# N2 is disabled for passphrases since we have no restriction for the minimum length of passphrase.
+	# N4 is set to 8 to accept the passowrd length atleast 8 characters and with four character class combinations.
+        pam_passwdqc_config="password    requisite    pam_passwdqc.so min=disabled,disabled,disabled,disabled,8 similar=deny random=0 enforce=everyone retry=3"
+        sed -i '/pam_passwdqc.so/ s/^#*/#/'  "${PAM_PWD_FILE}"
+        sed -i "0,/^password.*/s/^password.*/${pam_passwdqc_config}\n&/" "${PAM_PWD_FILE}"
+elif grep -c "pam_cracklib.so" "${PAM_PWD_FILE}";then
+        pam_cracklib_config="password  requisite    pam_cracklib.so retry=3 minlen=8 maxrepeat=3 ucredit=-1 lcredit=-1 dcredit=-1 ocredit=-1  difok=3 gecoscheck=1 reject_username  enforce_for_root"
         sed -i '/pam_cracklib.so/ s/^#*/#/'  "${PAM_PWD_FILE}"
+        sed -i "0,/^password.*/s/^password.*/${pam_cracklib_config}\n&/" "${PAM_PWD_FILE}"
+else
+        echo "No suitable pam module found to enforce password strength"
 fi
-sed -i "0,/^password.*/s/^password.*/${pam_cracklib_config}\n&/" "${PAM_PWD_FILE}"
 
 # CR1.11: Unsuccessful login attempts
 # Lock user account after unsuccessful login attempts
