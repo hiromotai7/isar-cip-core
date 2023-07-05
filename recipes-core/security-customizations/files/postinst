@@ -6,7 +6,7 @@
 
 set -e
 
-echo "CIP Core Security Image (login: root/Cipsecurity@123)" > /etc/issue
+echo "CIP Core Security Image (login: root/CIPsecurity@123)" > /etc/issue
 
 HOSTNAME=demo
 echo "$HOSTNAME" > /etc/hostname

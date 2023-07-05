@@ -16,7 +16,7 @@ target: cip-core-image-security
 local_conf_header:
   root_password: |
     USERS += "root"
-    USER_root[password] = "Cipsecurity@123"
+    USER_root[password] = "CIPsecurity@123"
     USER_root[flags] = "clear-text-password"
   adjust-swupdate: |
     ABROOTFS_IMAGE_RECIPE = "cip-core-image-security"
