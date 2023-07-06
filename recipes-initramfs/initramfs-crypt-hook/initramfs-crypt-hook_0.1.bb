@@ -33,8 +33,13 @@ CRYPT_PARTITIONS ??= "home:/home:reencrypt var:/var:reencrypt"
 # CRYPT_CREATE_FILE_SYSTEM_CMD contains the shell command to create the filesystem
 # in a newly formatted LUKS Partition
 CRYPT_CREATE_FILE_SYSTEM_CMD ??= "mke2fs -t ext4"
+# Timeout for creating / re-encrypting partitions on first boot
+CRYPT_SETUP_TIMEOUT ??= "600"
+# Watchdog to service during the initial setup of the crypto partitions
+WATCHDOG_DEVICE ??= "/dev/watchdog"
 
-TEMPLATE_VARS = "CRYPT_PARTITIONS CRYPT_CREATE_FILE_SYSTEM_CMD"
+TEMPLATE_VARS = "CRYPT_PARTITIONS CRYPT_CREATE_FILE_SYSTEM_CMD \
+    CRYPT_SETUP_TIMEOUT WATCHDOG_DEVICE"
 TEMPLATE_FILES = "encrypt_partition.env.tmpl"
 
 do_install[cleandirs] += " \
