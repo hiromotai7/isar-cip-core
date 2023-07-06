@@ -16,4 +16,5 @@ DESCRIPTION = "CIP Core image"
 
 IMAGE_INSTALL += "customizations"
 
+CIP_IMAGE_OPTIONS ?= ""
 require ${CIP_IMAGE_OPTIONS}
