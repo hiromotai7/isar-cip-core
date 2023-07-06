@@ -126,7 +126,7 @@ for partition_set in $partition_sets; do
 			/usr/sbin/cryptsetup luksFormat --batch-mode \
 				 --type luks2 "$partition" < "$tmp_key"
 			enroll_tpm2_token "$partition" "$tmp_key"
-			open_tpm2_partition_tpm2_partition "$partition"
+			open_tpm2_partition "$partition"
 			eval "${create_file_system_cmd} ${decrypted_part}"
 		;;
 		*)
