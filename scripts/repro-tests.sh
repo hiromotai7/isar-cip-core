@@ -78,6 +78,8 @@ res=0
 for file in "$@"; do
 	if [ -f "${artifacts1}/${file}" ] && [ -f "${artifacts1}/${file}" ]; then
 		if $DIFFOSCOPE --text "${file}.diffoscope_output.txt" \
+			--html-dir diffoscope_output \
+			--html "${file}.diffoscope_output.html" \
 			"${artifacts1}/${file}" \
 			"${artifacts2}/${file}" > /dev/null 2>&1; then
 			echo "${file}: ${GREEN}Reproducible${NC}" | tee -a diffoscope_output.txt

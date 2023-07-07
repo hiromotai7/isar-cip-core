@@ -64,7 +64,8 @@
     when: always
     expire_in: 1 day
     paths:
-      - "./*diffoscope_output.txt"
+      - "diffoscope_output"
+      - "./*diffoscope_output.*"
 
 
 # repro build
