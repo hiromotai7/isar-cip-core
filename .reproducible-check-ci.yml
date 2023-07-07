@@ -39,8 +39,12 @@
     expire_in: 1 day
     paths:
       - scripts/repro-tests.sh
-      - image1
-      - image2
+      - image*/*initrd.img
+      - image*/*-vmlinu*
+      - image*/*.tar.gz
+      - image*/*.squashfs
+      - image*/*.swu
+      - image*/linux.efi
 
 .repro-test:
   image:
