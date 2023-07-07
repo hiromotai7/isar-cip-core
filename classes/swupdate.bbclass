@@ -115,6 +115,10 @@ IMAGE_CMD:swu() {
         done
         cd "${PP_WORK}/swu"
         for file in "${SWU_DESCRIPTION_FILE}" ${SWU_ADDITIONAL_FILES}; do
+            # Set file timestamps for reproducible builds
+            if [ -n "${SOURCE_DATE_EPOCH}" ]; then
+                touch -d@"${SOURCE_DATE_EPOCH}" "$file"
+            fi
             echo "$file"
             if [ -n "$sign" -a "${SWU_DESCRIPTION_FILE}" = "$file" ]; then
                 if [ "${SWU_SIGNATURE_TYPE}" = "rsa" ]; then
@@ -129,9 +133,13 @@ IMAGE_CMD:swu() {
                         -inkey "${PP_WORK}/dev.key" \
                         -outform DER -nosmimecap -binary
                 fi
+                # Set file timestamps for reproducible builds
+                if [ -n "${SOURCE_DATE_EPOCH}" ]; then
+                    touch -d@"${SOURCE_DATE_EPOCH}" "$file.${SWU_SIGNATURE_EXT}"
+                fi
                 echo "$file.${SWU_SIGNATURE_EXT}"
            fi
-        done | cpio -ovL -H crc > "${SWU_BUILDCHROOT_IMAGE_FILE}"'
+        done | cpio -ovL --reproducible -H crc > "${SWU_BUILDCHROOT_IMAGE_FILE}"'
 }
 
 python do_check_swu_partition_uuids() {
