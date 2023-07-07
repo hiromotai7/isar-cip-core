@@ -19,6 +19,7 @@
     deploy_kernelci: disable
     artifact_suffix: ".tar.gz"
     base_yaml: "kas-cip.yml:kas/board/${target}.yml"
+    release: bookworm
   stage: build
   tags:
     - large
@@ -56,6 +57,7 @@
     - schedules
   variables:
     GIT_STRATEGY: none
+    release: bookworm
   before_script:
     - apt update && DEBIAN_FRONTEND=noninteractive apt install -y diffoscope
   script:
