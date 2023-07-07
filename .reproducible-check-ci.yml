@@ -69,18 +69,24 @@ build:qemu-amd64-base-repro-build:
     - .repro-build
   variables:
     target: qemu-amd64
+    extension: ebg-swu
+    wic_targz: enable
 
 build:qemu-arm64-base-repro-build:
   extends:
     - .repro-build
   variables:
     target: qemu-arm64
+    extension: ebg-swu
+    wic_targz: enable
 
 build:qemu-arm-base-repro-build:
   extends:
     - .repro-build
   variables:
     target: qemu-arm
+    extension: ebg-swu
+    wic_targz: enable
 
 # repro build test
 test:qemu-amd64-base-repro-test:
