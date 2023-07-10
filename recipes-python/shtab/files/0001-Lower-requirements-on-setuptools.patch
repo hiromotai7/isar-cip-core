@@ -1,28 +1,67 @@
-From d347695c4b173c94c4d8a678a67947de3ee5f186 Mon Sep 17 00:00:00 2001
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Date: Mon, 14 Mar 2022 08:17:00 +0100
+From 11b752a0f3e58f847caa74cf3a00acbe6853239a Mon Sep 17 00:00:00 2001
+From: Srinuvasan A <srinuvasan.a@siemens.com>
+Date: Mon, 10 Jul 2023 16:39:57 +0530
 Subject: [PATCH] Lower requirements on setuptools
 
-Allows to build against Debian buster.
+Allows to build against Debian buster and fix cross build issues.
 
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+Signed-off-by: Srinuvasan A <srinuvasan.a@siemens.com>
 ---
- setup.cfg | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ debian/control                                      |  8 +++-----
+ .../0001-Lower-requirements-on-setuptools.diff      | 13 +++++++++++++
+ debian/patches/series                               |  1 +
+ 3 files changed, 17 insertions(+), 5 deletions(-)
+ create mode 100644 debian/patches/0001-Lower-requirements-on-setuptools.diff
+ create mode 100644 debian/patches/series
 
-diff --git a/setup.cfg b/setup.cfg
-index 55eecd4..186aad6 100644
---- a/setup.cfg
-+++ b/setup.cfg
-@@ -66,7 +66,7 @@ classifiers=
-     Topic :: Terminals
-     Topic :: Utilities
- [options]
--setup_requires=setuptools>=42; setuptools_scm[toml]>=3.4
-+setup_requires=setuptools>=40; setuptools_scm>=3.2
- install_requires=
-     argparse; python_version < "2.7" or ("3.0" <= python_version and python_version < "3.2")
- python_requires= >=2.7, !=3.0.*, !=3.1.*
+diff --git a/debian/control b/debian/control
+index 523ffee..cdb8181 100644
+--- a/debian/control
++++ b/debian/control
+@@ -3,14 +3,12 @@ Section: python
+ Priority: optional
+ Maintainer: Debian Python Team <team+python@tracker.debian.org>
+ Uploaders: Felix Moessbauer <felix.moessbauer@siemens.com>
+-Build-Depends: debhelper-compat (= 13),
++Build-Depends: debhelper-compat (= 12),
+  dh-python,
+- python3-setuptools (>=42),
+- python3-setuptools-scm:native (>=3.4),
++ python3-setuptools (>=40),
++ python3-setuptools-scm:native (>=3.2),
+  libpython3-all-dev (>=3.2),
+  python3-all-dev:any (>=3.2),
+- python3-wheel:native,
+- python3-toml:native,
+  python3-pytest <!nocheck>,
+  python3-pytest-cov <!nocheck>,
+  python3-pytest-timeout <!nocheck>,
+diff --git a/debian/patches/0001-Lower-requirements-on-setuptools.diff b/debian/patches/0001-Lower-requirements-on-setuptools.diff
+new file mode 100644
+index 0000000..257c054
+--- /dev/null
++++ b/debian/patches/0001-Lower-requirements-on-setuptools.diff
+@@ -0,0 +1,13 @@
++diff --git a/setup.cfg b/setup.cfg
++index 77976c4..8857d32 100644
++--- a/setup.cfg
+++++ b/setup.cfg
++@@ -65,7 +65,7 @@ classifiers =
++ 	Topic :: Utilities
++ 
++ [options]
++-setup_requires = setuptools>=42; wheel; setuptools_scm[toml]>=3.4
+++setup_requires = setuptools>=40; setuptools_scm>=3.2
++ install_requires = 
++ 	argparse; "3.0" <= python_version and python_version < "3.2"
++ python_requires = >=3.2
+diff --git a/debian/patches/series b/debian/patches/series
+new file mode 100644
+index 0000000..804951a
+--- /dev/null
++++ b/debian/patches/series
+@@ -0,0 +1 @@
++0001-Lower-requirements-on-setuptools.diff
 -- 
 2.34.1
 
