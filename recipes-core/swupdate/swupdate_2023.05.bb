@@ -31,8 +31,12 @@ SRC_URI += "file://0001-d-rules-Add-option-for-suricatta_lua.patch \
             file://0003-d-patches-Add-patch-to-add-the-build-version-to-swup.patch \
             file://0004-d-rules-Add-option-to-enable-suricatta_wfx.patch"
 
-# deactivate signing and hardware compability for simple a/b rootfs update
-DEB_BUILD_PROFILES += "pkg.swupdate.nosigning"
+
+# The option: "pkg.swupdate.nosigning" disables the required signing
+# of update binaries
+# DEB_BUILD_PROFILES += "pkg.swupdate.nosigning"
+
+# deactivate hardware compability for simple a/b rootfs update
 DEB_BUILD_PROFILES += "pkg.swupdate.nohwcompat"
 
 # suricatta wfx requires suricatta lua and the dependency

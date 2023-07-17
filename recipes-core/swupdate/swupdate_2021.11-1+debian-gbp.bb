@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2021
+# Copyright (c) Siemens AG, 2021-2023
 #
 # Authors:
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
@@ -29,8 +29,11 @@ SRC_URI += "file://0001-debian-Remove-SWUpdate-USB-service-and-Udev-rules.patch 
 
 # end patching for dm-verity based images
 
-# deactivate signing and hardware compability for simple a/b rootfs update
-DEB_BUILD_PROFILES += "pkg.swupdate.nosigning"
+# The option: "pkg.swupdate.nosigning" disables the required signing
+# of update binaries
+# DEB_BUILD_PROFILES += "pkg.swupdate.nosigning"
+
+# deactivate hardware compability for simple a/b rootfs update
 DEB_BUILD_PROFILES += "pkg.swupdate.nohwcompat"
 
 # add cross build and deactivate testing for arm based builds
