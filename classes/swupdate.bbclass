@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2020
+# Copyright (c) Siemens AG, 2020-2023
 #
 # Authors:
 #  Christian Storm <christian.storm@siemens.com>
@@ -25,14 +25,17 @@ SWU_HW_COMPAT ?= ""
 SWU_IMAGE_FILE ?= "${DEPLOY_DIR_IMAGE}/${IMAGE_FULLNAME}.swu"
 SWU_DESCRIPTION_FILE ?= "sw-description"
 SWU_ADDITIONAL_FILES ?= "linux.efi ${SWU_ROOTFS_PARTITION_NAME}"
-SWU_SIGNED ?= ""
+SWU_SIGNED ??= ""
 SWU_SIGNATURE_EXT ?= "sig"
-SWU_SIGNATURE_TYPE ?= "rsa"
+SWU_SIGNATURE_TYPE ?= "cms"
 
 SWU_BUILDCHROOT_IMAGE_FILE ?= "${PP_DEPLOY}/${@os.path.basename(d.getVar('SWU_IMAGE_FILE'))}"
 
 IMAGE_TYPEDEP:swu = "${SWU_ROOTFS_TYPE}${@get_swu_compression_type(d)}"
-IMAGER_INSTALL:swu += "cpio ${@'openssl' if bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}"
+IMAGER_BUILD_DEPS:swu += "${@'swupdate-certificates-key' if bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}"
+IMAGER_INSTALL:swu += "cpio ${@'openssl swupdate-certificates-key' if bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}"
+IMAGE_INSTALL += "${@'swupdate-certificates' if bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}"
+
 
 IMAGE_SRC_URI:swu = "file://${SWU_DESCRIPTION_FILE}.tmpl"
 IMAGE_TEMPLATE_FILES:swu = "${SWU_DESCRIPTION_FILE}.tmpl"
@@ -102,10 +105,6 @@ IMAGE_CMD:swu() {
 
     # Prepare for signing
     export sign='${@'x' if bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}'
-    if [ -n "$sign" ]; then
-        cp -f '${SIGN_KEY}' '${WORKDIR}/dev.key'
-        test -e '${SIGN_CRT}' && cp -f '${SIGN_CRT}' '${WORKDIR}/dev.crt'
-    fi
 
     sudo -E chroot ${BUILDCHROOT_DIR} sh -c ' \
         # Fill in file check sums
@@ -123,14 +122,14 @@ IMAGE_CMD:swu() {
             if [ -n "$sign" -a "${SWU_DESCRIPTION_FILE}" = "$file" ]; then
                 if [ "${SWU_SIGNATURE_TYPE}" = "rsa" ]; then
                     openssl dgst \
-                        -sha256 -sign "${PP_WORK}/dev.key" "$file" \
+                        -sha256 -sign "/usr/share/swupdate-signing/swupdate-sign.key" "$file" \
                         > "$file.${SWU_SIGNATURE_EXT}"
                 elif [ "${SWU_SIGNATURE_TYPE}" = "cms" ]; then
                     openssl cms \
                         -sign -in "$file" \
                         -out "$file"."${SWU_SIGNATURE_EXT}" \
-                        -signer "${PP_WORK}/dev.crt" \
-                        -inkey "${PP_WORK}/dev.key" \
+                        -signer "/usr/share/swupdate-signing/swupdate-sign.crt" \
+                        -inkey "/usr/share/swupdate-signing/swupdate-sign.key" \
                         -outform DER -nosmimecap -binary
                 fi
                 # Set file timestamps for reproducible builds
