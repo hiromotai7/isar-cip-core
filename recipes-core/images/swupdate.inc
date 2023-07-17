@@ -12,6 +12,8 @@
 inherit image_uuid
 inherit read-only-rootfs
 
+SWU_SIGNED ?= "1"
+
 IMAGE_INSTALL += " swupdate"
 
 IMAGE_INSTALL += " swupdate-handler-roundrobin"
