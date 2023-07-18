@@ -14,4 +14,5 @@ header:
 
 local_conf_header:
   kernel-version: |
-    KERNEL_NAME = "mainline"
+    PREFERRED_VERSION_linux-cip = "6.1.%"
+    PREFERRED_VERSION_linux-cip-rt = "6.1.%"

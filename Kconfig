@@ -97,8 +97,8 @@ config KERNEL_4_19
 config KERNEL_5_10
 	bool "Kernel 5.10.x-cip"
 
-config KERNEL_6_1_MAINLINE
-	bool "Kernel 6.1.x-mainline"
+config KERNEL_6_1
+	bool "Kernel 6.1.x-cip"
 
 endchoice
 
@@ -107,12 +107,11 @@ config KAS_INCLUDE_KERNEL
 	default "kas/opt/4.4.yml" if KERNEL_4_4
 	default "kas/opt/4.19.yml" if KERNEL_4_19
 	default "kas/opt/5.10.yml" if KERNEL_5_10
-	default "kas/opt/6.1-mainline.yml" if KERNEL_6_1_MAINLINE
+	default "kas/opt/6.1.yml" if KERNEL_6_1
 
 config KERNEL_RT
 	bool "Real-time CIP kernel"
 	depends on !ARCH_RISCV64
-	depends on !KERNEL_6_1_MAINLINE
 
 config KAS_INCLUDE_KERNEL_RT
 	string
@@ -187,7 +186,7 @@ if IMAGE_FLASH && !KERNEL_4_4 && !KERNEL_4_19
 
 config IMAGE_SWUPDATE
 	bool "SWUpdate support for root partition"
-	depends on TARGET_QEMU_AMD64 || TARGET_SIMATIC_IPC227E || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM || TARGET_BBB || ( TARGET_QEMU_RISCV64 && KERNEL_6_1_MAINLINE ) || TARGET_HIHOPE_RZG2M
+	depends on TARGET_QEMU_AMD64 || TARGET_SIMATIC_IPC227E || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM || TARGET_BBB || ( TARGET_QEMU_RISCV64 && KERNEL_6_1 ) || TARGET_HIHOPE_RZG2M
 
 config IMAGE_SECURE_BOOT
 	bool "Secure boot support"
