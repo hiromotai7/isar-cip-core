@@ -87,7 +87,9 @@ reencrypt_existing_partition() {
 	reduced_size="$(expr "$part_size_blocks" - 65536 )"
 	reduced_size_in_byte="$(expr "$reduced_size" \* 512)"
 	reduced_size_in_kb="$(expr "$reduced_size_in_byte" / 1024)K"
-	resize2fs "$1" "${reduced_size_in_kb}"
+	if ! resize2fs "$1" "${reduced_size_in_kb}"; then
+		panic "reencryption of filesystem $1 cannot continue!"
+	fi
 	if [ -x /usr/sbin/cryptsetup-reencrypt ]; then
 		/usr/sbin/cryptsetup-reencrypt --new --reduce-device-size "$reduce_device_size"k "$1" < "$2"
 	else
