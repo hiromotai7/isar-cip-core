@@ -77,14 +77,16 @@ set -- \
 res=0
 for file in "$@"; do
 	if [ -f "${artifacts1}/${file}" ] && [ -f "${artifacts2}/${file}" ]; then
+		label=$(blkid -s LABEL -o value ${artifacts1}/${file})
+		fstype=$(blkid -s TYPE -o value ${artifacts1}/${file})
 		if $DIFFOSCOPE --text "${file}.diffoscope_output.txt" \
 			--html-dir diffoscope_output \
 			--html "${file}.diffoscope_output.html" \
 			"${artifacts1}/${file}" \
 			"${artifacts2}/${file}" > /dev/null 2>&1; then
-			echo "${file}: ${GREEN}Reproducible${NC}" | tee -a diffoscope_output.txt
+			echo "${file}($label,$fstype): ${GREEN}Reproducible${NC}" | tee -a diffoscope_output.txt
 		else
-			echo "${file}: ${RED}Not-Reproducible${NC}" | tee -a diffoscope_output.txt
+			echo "${file}($label,$fstype): ${RED}Not-Reproducible${NC}" | tee -a diffoscope_output.txt
 			res=1
 		fi
 	fi
