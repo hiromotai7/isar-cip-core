@@ -65,13 +65,13 @@ fi
 
 # Define files in the artifacts for checking the reproducibility
 set -- \
-	"${IMAGE_BASE}-${RELEASE}-${TARGET}-vmlinuz" \
-	"${IMAGE_BASE}-${RELEASE}-${TARGET}-vmlinux" \
-	"${IMAGE_BASE}-${RELEASE}-${TARGET}-initrd.img" \
-	"${IMAGE_BASE}-${RELEASE}-${TARGET}.tar.gz" \
-	"linux.efi" \
-	"${IMAGE_BASE}-${RELEASE}-${TARGET}.swu" \
-	"${IMAGE_BASE}-${RELEASE}-${TARGET}.squashfs" \
+	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p1" \
+	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p2" \
+	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p3" \
+	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p4" \
+	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p5" \
+	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p6" \
+	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p7"
 
 # compare artifacts
 res=0
