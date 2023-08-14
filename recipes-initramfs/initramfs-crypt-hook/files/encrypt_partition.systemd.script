@@ -41,10 +41,6 @@ tpm_device=/dev/tpmrm0
 partition_sets="$PARTITIONS"
 create_file_system_cmd="$CREATE_FILE_SYSTEM_CMD"
 
-if [ -z "${create_file_system_cmd}" ]; then
-	create_file_system_cmd="mke2fs -t ext4"
-fi
-
 service_watchdog() {
 	for n in $(seq $(($SETUP_TIMEOUT / 10)) ); do
 		printf '\0'

@@ -32,7 +32,7 @@ SRC_URI += "file://encrypt_partition.env.tmpl \
 CRYPT_PARTITIONS ??= "home:/home:reencrypt var:/var:reencrypt"
 # CRYPT_CREATE_FILE_SYSTEM_CMD contains the shell command to create the filesystem
 # in a newly formatted LUKS Partition
-CRYPT_CREATE_FILE_SYSTEM_CMD ??= "mke2fs -t ext4"
+CRYPT_CREATE_FILE_SYSTEM_CMD ??= "/usr/sbin/mke2fs -t ext4"
 # Timeout for creating / re-encrypting partitions on first boot
 CRYPT_SETUP_TIMEOUT ??= "600"
 # Watchdog to service during the initial setup of the crypto partitions
