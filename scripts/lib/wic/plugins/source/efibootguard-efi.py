@@ -105,8 +105,8 @@ class EfibootguardEFIPlugin(SourcePlugin):
         # dosfs image, created by mkdosfs
         efi_part_image = "%s/%s.%s.img" % (cr_workdir, part.label, part.lineno)
 
-        dosfs_cmd = "mkdosfs -S 512 -n %s -C %s %d" % \
-            (part.label.upper(), efi_part_image, blocks)
+        dosfs_cmd = "mkdosfs -S 512 -n %s -C %s %d -i %s" % \
+            (part.label.upper(), efi_part_image, blocks, part.fsuuid)
         exec_cmd(dosfs_cmd)
 
         # mtools for buster have problems with resursive mcopy.

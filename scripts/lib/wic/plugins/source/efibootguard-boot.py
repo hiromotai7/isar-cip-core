@@ -160,8 +160,8 @@ class EfibootguardBootPlugin(SourcePlugin):
         # dosfs image, created by mkdosfs
         bootimg = "%s/%s.%s.img" % (cr_workdir, part.label, part.lineno)
 
-        dosfs_cmd = "mkdosfs -F 16 -S 512 -n %s -C %s %d" % \
-            (part.label.upper(), bootimg, blocks)
+        dosfs_cmd = "mkdosfs -F 16 -S 512 -n %s -C %s %d -i %s" % \
+            (part.label.upper(), bootimg, blocks, part.fsuuid)
         exec_cmd(dosfs_cmd)
 
         mcopy_cmd = "mcopy -v -i %s -s %s/* ::/" % (bootimg, part_rootfs_dir)
