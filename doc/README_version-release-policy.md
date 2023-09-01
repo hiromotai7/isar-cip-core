@@ -16,7 +16,7 @@ The isar-cip-core metadata follows semantic versioning system i.e **x.y.z** form
 1. **z** is incremented only when critical bugs are fixed. If **z** is zero, it will be left out.
     * For example, if the latest release version is **2.2.5**, then the upcoming release version after fixing some critical bugs will be **2.2.6**.
 
-2. **y** is incremented for each Debian point release or in case of isar-cip-core regular release. When **y** is incremented, **z** is reset to 0.
+2. **y** is incremented in case of isar-cip-core regular release. When **y** is incremented, **z** is reset to 0. Regular releases include modifications in recipes, addition of new features, bringing changes when updates are announced in CIP Kernel and Debian releases.
     * Let us assume that the latest release version is **2.1.1**, then the upcoming regular release version will be **2.2**.
 
 3. **x** is incremented when significant changes are done other than **y** and **z**.
