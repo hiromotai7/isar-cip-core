@@ -34,22 +34,22 @@ if [ -f "${BASE_PATH}.wic" ]; then
 
 	echo "Uploading artifacts..."
 	aws s3 cp --no-progress --acl public-read "${BASE_PATH}.wic.xz" "${S3_TARGET}"
-fi
+else
+	if [ -f "${BASE_PATH}.tar.gz" ]; then
+		echo "Uploading artifacts..."
+		aws s3 cp --no-progress --acl public-read "${BASE_PATH}.tar.gz" "${S3_TARGET}"
+	fi
 
-if [ -f "${BASE_PATH}.tar.gz" ]; then
-	echo "Uploading artifacts..."
-	aws s3 cp --no-progress --acl public-read "${BASE_PATH}.tar.gz" "${S3_TARGET}"
-fi
+	KERNEL_IMAGE="$BASE_PATH-vmlinu[xz]"
+	# iwg20m workaround
+	if [ -f "build/tmp/deploy/images/$TARGET/zImage" ]; then
+		KERNEL_IMAGE=build/tmp/deploy/images/$TARGET/zImage
+	fi
+	# shellcheck disable=SC2086
+	aws s3 cp --no-progress --acl public-read $KERNEL_IMAGE "${S3_TARGET}"
+	aws s3 cp --no-progress --acl public-read "${BASE_PATH}-initrd.img" "${S3_TARGET}"
 
-KERNEL_IMAGE="$BASE_PATH-vmlinu[xz]"
-# iwg20m workaround
-if [ -f "build/tmp/deploy/images/$TARGET/zImage" ]; then
-	KERNEL_IMAGE=build/tmp/deploy/images/$TARGET/zImage
-fi
-# shellcheck disable=SC2086
-aws s3 cp --no-progress --acl public-read $KERNEL_IMAGE "${S3_TARGET}"
-aws s3 cp --no-progress --acl public-read "${BASE_PATH}-initrd.img" "${S3_TARGET}"
-
-if [ "$DTB" != "none" ]; then
-	aws s3 cp --no-progress --acl public-read build/tmp/deploy/images/*/"$DTB" "${S3_TARGET}"
+	if [ "$DTB" != "none" ]; then
+		aws s3 cp --no-progress --acl public-read build/tmp/deploy/images/*/"$DTB" "${S3_TARGET}"
+	fi
 fi
