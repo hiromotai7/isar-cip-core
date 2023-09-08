@@ -170,6 +170,9 @@ config KAS_INCLUDE_IMAGE_FORMAT
 
 config IMAGE_SECURITY
 	bool "Security extensions"
+	select IMAGE_DATA_ENCRYPTION
+        help
+          This enables security, encryption, secureboot and swupdate for IEC 62443-4-2.
 
 config KAS_INCLUDE_SECURITY
 	string
