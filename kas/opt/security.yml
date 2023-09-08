@@ -10,6 +10,9 @@
 #
 header:
   version: 12
+  includes:
+   - kas/opt/encrypt-partitions.yml
+   - kas/opt/ebg-secure-boot-snakeoil.yml
 
 target: cip-core-image-security
 
