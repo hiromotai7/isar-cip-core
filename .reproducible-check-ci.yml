@@ -87,6 +87,13 @@ build:qemu-arm-repro-build:
   variables:
     target: qemu-arm
 
+build:bbb-repro-build:
+  extends:
+    - .repro-build
+  variables:
+    target: bbb
+    extension: "none"
+
 # repro build test
 test:qemu-amd64-repro-test:
   extends:
@@ -111,3 +118,12 @@ test:qemu-arm-repro-test:
     target: qemu-arm
   dependencies:
     - build:qemu-arm-repro-build
+
+test:bbb-repro-test:
+  extends:
+    - .repro-test
+  variables:
+    target: bbb
+    extension: "none"
+  dependencies:
+    - build:bbb-repro-build
