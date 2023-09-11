@@ -13,13 +13,14 @@
 .repro-build:
   variables:
     use_rt: disable
-    wic_targz: disable
-    targz: enable
+    wic_targz: enable
+    targz: disable
     deploy: disable
     deploy_kernelci: disable
     artifact_suffix: ".tar.gz"
     base_yaml: "kas-cip.yml:kas/board/${target}.yml"
     release: bookworm
+    extension: ebg-swu
   stage: build
   tags:
     - large
@@ -71,24 +72,18 @@ build:qemu-amd64-repro-build:
     - .repro-build
   variables:
     target: qemu-amd64
-    extension: ebg-swu
-    wic_targz: enable
 
 build:qemu-arm64-repro-build:
   extends:
     - .repro-build
   variables:
     target: qemu-arm64
-    extension: ebg-swu
-    wic_targz: enable
 
 build:qemu-arm-repro-build:
   extends:
     - .repro-build
   variables:
     target: qemu-arm
-    extension: ebg-swu
-    wic_targz: enable
 
 # repro build test
 test:qemu-amd64-repro-test:
