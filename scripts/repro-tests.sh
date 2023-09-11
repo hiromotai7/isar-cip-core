@@ -74,6 +74,7 @@ fi
 
 # Define files in the artifacts for checking the reproducibility
 set -- \
+	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p0" \
 	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p1" \
 	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p2" \
 	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p3" \
@@ -86,8 +87,8 @@ set -- \
 res=0
 for file in "$@"; do
 	if [ -f "${artifacts1}/${file}" ] && [ -f "${artifacts2}/${file}" ]; then
-		label=$(blkid -s LABEL -o value ${artifacts1}/${file})
-		fstype=$(blkid -s TYPE -o value ${artifacts1}/${file})
+		label=$(blkid -s LABEL -o value ${artifacts1}/${file} || true)
+		fstype=$(blkid -s TYPE -o value ${artifacts1}/${file} || true)
 		if $DIFFOSCOPE --text "${file}.diffoscope_output.txt" \
 			--html-dir diffoscope_output \
 			--html "${file}.diffoscope_output.html" \
