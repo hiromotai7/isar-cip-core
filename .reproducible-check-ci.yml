@@ -20,7 +20,8 @@
     artifact_suffix: ".tar.gz"
     base_yaml: "kas-cip.yml:kas/board/${target}.yml"
     release: bookworm
-    extension: ebg-swu
+    # This target include base + swupdate + secureboot + security
+    extension: security
   stage: build
   tags:
     - large
