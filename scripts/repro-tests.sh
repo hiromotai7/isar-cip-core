@@ -31,6 +31,7 @@ GREEN='\033[0;32m'
 IMAGE_BASE="cip-core-image-cip-core"
 RELEASE="bullseye"
 TARGET="qemu-amd64"
+EXTENSION=""
 DIFFOSCOPE="diffoscope"
 
 while [ "$1" != "" ]; do
@@ -41,6 +42,10 @@ while [ "$1" != "" ]; do
 			;;
 		-t | --target )
 			TARGET="$2"
+			shift 2
+			;;
+		-e | --extension )
+			EXTENSION="$2"
 			shift 2
 			;;
 		-h | --help )
@@ -61,6 +66,10 @@ if [ -z "$artifacts1" ] || [ -z "$artifacts2" ]; then
 	echo "artifact folders are missing"
 	usage
 	exit 1
+fi
+
+if [ "${EXTENSION}" = "security" ]; then
+	IMAGE_BASE="cip-core-image-security-cip-core"
 fi
 
 # Define files in the artifacts for checking the reproducibility

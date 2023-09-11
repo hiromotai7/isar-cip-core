@@ -55,10 +55,11 @@
   variables:
     GIT_STRATEGY: none
     release: bookworm
+    extension: security
   before_script:
     - apt update && DEBIAN_FRONTEND=noninteractive apt install -y diffoscope
   script:
-    - ./scripts/repro-tests.sh --release ${release} --target ${target} image1 image2
+    - ./scripts/repro-tests.sh --release ${release} --target ${target} --extension ${extension} image1 image2
   artifacts:
     when: always
     expire_in: 1 day
