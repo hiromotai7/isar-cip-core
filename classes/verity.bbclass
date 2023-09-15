@@ -19,6 +19,37 @@ VERITY_IMAGE_METADATA = "${VERITY_OUTPUT_IMAGE}.metadata"
 VERITY_HASH_BLOCK_SIZE ?= "1024"
 VERITY_DATA_BLOCK_SIZE ?= "1024"
 
+# Set the salt used to generate a verity image to a fixed value
+# if not set it is derived from TARGET_IMAGE_UUID
+VERITY_IMAGE_SALT ?= ""
+
+# Set the UUID used to generate a verity image to a fixed value
+# if not set it is set to TARGET_IMAGE_UUID
+VERITY_IMAGE_UUID ?= ""
+
+python derive_verity_salt_and_uuid() {
+    import hashlib
+
+    verity_salt = d.getVar("VERITY_IMAGE_SALT")
+    verity_uuid = d.getVar("VERITY_IMAGE_UUID")
+    target_uuid = d.getVar("TARGET_IMAGE_UUID")
+
+    if not verity_salt:
+        if target_uuid:
+            verity_salt = hashlib.sha256(target_uuid.encode()).hexdigest()
+        else:
+            bb.error("TARGET_IMAGE_UUID and VERITY_IMAGE_SALT are empty. Could not set VERITY_SALT.")
+
+    if not verity_uuid:
+        if target_uuid:
+            verity_uuid = target_uuid
+        else:
+            bb.error("TARGET_IMAGE_UUID and VERITY_IMAGE_UUID are empty. Could not set VERITY_UUID.")
+
+    d.setVar("VERITY_IMAGE_SALT_OPTION", "--salt=" + str(verity_salt))
+    d.setVar("VERITY_IMAGE_UUID_OPTION", "--uuid=" + str(verity_uuid))
+}
+
 create_verity_env_file() {
 
     local ENV="${DEPLOY_DIR_IMAGE}/${IMAGE_FULLNAME}.verity.env"
@@ -49,8 +80,9 @@ python calculate_verity_data_blocks() {
     d.setVar("VERITY_DATA_BLOCKS", str(size // data_block_size))
 }
 
+do_image_verity[vardeps] += "VERITY_IMAGE_UUID VERITY_IMAGE_SALT"
 do_image_verity[cleandirs] = "${WORKDIR}/verity"
-do_image_verity[prefuncs] = "calculate_verity_data_blocks"
+do_image_verity[prefuncs] = "calculate_verity_data_blocks derive_verity_salt_and_uuid"
 IMAGE_CMD:verity() {
     rm -f ${DEPLOY_DIR_IMAGE}/${VERITY_OUTPUT_IMAGE}
     rm -f ${WORKDIR}/${VERITY_IMAGE_METADATA}
@@ -62,6 +94,8 @@ IMAGE_CMD:verity() {
         --data-block-size "${VERITY_DATA_BLOCK_SIZE}"  \
         --data-blocks "${VERITY_DATA_BLOCKS}" \
         --hash-offset "${VERITY_INPUT_IMAGE_SIZE}" \
+        "${VERITY_IMAGE_SALT_OPTION}" \
+        "${VERITY_IMAGE_UUID_OPTION}" \
         "${PP_DEPLOY}/${VERITY_OUTPUT_IMAGE}" \
         "${PP_DEPLOY}/${VERITY_OUTPUT_IMAGE}" \
         >"${WORKDIR}/${VERITY_IMAGE_METADATA}"
@@ -70,3 +104,4 @@ IMAGE_CMD:verity() {
         >>"${WORKDIR}/${VERITY_IMAGE_METADATA}"
     create_verity_env_file
 }
+addtask do_image_verity after do_generate_image_uuid
