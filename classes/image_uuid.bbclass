@@ -42,7 +42,6 @@ def read_target_image_uuid(d):
 TARGET_IMAGE_UUID = "${@read_target_image_uuid(d)}"
 
 do_generate_image_uuid[vardeps] += "IMAGE_UUID"
-do_generate_image_uuid[depends] = "buildchroot-target:do_build"
 do_generate_image_uuid[dirs] = "${DEPLOY_DIR_IMAGE}"
 do_generate_image_uuid[network] = "${TASK_USE_SUDO}"
 do_generate_image_uuid() {
