@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: MIT
 #
 header:
-  version: 12
+  version: 14
   includes:
    - kas/opt/encrypt-partitions.yml
    - kas/opt/ebg-secure-boot-snakeoil.yml

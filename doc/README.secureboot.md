@@ -151,7 +151,7 @@ For user-generated keys, create a new option file in the repository. This option
 
 ```yaml
 header:
-  version: 12
+  version: 14
   includes:
    - kas/opt/ebg-swu.yml
 

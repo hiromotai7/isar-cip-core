@@ -10,7 +10,7 @@
 #
 
 header:
-  version: 12
+  version: 14
 
 local_conf_header:
   initramfs-option-encrypt-partitions: |
