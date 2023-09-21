@@ -11,13 +11,15 @@
 
 FILESEXTRAPATHS:prepend := "${FILE_DIRNAME}/files:"
 
+KERNEL_MAJOR_MINOR = "${@d.getVar('PV').split('.')[0] + '.' + d.getVar('PV').split('.')[1]}"
+
 KERNEL_DEFCONFIG ?= "${MACHINE}_defconfig"
 
 require recipes-kernel/linux/linux-custom.inc
 require recipes-kernel/linux/cip-kernel-config.inc
 
 SRC_URI += " \
-    https://git.kernel.org/pub/scm/linux/kernel/git/cip/linux-cip.git/snapshot/linux-cip-${PV}.tar.gz \
+    https://cdn.kernel.org/pub/linux/kernel/projects/cip/${KERNEL_MAJOR_MINOR}/linux-cip-${PV}.tar.xz \
     "
 
 S = "${WORKDIR}/linux-cip-${PV}"

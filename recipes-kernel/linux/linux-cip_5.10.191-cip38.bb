@@ -13,4 +13,4 @@ require linux-cip-common.inc
 
 KERNEL_DEFCONFIG_VERSION ?= "5.10.y-cip"
 
-SRC_URI[sha256sum] = "cee2c13b4e7280e6eb92746d14ec2b5e0e76c3842808de4348765e33b9e6dd39"
+SRC_URI[sha256sum] = "285dee8d7076fa4ac236167c0be10122f7eac5052e2ec20379fdf5be6452ec79"
