@@ -122,7 +122,7 @@ comment "Debian distribution options"
 
 choice
 	prompt "Debian Release"
-	default DEBIAN_BULLSEYE
+	default DEBIAN_BOOKWORM
 
 config DEBIAN_BUSTER
 	bool "buster (10)"
