@@ -27,17 +27,17 @@ esac
 . /scripts/functions
 
 
-ovl_partition_label="${INITRAMFS_OVERLAY_STORAGE_PARTITION_LABEL}"
+ovl_partition_device="${INITRAMFS_OVERLAY_STORAGE_DEVICE}"
 ovl_storage_path="${INITRAMFS_OVERLAY_STORAGE_PATH}"
 ovl_lower_dirs="${INITRAMFS_OVERLAY_PATHS}"
 
 root_mount_storage=${rootmnt}${ovl_storage_path}
 
-if ! mountpoint -q "${rootmnt}/${ovl_partition_label}"; then
-	if ! mount -t $(get_fstype /dev/disk/by-label/${ovl_partition_label}) \
-		 /dev/disk/by-label/${ovl_partition_label} \
-		 ${rootmnt}/${ovl_partition_label}; then
-		panic "Can't mount /${ovl_partition_label} partition - overlay will not work!"
+if ! mountpoint -q "${rootmnt}/var"; then
+	if ! mount -t $(get_fstype ${ovl_partition_device}) \
+		 ${ovl_partition_device} \
+		 ${rootmnt}/var; then
+		panic "Can't mount /var partition - overlay will not work!"
 	fi
 fi
 
