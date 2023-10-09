@@ -11,11 +11,13 @@
 # This recipe deploys the OVMF binaries to run the image in QEMU
 # Note: x86 only
 
-IMAGER_INSTALL += "ovmf"
+INSTALL_deploy_ovmf_binaries += "ovmf"
 
+do_deploy_ovmf_binaries[network] += "${TASK_USE_SUDO}"
 do_deploy_ovmf_binaries[cleandirs] += "${DEPLOY_DIR_IMAGE}/OVMF"
+do_deploy_ovmf_binaries[depends] += "${SCHROOT_DEP}"
 do_deploy_ovmf_binaries() {
-    cp -v ${BUILDCHROOT_DIR}/usr/share/OVMF/*.fd ${DEPLOY_DIR_IMAGE}/OVMF
+    imager_run -p -d ${PP_WORK} -- \
+        sh -c 'cp -v /usr/share/OVMF/*.fd ${PP_DEPLOY}/OVMF/'
 }
-
-addtask deploy_ovmf_binaries after do_install_imager_deps before do_image
+addtask deploy_ovmf_binaries after do_rootfs_install before do_image
