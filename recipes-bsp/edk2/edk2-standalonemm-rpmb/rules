@@ -18,11 +18,11 @@ export ACTIVE_PLATFORM="Platform/StandaloneMm/PlatformStandaloneMmPkg/PlatformSt
 # https://github.com/tianocore/edk2-platforms/blob/master/Readme.md#if-cross-compiling
 ifeq (arm64,$(DEB_TARGET_ARCH))
 export TARGET_ARCH = 'AARCH64'
-else ifeq ((armhf,$(DEB_TARGET_ARCH))
+else ifeq (armhf,$(DEB_TARGET_ARCH))
 export TARGET_ARCH = 'ARM'
-else ifeq ((amd64,$(DEB_TARGET_ARCH))
+else ifeq (amd64,$(DEB_TARGET_ARCH))
 export TARGET_ARCH = 'X64'
-else ifeq ((i386,$(DEB_TARGET_ARCH))
+else ifeq (i386,$(DEB_TARGET_ARCH))
 export TARGET_ARCH = 'IA32'
 else
 $(error DEB_TARGET_ARCH $(DEB_TARGET_ARCH) unsupported)
