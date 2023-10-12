@@ -85,11 +85,11 @@ do_image_verity[cleandirs] = "${WORKDIR}/verity"
 do_image_verity[prefuncs] = "calculate_verity_data_blocks derive_verity_salt_and_uuid"
 IMAGE_CMD:verity() {
     rm -f ${DEPLOY_DIR_IMAGE}/${VERITY_OUTPUT_IMAGE}
-    rm -f ${WORKDIR}/${VERITY_IMAGE_METADATA}
+    echo -n >${WORKDIR}/${VERITY_IMAGE_METADATA}
 
     cp -a ${DEPLOY_DIR_IMAGE}/${VERITY_INPUT_IMAGE} ${DEPLOY_DIR_IMAGE}/${VERITY_OUTPUT_IMAGE}
 
-    ${SUDO_CHROOT} /sbin/veritysetup format \
+    ${SUDO_CHROOT} sh -c '/sbin/veritysetup format \
         --hash-block-size "${VERITY_HASH_BLOCK_SIZE}"  \
         --data-block-size "${VERITY_DATA_BLOCK_SIZE}"  \
         --data-blocks "${VERITY_DATA_BLOCKS}" \
@@ -98,7 +98,7 @@ IMAGE_CMD:verity() {
         "${VERITY_IMAGE_UUID_OPTION}" \
         "${PP_DEPLOY}/${VERITY_OUTPUT_IMAGE}" \
         "${PP_DEPLOY}/${VERITY_OUTPUT_IMAGE}" \
-        >"${WORKDIR}/${VERITY_IMAGE_METADATA}"
+        >>"${PP_WORK}/${VERITY_IMAGE_METADATA}"'
 
     echo "Hash offset:    	${VERITY_INPUT_IMAGE_SIZE}" \
         >>"${WORKDIR}/${VERITY_IMAGE_METADATA}"
