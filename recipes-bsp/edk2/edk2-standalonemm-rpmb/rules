@@ -51,7 +51,7 @@ export PATH=$(WORKSPACE)/edk2/BaseTools/Bin/Linux-$(TARGET_ARCH):$(WORKSPACE)/ed
 override_dh_auto_build:
 	source edk2/edksetup.sh --reconfig
 
-	CFLAGS= LDFLAGS=  make -C edk2/BaseTools
+	CFLAGS= LDFLAGS= $(MAKE) $(PARALLEL_MAKE) -C edk2/BaseTools
 
 	(export GCC5_$(TARGET_ARCH)_PREFIX=$(DEB_HOST_GNU_TYPE)- && \
 		build -p $(ACTIVE_PLATFORM) -b RELEASE -a $(TARGET_ARCH) -t GCC5 -n $(shell nproc))
