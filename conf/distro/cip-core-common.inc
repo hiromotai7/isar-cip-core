@@ -15,5 +15,5 @@ WKS_FILE ?= "${MACHINE}.wks"
 
 CIP_IMAGE_OPTIONS ?= ""
 
-IMAGER_BUILD_DEPS ?= "dosfstools"
-IMAGER_BUILD_DEPS:remove:buster = "dosfstools"
+IMAGER_BUILD_DEPS ?= "dosfstools-native"
+IMAGER_BUILD_DEPS:remove:buster = "dosfstools-native"
