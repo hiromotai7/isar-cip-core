@@ -40,6 +40,9 @@ PV-openssl = "OpenSSL_1_1_1t"
 
 DEBIAN_BUILD_DEPENDS = "bash, python3:native, dh-python, uuid-dev:native"
 
+# edk2-edk2-stable comes with two pre-built .a files that need to be preserved
+DPKG_SOURCE_EXTRA_ARGS = ""
+
 do_prepare_build() {
     deb_debianize
 
