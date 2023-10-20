@@ -9,6 +9,6 @@
 # SPDX-License-Identifier: MIT
 #
 
-require linux-cip-common.inc
+require linux-cip-rt-common.inc
 
-SRC_URI[sha256sum] = "cc84633377b3e46e48b25fba7061fdea319a44b541d466221707a014c0136e41"
+SRC_URI[sha256sum] = "96ee568d51fc662ead73d0851fb0fcec043317d11c3f00835fdb09c7740e3131"
