@@ -130,7 +130,7 @@ IMAGE_CMD:swu() {
                         -out "$file"."${SWU_SIGNATURE_EXT}" \
                         -signer "/usr/share/swupdate-signing/swupdate-sign.crt" \
                         -inkey "/usr/share/swupdate-signing/swupdate-sign.key" \
-                        -outform DER -nosmimecap -binary
+                        -outform DER -noattr -binary
                 fi
                 # Set file timestamps for reproducible builds
                 if [ -n "${SOURCE_DATE_EPOCH}" ]; then
