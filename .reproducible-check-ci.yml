@@ -43,6 +43,7 @@
     paths:
       - scripts/repro-tests.sh
       - image*/*.wic.p*
+      - image*/*.swu
 
 .repro-test:
   image:

@@ -74,6 +74,7 @@ fi
 
 # Define files in the artifacts for checking the reproducibility
 set -- \
+	"${IMAGE_BASE}-${RELEASE}-${TARGET}.swu" \
 	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p0" \
 	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p1" \
 	"${IMAGE_BASE}-${RELEASE}-${TARGET}.wic.p2" \
