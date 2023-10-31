@@ -51,14 +51,6 @@ if grep -c "${PAM_MODULE}" "${PAM_AUTH_FILE}";then
 fi
 sed -i "0,/^auth.*/s/^auth.*/${PAM_CONFIG}\n&/" "${PAM_AUTH_FILE}"
 
-# CR2.6: Remote session termination
-# Terminate remote session after inactive time period
-SSHD_CONFIG="/etc/ssh/sshd_config"
-alive_interval=$(sed -n '/ClientAliveInterval/p' "${SSHD_CONFIG}")
-alive_countmax=$(sed -n '/ClientAliveCountMax/p' "${SSHD_CONFIG}")
-sed -i "/${alive_interval}/c ClientAliveInterval 120"  "${SSHD_CONFIG}"
-sed -i "/${alive_countmax}/c ClientAliveCountMax 0" "${SSHD_CONFIG}"
-
 # CR2.7: Concurrent session control
 # Limit the concurrent login sessions
 LIMITS_CONFIG="/etc/security/limits.conf"
@@ -80,12 +72,4 @@ if grep -c "pam_google_authenticator.so" "${SSHD_AUTH_CONFIG}";then
         sed -i '/pam_google_authenticator.so/ s/^#*/#/'  "${SSHD_AUTH_CONFIG}"
 fi
 echo "auth required pam_google_authenticator.so nullok" | tee -a "${SSHD_AUTH_CONFIG}"
-# Enable PAM configuration for Remote Session
-if grep -s -q "ChallengeResponseAuthentication" "${SSHD_CONFIG}";then
-       sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' "${SSHD_CONFIG}"
-fi
 
-if grep -s -q "KbdInteractiveAuthentication" "${SSHD_CONFIG}";then
-       sed -i 's/KbdInteractiveAuthentication no/KbdInteractiveAuthentication yes/g' "${SSHD_CONFIG}"
-fi
-echo "AuthenticationMethods keyboard-interactive" | tee -a "${SSHD_CONFIG}"
