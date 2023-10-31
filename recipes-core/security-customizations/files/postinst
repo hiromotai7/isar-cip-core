@@ -8,10 +8,6 @@ set -e
 
 echo "CIP Core Security Image (login: root/CIPsecurity@123)" > /etc/issue
 
-HOSTNAME=demo
-echo "$HOSTNAME" > /etc/hostname
-echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
-
 # CR1.7: Strength of password-based authentication
 # Pam configuration to  enforce password strength
 PAM_PWD_FILE="/etc/pam.d/common-password"

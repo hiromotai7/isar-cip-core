@@ -12,6 +12,8 @@
 require common.inc
 
 SRC_URI += "file://ssh-permit-root.conf"
+SRC_URI:remove:security = "file://ssh-permit-root.conf"
+
 DESCRIPTION = "CIP Core image demo & customizations"
 
 do_prepare_build:prepend:qemu-riscv64() {
