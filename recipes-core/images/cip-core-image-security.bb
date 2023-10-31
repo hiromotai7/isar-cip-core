@@ -28,24 +28,14 @@ IMAGE_PREINSTALL += " \
 	tpm2-tools \
 	tpm2-abrmd \
 	acl \
-	audispd-plugins auditd \
+	audispd-plugins \
 	uuid-runtime \
 	sudo \
 	aide-common \
-	libpam-google-authenticator \
 	passwd \
 	login \
-	libpam-runtime \
 	util-linux \
 "
-
-# Package names based on the distro version
-IMAGE_PREINSTALL:append:buster = " libtss2-esys0 \
-                                   libpam-cracklib"
-IMAGE_PREINSTALL:append:bullseye = " libtss2-esys-3.0.2-0 \
-                                     libpam-cracklib"
-IMAGE_PREINSTALL:append:bookworm = " libtss2-esys-3.0.2-0 \
-                                     libpam-passwdqc"
 
 CIP_IMAGE_OPTIONS ?= ""
 require ${CIP_IMAGE_OPTIONS}
