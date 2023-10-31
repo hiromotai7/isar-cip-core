@@ -14,10 +14,6 @@ set -e
 
 echo "CIP Core Demo & Test Image (login: root/root)" > /etc/issue
 
-if ! grep -e "^PermitRootLogin.*yes" -q /etc/ssh/sshd_config; then
-	echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
-fi
-
 HOSTNAME="${CUSTOM_HOSTNAME}"
 echo "$HOSTNAME" > /etc/hostname
 echo "127.0.0.1 $HOSTNAME" >> /etc/hosts
