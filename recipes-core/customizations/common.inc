@@ -14,15 +14,19 @@ inherit dpkg-raw
 FILESPATH:append := ":${FILE_DIRNAME}/files"
 
 SRC_URI = " \
-    file://postinst \
+    file://postinst.tmpl \
     file://ethernet \
     file://99-silent-printk.conf \
     file://99-watchdog.conf"
 
 SRC_URI:append:swupdate = " file://swupdate.cfg"
 
+CUSTOM_HOSTNAME ??= "demo"
 WIRELESS_FIRMWARE_PACKAGE ?= ""
 INSTALL_WIRELESS_TOOLS ??= "0"
+
+TEMPLATE_FILES += "postinst.tmpl"
+TEMPLATE_VARS += "CUSTOM_HOSTNAME"
 
 DEPENDS += "sshd-regen-keys change-root-homedir"
 
