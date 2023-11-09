@@ -25,8 +25,8 @@
   stage: build
   tags:
     - large
-  only:
-    - schedules
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $REPRODUCIBLE_BUILDS
   script:
     - if [ -f kas/opt/reproducible.yml ]; then base_yaml="${base_yaml}:kas/opt/reproducible.yml"; fi
     # Build 1st time
@@ -51,8 +51,8 @@
   tags:
     - large
   stage: test
-  only:
-    - schedules
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $REPRODUCIBLE_BUILDS
   variables:
     GIT_STRATEGY: none
     release: bookworm
