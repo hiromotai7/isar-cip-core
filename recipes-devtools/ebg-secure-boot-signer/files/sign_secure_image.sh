@@ -30,4 +30,9 @@ fi
 
 keydir=/usr/share/secure-boot-secrets
 
-sbsign --key ${keydir}/secure-boot.key --cert ${keydir}/secure-boot.pem --output $signed $signee
+faketime_cmd=""
+if [ -n "$SOURCE_DATE_EPOCH" ]; then
+    faketime_cmd="faketime -f \"$(TZ=UTC date -d @$SOURCE_DATE_EPOCH +'%Y-%m-%d %H:%M:%S')\""
+fi
+
+eval $faketime_cmd sbsign --key ${keydir}/secure-boot.key --cert ${keydir}/secure-boot.pem --output $signed $signee
