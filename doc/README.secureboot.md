@@ -167,7 +167,7 @@ local_conf_header:
 
   secure-boot: |
     IMAGER_BUILD_DEPS += "ebg-secure-boot-signer"
-    IMAGER_INSTALL += "ebg-secure-boot-signer"
+    IMAGER_INSTALL:wic += "ebg-secure-boot-signer"
 
     # Use user-generated keys
     PREFERRED_PROVIDER_secure-boot-secrets = "secure-boot-key"
