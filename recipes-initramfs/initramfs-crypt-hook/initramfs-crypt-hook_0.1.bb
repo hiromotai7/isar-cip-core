@@ -37,9 +37,12 @@ CRYPT_CREATE_FILE_SYSTEM_CMD ??= "/usr/sbin/mke2fs -t ext4"
 CRYPT_SETUP_TIMEOUT ??= "600"
 # Watchdog to service during the initial setup of the crypto partitions
 INITRAMFS_WATCHDOG_DEVICE ??= "/dev/watchdog"
+# clevis needs tpm hash algorithm type
+CRYPT_HASH_TYPE ??= "sha256"
+
 
 TEMPLATE_VARS = "CRYPT_PARTITIONS CRYPT_CREATE_FILE_SYSTEM_CMD \
-    CRYPT_SETUP_TIMEOUT INITRAMFS_WATCHDOG_DEVICE"
+    CRYPT_SETUP_TIMEOUT INITRAMFS_WATCHDOG_DEVICE CRYPT_HASH_TYPE"
 TEMPLATE_FILES = "encrypt_partition.env.tmpl"
 
 do_install[cleandirs] += " \

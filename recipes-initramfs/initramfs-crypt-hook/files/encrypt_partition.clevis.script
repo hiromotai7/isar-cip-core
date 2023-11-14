@@ -40,6 +40,7 @@ modprobe tpm_crb
 tpm_device=/dev/tpmrm0
 partition_sets="$PARTITIONS"
 create_file_system_cmd="$CREATE_FILE_SYSTEM_CMD"
+hash_type="$HASH_TYPE"
 
 if [ -z "${create_file_system_cmd}" ]; then
 	create_file_system_cmd="mke2fs -t ext4"
@@ -61,7 +62,7 @@ open_tpm2_partition() {
 
 enroll_tpm2_token() {
 	if [ -x /usr/bin/clevis ]; then
-		 clevis luks bind -d "$1" tpm2 '{"pcr_ids":"7"}' < "$2"
+		clevis luks bind -d "$1" tpm2 '{"pcr_bank":"'"$hash_type"'","pcr_ids":"7"}' < "$2"
 	else
 		panic "clevis not available cannot enroll tpm2 key!"
 	fi
