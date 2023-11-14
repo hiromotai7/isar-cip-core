@@ -16,13 +16,15 @@ LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://${LAYERDIR_isar}/licenses/COPYING.GPLv2;md5=751419260aa954499f7abaabaa882bbe"
 MAINTAINER = "Jan Kiszka <jan.kiszka@siemens.com>"
 
+EBG_VERSION = "${@d.getVar('PV').split('-')[0]}"
+
 SRC_URI = " \
-    https://github.com/siemens/efibootguard/archive/refs/tags/v0.15.tar.gz;downloadfilename=efibootguard_0.15.orig.tar.gz;unpack=0;name=tarball \
+    https://github.com/siemens/efibootguard/archive/refs/tags/v${EBG_VERSION}.tar.gz;downloadfilename=efibootguard_${EBG_VERSION}.orig.tar.gz;unpack=0;name=tarball \
     git://salsa.debian.org/debian/efibootguard.git;protocol=https;branch=master;name=debian \
     file://debian-patches/0001-d-control-Make-compatible-with-debian-buster.patch \
     "
-SRC_URI[tarball.sha256sum] = "9d2d46913ed8013056a3c2b080a997e68d78d92a1051ced06fbfefa93353bb7f"
-SRCREV_debian = "e39728f63946d1af2d5edbecd89a30706dc31a9a"
+SRC_URI[tarball.sha256sum] = "d6d37c59aed17489d02b4f0b63db16994dfb8f9f70f54be4d65c366f58c6be9d"
+SRCREV_debian = "2e80fafa87f8f6fd093f49ff33ad7cac61592871"
 
 PROVIDES = "libebgenv-dev libebgenv0 efibootguard"
 
