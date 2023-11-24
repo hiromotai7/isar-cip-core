@@ -120,18 +120,7 @@ IMAGE_CMD:swu() {
             fi
             echo "$file"
             if [ -n "$sign" -a "${SWU_DESCRIPTION_FILE}" = "$file" ]; then
-                if [ "${SWU_SIGNATURE_TYPE}" = "rsa" ]; then
-                    openssl dgst \
-                        -sha256 -sign "/usr/share/swupdate-signing/swupdate-sign.key" "$file" \
-                        > "$file.${SWU_SIGNATURE_EXT}"
-                elif [ "${SWU_SIGNATURE_TYPE}" = "cms" ]; then
-                    openssl cms \
-                        -sign -in "$file" \
-                        -out "$file"."${SWU_SIGNATURE_EXT}" \
-                        -signer "/usr/share/swupdate-signing/swupdate-sign.crt" \
-                        -inkey "/usr/share/swupdate-signing/swupdate-sign.key" \
-                        -outform DER -noattr -binary
-                fi
+                sign-swu "$file" "$file.${SWU_SIGNATURE_EXT}"
                 # Set file timestamps for reproducible builds
                 if [ -n "${SOURCE_DATE_EPOCH}" ]; then
                     touch -d@"${SOURCE_DATE_EPOCH}" "$file.${SWU_SIGNATURE_EXT}"

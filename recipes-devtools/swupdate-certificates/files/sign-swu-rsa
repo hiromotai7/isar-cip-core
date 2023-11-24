@@ -1,0 +1,6 @@
+#!/bin/sh
+in_file=$1
+out_file=$2
+openssl dgst \
+	-sha256 -sign "/usr/share/swupdate-signing/swupdate-sign.key" "$in_file" \
+	> "$out_file"

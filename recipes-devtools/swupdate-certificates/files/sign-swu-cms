@@ -1,0 +1,9 @@
+#!/bin/sh
+in_file=$1
+out_file=$2
+openssl cms \
+	-sign -in "$in_file" \
+	-out "$out_file" \
+	-signer "/usr/share/swupdate-signing/swupdate-sign.crt" \
+	-inkey "/usr/share/swupdate-signing/swupdate-sign.key" \
+	-outform DER -noattr -binary
