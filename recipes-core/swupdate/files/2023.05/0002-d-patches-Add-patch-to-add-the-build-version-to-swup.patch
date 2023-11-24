@@ -1,7 +1,7 @@
-From ed4e8b5d4ad6ffcddb755571303c077fff227ea3 Mon Sep 17 00:00:00 2001
+From ad714bc12b03c148aadb3523f87cc14d42a477b0 Mon Sep 17 00:00:00 2001
 From: Quirin Gylstorff <quirin.gylstorff@siemens.com>
 Date: Fri, 16 Jun 2023 19:43:38 +0200
-Subject: [PATCH 3/4] d/patches: Add patch to add the build version to swupdate
+Subject: [PATCH 2/4] d/patches: Add patch to add the build version to swupdate
 
 The build version is only set if build in a git repository
 this patch allows to use the version information stored in
@@ -77,10 +77,10 @@ index 5638bbf5..12324569 100644
  use-gcc-compiler.diff
 +Makefile.flags-Set-version-if-git-returns-no-informa.diff
 diff --git a/debian/rules b/debian/rules
-index 8cac6359..566a21bd 100755
+index 2c91677c..5d72987c 100755
 --- a/debian/rules
 +++ b/debian/rules
-@@ -17,6 +17,8 @@ export DH_WITH=--with lua
+@@ -17,6 +17,8 @@ export DH_WITH=,lua
  export HAVE_LUA=y
  endif
  
@@ -90,5 +90,5 @@ index 8cac6359..566a21bd 100755
  ifeq (linux,$(DEB_HOST_ARCH_OS))
  	BU_SWU += -VBuilt-Using="$(shell dpkg-query -f '$${source:Package} (= $${source:Version}), ' -W libmtd-dev libubi-dev)"
 -- 
-2.39.2
+2.42.0
 

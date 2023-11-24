@@ -22,15 +22,14 @@ FILESEXTRAPATHS:prepend := "${FILE_DIRNAME}/files/${PV}:"
 SRC_URI += "git://github.com/sbabic/swupdate.git;protocol=https;branch=master;name=upstream;destsuffix=${P}"
 SRC_URI += "git://salsa.debian.org/debian/swupdate.git;protocol=https;branch=debian/master;name=debian;subpath=debian;destsuffix=${P}/debian"
 
-SRCREV_debian = "aa9edf070567fa5b3e942c270633a8feef49dad8"
+SRCREV_debian = "78cb6f20319d2b911e170eea5305f2cf0bd33030"
 SRCREV_upstream = "c8ca55684c375937dbcdefb0563071a35137f4ba"
 
 # patches
-SRC_URI += "file://0001-d-rules-Add-option-for-suricatta_lua.patch \
-            file://0002-d-rules-Add-seperate-build_profile-option-for-delta-.patch \
-            file://0003-d-patches-Add-patch-to-add-the-build-version-to-swup.patch \
-            file://0004-d-rules-Add-option-to-enable-suricatta_wfx.patch"
-
+SRC_URI += "file://0001-d-rules-Add-seperate-build_profile-option-for-delta-.patch \
+            file://0002-d-patches-Add-patch-to-add-the-build-version-to-swup.patch \
+            file://0003-d-rules-Add-option-to-enable-suricatta_wfx.patch"
+SRC_URI:append:bullseye = " file://0004-d-swupdate-www.install-Fix-path-for-debian-bullseye.patch"
 
 # The option: "pkg.swupdate.nosigning" disables the required signing
 # of update binaries
