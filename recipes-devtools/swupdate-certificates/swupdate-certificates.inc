@@ -18,7 +18,7 @@ SWU_SIGN_CERT ??= ""
 SRC_URI:append = " ${@ "file://"+d.getVar('SWU_SIGN_CERT') if d.getVar('SWU_SIGN_CERT') else '' }"
 
 do_install() {
-    if [ -z ${SWU_SIGN_CERT} ] ]; then
+    if [ -z ${SWU_SIGN_CERT} ]; then
         bbfatal "You must set SWU_SIGN_CERT and provide the required file as artifacts to this recipe"
     fi
     TARGET=${D}/usr/share/swupdate-signing/

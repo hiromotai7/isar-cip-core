@@ -21,11 +21,11 @@ SRC_URI:append = " ${@ "file://"+d.getVar('SWU_SIGN_SCRIPT') if d.getVar('SWU_SI
 do_install[cleandirs] = "${D}/usr/share/swupdate-signing/ \
                          ${D}/usr/bin/"
 do_install() {
-    if [ ! -f ${WORKDIR}/${SWU_SIGN_SCRIPT} ] ]; then
+    if [ ! -f ${WORKDIR}/${SWU_SIGN_SCRIPT} ]; then
         bbfatal "You must add a '${SWU_SIGN_SCRIPT}' to execute the signing process"
     fi
     install -m 0700 ${WORKDIR}/${SWU_SIGN_SCRIPT} ${D}/usr/bin/sign-swu
-    if [ -z ${SWU_SIGN_KEY} ] ]; then
+    if [ -z ${SWU_SIGN_KEY} ]; then
         bbfatal "You must set SWU_SIGN_KEY and provide the required file as artifacts to this recipe"
     fi
     TARGET=${D}/usr/share/swupdate-signing/
