@@ -11,6 +11,8 @@
 
 inherit dpkg-raw
 
+FILESEXTRAPATHS:prepend := "${FILE_DIRNAME}/files:"
+
 PROVIDES += "swupdate-certificates"
 
 SWU_SIGN_CERT ??= ""
