@@ -17,8 +17,16 @@ SRC_URI += " \
     file://overlay.script.tmpl \
     "
 
+# The variable INITRAMFS_OVERLAY_PATHS contains the directories which are
+# overlayed(lower dir).
 INITRAMFS_OVERLAY_PATHS ??= "/etc"
+
+# The variable INITRAMFS_OVERLAY_STORAGE_PATH designates the path were the
+# changes to the overlayed directory are stored (upper dir). The initramfs
+# also mounts the first directory after root to the
+# INITRAMFS_OVERLAY_STORAGE_DEVICE.
 INITRAMFS_OVERLAY_STORAGE_PATH ??= "/var/local"
+
 # override this to switch to UUID or PARTUUID based mounts
 INITRAMFS_OVERLAY_STORAGE_DEVICE ??= "/dev/disk/by-label/var"
 
