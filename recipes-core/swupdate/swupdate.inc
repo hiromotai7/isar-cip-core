@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2021-2022
+# Copyright (c) Siemens AG, 2021-2023
 #
 # Authors:
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
@@ -13,15 +13,10 @@ HOMEPAGE= "https://github.com/sbabic/swupdate"
 LICENSE = "GPL-2.0"
 LIC_FILES_CHKSUM = "file://${LAYERDIR_isar}/licenses/COPYING.GPLv2;md5=751419260aa954499f7abaabaa882bbe"
 
-def get_bootloader_build_profile(d):
-    bootloader = d.getVar("SWUPDATE_BOOTLOADER") or ""
-    if bootloader == "efibootguard":
-        return "pkg.swupdate.efibootguard"
-    if bootloader == "u-boot":
-        return "pkg.swupdate.uboot"
-    return ""
+PROVIDES += "libswupdate-dev"
+PROVIDES += "libswupdate0.1"
+PROVIDES += "lua-swupdate"
 
-DEB_BUILD_PROFILES += "${@get_bootloader_build_profile(d)}"
 
 def get_bootloader_dependencies(d):
     bootloader = d.getVar("SWUPDATE_BOOTLOADER") or ""
@@ -36,6 +31,14 @@ def get_bootloader_dependencies(d):
 
 DEPENDS += "${@get_bootloader_dependencies(d)}"
 DEPENDS += "${@bb.utils.contains('DEB_BUILD_PROFILES', 'mtd', 'mtd-utils', '', d)}"
+
+DEB_BUILD_PROFILES += "${@'pkg.swupdate.nosigning' if not d.getVar('SWU_SIGNED') == '1' else ''}"
+
+# deactivate hardware compability for simple a/b rootfs update
+DEB_BUILD_PROFILES += "pkg.swupdate.nohwcompat"
+
+# add cross build and deactivate testing for arm based builds
+DEB_BUILD_PROFILES += "cross nocheck"
 
 python do_check_bootloader () {
     bootloader = d.getVar("SWUPDATE_BOOTLOADER") or "None"

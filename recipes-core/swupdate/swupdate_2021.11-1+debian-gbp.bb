@@ -27,17 +27,6 @@ SRC_URI += "file://0001-debian-Remove-SWUpdate-USB-service-and-Udev-rules.patch 
             file://0004-debian-rules-Add-option-to-disable-webserver.patch \
             file://0005-debian-Add-patch-to-fix-bootloader_env_get-for-EBG.patch"
 
-# end patching for dm-verity based images
-
-# The option: "pkg.swupdate.nosigning" disables the required signing
-# of update binaries
-# DEB_BUILD_PROFILES += "pkg.swupdate.nosigning"
-
-# deactivate hardware compability for simple a/b rootfs update
-DEB_BUILD_PROFILES += "pkg.swupdate.nohwcompat"
-
-# add cross build and deactivate testing for arm based builds
-DEB_BUILD_PROFILES += "cross nocheck"
 # If the luahandler shall be embedded into the swupdate binary
 # include the following lines.
 # DEPENDS += "swupdate-handlers"

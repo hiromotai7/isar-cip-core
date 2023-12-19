@@ -31,13 +31,6 @@ SRC_URI += "file://0001-d-rules-Add-seperate-build_profile-option-for-delta-.pat
             file://0003-d-rules-Add-option-to-enable-suricatta_wfx.patch"
 SRC_URI:append:bullseye = " file://0004-d-swupdate-www.install-Fix-path-for-debian-bullseye.patch"
 
-# The option: "pkg.swupdate.nosigning" disables the required signing
-# of update binaries
-# DEB_BUILD_PROFILES += "pkg.swupdate.nosigning"
-
-# deactivate hardware compability for simple a/b rootfs update
-DEB_BUILD_PROFILES += "pkg.swupdate.nohwcompat"
-
 # suricatta wfx requires suricatta lua and the dependency
 # is not set automatically
 DEB_BUILD_PROFILES += "pkg.swupdate.suricattalua"
@@ -47,9 +40,6 @@ DEB_BUILD_PROFILES += "pkg.swupdate.suricattawfx"
 # Disable cross for arm and arm64 on bullseye
 # with cross compile we have a unsat-dependency to dh-nodejs on arm/arm64
 ISAR_CROSS_COMPILE:bullseye = "0"
-
-# add cross build and deactivate testing for arm based builds
-DEB_BUILD_PROFILES += "cross nocheck"
 
 # use backport build profile for bullseye
 DEB_BUILD_PROFILES:append:bullseye = " pkg.swupdate.bpo"
