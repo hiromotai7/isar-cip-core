@@ -7,6 +7,19 @@ Start with cloning the isar-cip-core repository:
 ```
 host$ git clone https://gitlab.com/cip-project/cip-core/isar-cip-core.git
 ```
+## SWUpdate Efibootguard update
+
+:warning: **If the efibootguard binary is corrupted the system can no longer boot**
+
+If you build a CIP Core image with SWUpdate support an additional swu will
+be generated. This swu ends on `*-ebg.swu` and contains a sw-description to
+update only efibootguard. SWUpdate will copy the file to a temporary location
+and rename the binary in place to reduce the time the system can be destroyed
+by a power failure. As FAT partitions have **no** atomic operations a small error
+window is still possible.
+
+If the variable `SWU_EBG_UPDATE` is set to `"1"` the update is also stored in
+the `*.swu` file.
 
 # Building and testing the CIP Core image
 
