@@ -180,27 +180,20 @@ class EfibootguardBootPlugin(SourcePlugin):
     def _create_unified_kernel_image(cls, rootfs_dir, cr_workdir, cmdline,
                                      deploy_dir, kernel_image, initrd_image,
                                      dtb_files, source_params):
-        # we need to map the distro_arch to uefi values
-        distro_to_efi_arch = {
-            "amd64": "x64",
-            "arm64": "aa64",
-            "armhf": "arm",
-            "i386": "ia32",
-            "riscv64" : "riscv64"
-        }
-        distro_to_lib_arch = {
-            "amd64": "x86_64-linux-gnu",
-            "arm64": "aarch64-linux-gnu",
-            "armhf": "arm-linux-gnueabihf",
-            "i386": "i386-linux-gnu",
-            "riscv64": "riscv64-linux-gnu",
-        }
         rootfs_path = rootfs_dir.get('ROOTFS_DIR')
-        distro_arch = get_bitbake_var("DISTRO_ARCH")
+        efiarch = get_bitbake_var("EFI_ARCH")
+        if not efiarch:
+            msger.error("Bitbake variable 'EFI_ARCH' not set, exiting\n")
+            exit(1)
+        libarch = get_bitbake_var("EFI_LIB_ARCH")
+        if not libarch:
+            msger.error("Bitbake variable 'EFI_LIB_ARCH' not set, exiting\n")
+            exit(1)
+
         efistub = "{rootfs_path}/usr/lib/{libpath}/efibootguard/kernel-stub{efiarch}.efi"\
             .format(rootfs_path=rootfs_path,
-                    libpath=distro_to_lib_arch[distro_arch],
-                    efiarch=distro_to_efi_arch[distro_arch])
+                    libpath=libarch,
+                    efiarch=efiarch)
         uefi_kernel_name = "linux.efi"
         uefi_kernel_file = "{deploy_dir}/{uefi_kernel_name}"\
             .format(deploy_dir=deploy_dir, uefi_kernel_name=uefi_kernel_name)

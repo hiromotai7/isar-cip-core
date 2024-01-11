@@ -51,35 +51,31 @@ class EfibootguardEFIPlugin(SourcePlugin):
         populate an EFI boot partition containing the EFI Boot Guard
         bootloader binary.
         """
-        # we need to map the distro_arch to uefi values
-        distro_to_efi_arch = {
-            "amd64": "x64",
-            "arm64": "aa64",
-            "armhf": "arm",
-            "i386": "ia32",
-            "riscv64" : "riscv64"
-        }
+        efiarch = get_bitbake_var("EFI_ARCH")
+        if not efiarch:
+            msger.error("Bitbake variable 'EFI_ARCH' not set, exiting\n")
+            exit(1)
+        libarch = get_bitbake_var("EFI_LIB_ARCH")
+        if not libarch:
+            msger.error("Bitbake variable 'EFI_LIB_ARCH' not set, exiting\n")
+            exit(1)
 
-        distro_to_lib_arch = {
-            "amd64": "x86_64-linux-gnu",
-            "arm64": "aarch64-linux-gnu",
-            "armhf": "arm-linux-gnueabihf",
-            "i386": "i386-linux-gnu",
-            "riscv64": "riscv64-linux-gnu",
-        }
+        deploy_dir = get_bitbake_var("DEPLOY_DIR_IMAGE")
+        if not deploy_dir:
+            msger.error("DEPLOY_DIR_IMAGE not set, exiting\n")
+            exit(1)
+        creator.deploy_dir = deploy_dir
 
-        distro_arch = get_bitbake_var("DISTRO_ARCH")
         bootloader = "/usr/lib/{libpath}/efibootguard/efibootguard{efiarch}.efi".format(
-            libpath=distro_to_lib_arch[distro_arch],
-            efiarch=distro_to_efi_arch[distro_arch])
+                        libpath=libarch,
+                        efiarch=efiarch)
         part_rootfs_dir = "%s/disk/%s.%s" % (cr_workdir,
                                              part.label,
                                              part.lineno)
         create_dir_cmd = "install -d %s/EFI/BOOT" % part_rootfs_dir
         exec_cmd(create_dir_cmd)
 
-        name = "boot{}.efi".format(
-            distro_to_efi_arch[distro_arch])
+        name = "boot{}.efi".format(efiarch)
 
         signed_bootloader = cls._sign_file(name,
                                            bootloader,
