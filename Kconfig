@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2021-2022
+# Copyright (c) Siemens AG, 2021-2024
 #
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
@@ -136,8 +136,8 @@ config DEBIAN_BOOKWORM
 	bool "bookworm (12)"
 	depends on !ARCH_RISCV64
 
-config DEBIAN_SID_PORTS
-	bool "sid (unstable) with unofficial ports"
+config DEBIAN_SID
+	bool "sid (unstable)"
 	depends on ARCH_RISCV64
 
 endchoice
@@ -147,7 +147,7 @@ config KAS_INCLUDE_DEBIAN
 	default "kas/opt/buster.yml" if DEBIAN_BUSTER
 	default "kas/opt/bullseye.yml" if DEBIAN_BULLSEYE
 	default "kas/opt/bookworm.yml" if DEBIAN_BOOKWORM
-	default "kas/opt/sid-ports.yml" if DEBIAN_SID_PORTS
+	default "kas/opt/sid.yml" if DEBIAN_SID
 
 comment "Image features"
 
