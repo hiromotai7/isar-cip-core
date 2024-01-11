@@ -25,15 +25,17 @@ SWU_HW_COMPAT ?= ""
 
 SWU_EBG_UPDATE ?= ""
 SWU_EFI_BOOT_DEVICE ?= "/dev/disk/by-uuid/4321-DCBA"
+SWU_BOOTLOADER ??= "ebg"
+SWU_DESCRIPITION_FILE_BOOTLOADER ??= "${SWU_DESCRIPTION_FILE}-${SWU_BOOTLOADER}"
 
-SWU_IMAGE_FILE ?= "${DEPLOY_DIR_IMAGE}/${IMAGE_FULLNAME}.swu"
+SWU_IMAGE_FILE ?= "${IMAGE_FULLNAME}"
 SWU_DESCRIPTION_FILE ?= "sw-description"
 SWU_ADDITIONAL_FILES ?= "linux.efi ${SWU_ROOTFS_PARTITION_NAME}"
 SWU_SIGNED ??= ""
 SWU_SIGNATURE_EXT ?= "sig"
 SWU_SIGNATURE_TYPE ?= "cms"
 
-SWU_BUILDCHROOT_IMAGE_FILE ?= "${PP_DEPLOY}/${@os.path.basename(d.getVar('SWU_IMAGE_FILE'))}"
+SWU_BUILDCHROOT_IMAGE_FILE ?= "${@os.path.basename(d.getVar('SWU_IMAGE_FILE'))}"
 
 IMAGE_TYPEDEP:swu = "${SWU_ROOTFS_TYPE}${@get_swu_compression_type(d)}"
 IMAGER_BUILD_DEPS:swu += "${@'swupdate-certificates-key' if bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}"
@@ -42,7 +44,9 @@ IMAGE_INSTALL += "${@'swupdate-certificates' if bb.utils.to_boolean(d.getVar('SW
 
 
 IMAGE_SRC_URI:swu = "file://${SWU_DESCRIPTION_FILE}.tmpl"
+IMAGE_SRC_URI:swu += "file://${SWU_DESCRIPITION_FILE_BOOTLOADER}.tmpl"
 IMAGE_TEMPLATE_FILES:swu = "${SWU_DESCRIPTION_FILE}.tmpl"
+IMAGE_TEMPLATE_FILES:swu += "${SWU_DESCRIPITION_FILE_BOOTLOADER}.tmpl"
 IMAGE_TEMPLATE_VARS:swu = " \
     SWU_ROOTFS_PARTITION_NAME \
     TARGET_IMAGE_UUID \
@@ -53,6 +57,7 @@ IMAGE_TEMPLATE_VARS:swu = " \
     SWU_VERSION \
     SWU_NAME \
     SWU_FILE_NODES \
+    SWU_BOOTLOADER_FILE_NODE \
     "
 
 # Add the bootloader file
@@ -94,11 +99,11 @@ python add_swu_compression(){
         d.setVar('SWU_COMPRESSION_NODE', '')
 }
 
-SWU_EXTEND_SW_DESCRIPTION += "${@ 'add_ebg_update' if d.getVar('SWU_EBG_UPDATE') == '1' else ''}"
+SWU_EXTEND_SW_DESCRIPTION += "add_ebg_update"
 python add_ebg_update(){
    efi_boot_loader_file = efi_bootloader_name(d)
    efi_boot_device = d.getVar('SWU_EFI_BOOT_DEVICE')
-   swu_ebg_update_node = f""",
+   swu_ebg_update_node = f"""
    {{
           filename = "{efi_boot_loader_file}";
           path = "EFI/BOOT/{efi_boot_loader_file}";
@@ -110,7 +115,11 @@ python add_ebg_update(){
           }};
    }}
    """
-   d.appendVar('SWU_FILE_NODES', swu_ebg_update_node)
+
+   d.setVar('SWU_BOOTLOADER_FILE_NODE', swu_ebg_update_node)
+   ebg_update = d.getVar('SWU_EBG_UPDATE') or ""
+   if ebg_update:
+     d.appendVar('SWU_FILE_NODES', "," + swu_ebg_update_node)
    d.appendVar('SWU_ADDITIONAL_FILES', " " + efi_boot_loader_file)
 }
 
@@ -132,46 +141,63 @@ FILESEXTRAPATHS:append = ":${LAYERDIR_cip-core}/recipes-core/images/swu"
 
 do_image_swu[depends] += "${PN}:do_transform_template"
 do_image_swu[stamp-extra-info] = "${DISTRO}-${MACHINE}"
-do_image_swu[cleandirs] += "${WORKDIR}/swu"
+do_image_swu[cleandirs] += "${WORKDIR}/swu ${WORKDIR}/swu-${SWU_BOOTLOADER}"
 IMAGE_CMD:swu() {
-    rm -f '${SWU_IMAGE_FILE}'
+    rm -f '${DEPLOY_DIR_IMAGE}/${SWU_IMAGE_FILE}'*.swu
     cp '${WORKDIR}/${SWU_DESCRIPTION_FILE}' '${WORKDIR}/swu/${SWU_DESCRIPTION_FILE}'
+    if [ -f '${WORKDIR}/${SWU_DESCRIPITION_FILE_BOOTLOADER}' ]; then
+        cp '${WORKDIR}/${SWU_DESCRIPITION_FILE_BOOTLOADER}' '${WORKDIR}/swu-${SWU_BOOTLOADER}/${SWU_DESCRIPTION_FILE}'
+    fi
 
-    # Create symlinks for files used in the update image
-    for file in ${SWU_ADDITIONAL_FILES}; do
-        if [ -e "${WORKDIR}/$file" ]; then
-            ln -s "${PP_WORK}/$file" "${WORKDIR}/swu/$file"
-        else
-            ln -s "${PP_DEPLOY}/$file" "${WORKDIR}/swu/$file"
-        fi
-    done
-
-    # Prepare for signing
-    export sign='${@'x' if bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}'
-
-    imager_run -p -d ${PP_WORK} -u root <<'EOIMAGER'
-        # Fill in file check sums
+    for swu_file in "${WORKDIR}"/swu*; do
+        swu_file_base=$(basename $swu_file)
+        # Create symlinks for files used in the update image
         for file in ${SWU_ADDITIONAL_FILES}; do
-            sed -i "s:$file-sha256:$(sha256sum "${PP_WORK}/swu/"$file | cut -f 1 -d " "):g" \
-                "${PP_WORK}/swu/${SWU_DESCRIPTION_FILE}"
-        done
-        cd "${PP_WORK}/swu"
-        for file in "${SWU_DESCRIPTION_FILE}" ${SWU_ADDITIONAL_FILES}; do
-            # Set file timestamps for reproducible builds
-            if [ -n "${SOURCE_DATE_EPOCH}" ]; then
-                touch -d@"${SOURCE_DATE_EPOCH}" "$file"
-            fi
-            echo "$file"
-            if [ -n "$sign" -a "${SWU_DESCRIPTION_FILE}" = "$file" ]; then
-                sign-swu "$file" "$file.${SWU_SIGNATURE_EXT}"
-                # Set file timestamps for reproducible builds
-                if [ -n "${SOURCE_DATE_EPOCH}" ]; then
-                    touch -d@"${SOURCE_DATE_EPOCH}" "$file.${SWU_SIGNATURE_EXT}"
+            if grep -q "$file" "${WORKDIR}/$swu_file_base/${SWU_DESCRIPTION_FILE}"; then
+                if [ -e "${WORKDIR}/$file" ]; then
+                    ln -s "${PP_WORK}/$file" "${WORKDIR}/$swu_file_base/$file"
+                else
+                    ln -s "${PP_DEPLOY}/$file" "${WORKDIR}/$swu_file_base/$file"
                 fi
-                echo "$file.${SWU_SIGNATURE_EXT}"
-           fi
-        done | cpio -ovL --reproducible -H crc > "${SWU_BUILDCHROOT_IMAGE_FILE}"
+            fi
+        done
+
+        # Prepare for signing
+        export sign='${@'x' if bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}'
+        export swu_file_base
+        # create a exetension to differ between swus
+        swu_file_extension=""
+        if [ "$swu_file_base" != "swu" ]; then
+            swu_file_extension=${swu_file_base#swu}
+        fi
+        export swu_file_extension
+        imager_run -p -d ${PP_WORK} -u root <<'EOIMAGER'
+            # Fill in file check sums
+            for file in ${SWU_ADDITIONAL_FILES}; do
+                sed -i "s:$file-sha256:$(sha256sum "${PP_WORK}/$swu_file_base/"$file | cut -f 1 -d " "):g" \
+                    "${PP_WORK}/$swu_file_base/${SWU_DESCRIPTION_FILE}"
+            done
+            cd "${PP_WORK}/$swu_file_base"
+            for file in "${SWU_DESCRIPTION_FILE}" ${SWU_ADDITIONAL_FILES}; do
+                if [ "$file" = "${SWU_DESCRIPTION_FILE}" ] || \
+                    grep -q "$file" "${PP_WORK}/$swu_file_base/${SWU_DESCRIPTION_FILE}"; then
+                    # Set file timestamps for reproducible builds
+                    if [ -n "${SOURCE_DATE_EPOCH}" ]; then
+                        touch -d@"${SOURCE_DATE_EPOCH}" "$file"
+                    fi
+                    echo "$file"
+                    if [ -n "$sign" -a "${SWU_DESCRIPTION_FILE}" = "$file" ]; then
+                        sign-swu "$file" "$file.${SWU_SIGNATURE_EXT}"
+                        # Set file timestamps for reproducible builds
+                        if [ -n "${SOURCE_DATE_EPOCH}" ]; then
+                            touch -d@"${SOURCE_DATE_EPOCH}" "$file.${SWU_SIGNATURE_EXT}"
+                        fi
+                        echo "$file.${SWU_SIGNATURE_EXT}"
+                    fi
+                fi
+            done | cpio -ovL --reproducible -H crc > "${PP_DEPLOY}/${SWU_IMAGE_FILE}$swu_file_extension.swu"
 EOIMAGER
+    done
 }
 
 python do_check_swu_partition_uuids() {
