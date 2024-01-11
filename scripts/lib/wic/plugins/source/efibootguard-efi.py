@@ -66,6 +66,13 @@ class EfibootguardEFIPlugin(SourcePlugin):
             exit(1)
         creator.deploy_dir = deploy_dir
 
+        deploy_dir = get_bitbake_var("DEPLOY_DIR_IMAGE")
+        if not deploy_dir:
+            msger.error("DEPLOY_DIR_IMAGE not set, exiting\n")
+            exit(1)
+        creator.deploy_dir = deploy_dir
+
+        distro_arch = get_bitbake_var("DISTRO_ARCH")
         bootloader = "/usr/lib/{libpath}/efibootguard/efibootguard{efiarch}.efi".format(
                         libpath=libarch,
                         efiarch=efiarch)
@@ -86,6 +93,13 @@ class EfibootguardEFIPlugin(SourcePlugin):
                                               part_rootfs_dir,
                                               name)
         exec_cmd(cp_cmd, True)
+
+        cp_to_deploy_cmd = "cp %s/%s %s/%s" % (cr_workdir,
+                                               signed_bootloader,
+                                               deploy_dir,
+                                               name)
+        exec_cmd(cp_to_deploy_cmd, True)
+
         du_cmd = "du --apparent-size -ks %s" % part_rootfs_dir
         blocks = int(exec_cmd(du_cmd).split()[0])
 
