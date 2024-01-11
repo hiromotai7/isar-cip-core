@@ -53,6 +53,16 @@ IMAGE_TEMPLATE_VARS:swu = " \
 addtask do_transform_template after do_generate_image_uuid
 
 python(){
+    cmds = d.getVar("SWU_EXTEND_SW_DESCRIPTION")
+    if cmds is None or not cmds.strip():
+        return
+    cmds = cmds.split()
+    for cmd in cmds:
+        bb.build.exec_func(cmd, d)
+}
+
+SWU_EXTEND_SW_DESCRIPTION += "add_swu_hw_compat"
+python add_swu_hw_compat(){
     # create SWU_HW_COMPAT_NODE based on list of supported hw
     hw_compat = d.getVar('SWU_HW_COMPAT')
     if hw_compat:
@@ -61,7 +71,10 @@ python(){
             'hardware-compatibility: [ ' + hw_entries +' ];')
     else:
         d.setVar('SWU_HW_COMPAT_NODE', '')
+}
 
+SWU_EXTEND_SW_DESCRIPTION += "add_swu_compression"
+python add_swu_compression(){
     # create SWU_COMPRESSION_NODE node if compression is enabled
     calgo = d.getVar('SWU_COMPRESSION_TYPE')
     if calgo:
