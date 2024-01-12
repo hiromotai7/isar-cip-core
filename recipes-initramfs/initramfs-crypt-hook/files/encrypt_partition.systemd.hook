@@ -31,8 +31,11 @@ manual_add_modules tpm_crb
 manual_add_modules dm_mod
 manual_add_modules dm_crypt
 
-# add crypto modules for debian upstream kernel
-manual_add_modules aesni-intel
+# add required crypto modules in case
+# the kernel does not have them as default
+manual_add_modules ecb
+manual_add_modules aes_generic
+manual_add_modules xts
 
 copy_exec /usr/bin/openssl || hook_error "/usr/bin/openssl not found"
 copy_exec /usr/sbin/mke2fs || hook_error "/usr/sbin/mke2fs not found"

@@ -36,6 +36,13 @@ esac
 modprobe tpm_tis
 modprobe tpm_crb
 
+modprobe ecb
+modprobe aes_generic
+modprobe xts
+
+# this needs to be probed particularly for re-encryption
+modprobe loop
+
 # fixed tpm device or do we need to find it
 tpm_device=/dev/tpmrm0
 partition_sets="$PARTITIONS"
