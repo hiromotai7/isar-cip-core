@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2022
+# Copyright (c) Siemens AG, 2022-2024
 #
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
@@ -9,12 +9,10 @@
 # SPDX-License-Identifier: MIT
 #
 
-require u-boot-common.inc
+require u-boot-common-${PV}.inc
 
 U_BOOT_CONFIG = "am335x_evm_defconfig"
 U_BOOT_BIN = "all"
-
-EFI_ARCH = "arm"
 
 do_prepare_build:append() {
     echo "MLO u-boot.img /usr/lib/u-boot/${MACHINE}" > \

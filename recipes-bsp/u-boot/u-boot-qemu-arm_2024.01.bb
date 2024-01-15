@@ -9,8 +9,7 @@
 # SPDX-License-Identifier: MIT
 #
 
+require u-boot-common-${PV}.inc
 require u-boot-qemu-common.inc
 
-U_BOOT_CONFIG = "qemu_arm64_defconfig"
-
-EFI_ARCH = "aa64"
+U_BOOT_CONFIG = "qemu_arm_defconfig"
