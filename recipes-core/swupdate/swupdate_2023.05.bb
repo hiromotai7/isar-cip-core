@@ -43,6 +43,8 @@ DEB_BUILD_PROFILES += "pkg.swupdate.nohwcompat"
 DEB_BUILD_PROFILES += "pkg.swupdate.suricattalua"
 # add suricatta wfx
 DEB_BUILD_PROFILES += "pkg.swupdate.suricattawfx"
+# add delta update build profile for bookworm
+DEB_BUILD_PROFILES += "pkg.swupdate.delta"
 
 # Disable cross for arm and arm64 on bullseye
 # with cross compile we have a unsat-dependency to dh-nodejs on arm/arm64
