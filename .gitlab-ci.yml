@@ -63,6 +63,14 @@ default:
     - if [ "${deploy}" = "enable" ]; then scripts/deploy-cip-core.sh ${release} ${target} ${extension} ${dtb} ${CI_COMMIT_REF_SLUG}; fi
     - if [ "${deploy_kernelci}" = "enable" ]; then scripts/deploy-kernelci.py ${release} ${target} ${extension} ${dtb}; fi
 
+cve-checks:
+  image: registry.gitlab.com/cip-playground/debian-cve-checker:latest
+  script:
+    - scripts/run-cve-checks.sh
+  rules:
+     - if: $CI_PIPELINE_SOURCE == "web" && $CI_JOB_NAME == "cve-checks"
+  when: manual
+
 # base image
 build:simatic-ipc227e-base:
   extends:
