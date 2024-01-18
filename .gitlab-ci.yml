@@ -29,6 +29,7 @@ variables:
 stages:
   - build
   - test
+  - cve-check
 
 default:
   before_script:
@@ -340,5 +341,18 @@ build:qemu-riscv64:
     wic_targz: disable
     deploy: disable
   allow_failure: true
+
+cve-checks:
+  stage: cve-check
+  needs: []
+  image: registry.gitlab.com/cip-playground/debian-cve-checker:latest
+  script:
+    - scripts/run-cve-checks.sh
+  when: manual
+  allow_failure: true
+  artifacts:
+    expire_in: 1 day
+    paths:
+      - cve-reports
 
 include: '.reproducible-check-ci.yml'
