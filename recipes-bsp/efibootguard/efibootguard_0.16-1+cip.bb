@@ -22,9 +22,10 @@ SRC_URI = " \
     https://github.com/siemens/efibootguard/archive/refs/tags/v${EBG_VERSION}.tar.gz;downloadfilename=efibootguard_${EBG_VERSION}.orig.tar.gz;unpack=0;name=tarball \
     git://salsa.debian.org/debian/efibootguard.git;protocol=https;branch=master;name=debian \
     file://debian-patches/0001-d-control-Make-compatible-with-debian-buster.patch \
+    file://debian-patches/0002-d-control-remove-native-from-python3-shtab.patch \
     "
 SRC_URI[tarball.sha256sum] = "d6d37c59aed17489d02b4f0b63db16994dfb8f9f70f54be4d65c366f58c6be9d"
-SRCREV_debian = "eacf94e767136a0257850ea0c888d234cb8cace4"
+SRCREV_debian = "ee551bc5239068ce5ab024089cf20385749ae77e"
 
 PROVIDES = "libebgenv-dev libebgenv0 efibootguard"
 
