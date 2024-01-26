@@ -40,3 +40,32 @@ def distro_to_lib_arch(d):
     return DISTRO_TO_LIB_ARCH[distro_arch]
 
 EFI_LIB_ARCH := "${@distro_to_lib_arch(d)}"
+
+# Add the bootloader file
+def efi_bootloader_name(d):
+    efi_arch = distro_to_efi_arch(d)
+    return "boot{}.efi".format(efi_arch)
+
+SWU_EXTEND_SW_DESCRIPTION += "add_ebg_update"
+python add_ebg_update(){
+   efi_boot_loader_file = efi_bootloader_name(d)
+   efi_boot_device = d.getVar('SWU_EFI_BOOT_DEVICE')
+   swu_ebg_update_node = f"""
+   {{
+          filename = "{efi_boot_loader_file}";
+          path = "EFI/BOOT/{efi_boot_loader_file}";
+          device = "{efi_boot_device}";
+          filesystem = "vfat";
+          sha256 = "{efi_boot_loader_file}-sha256";
+          properties: {{
+               atomic-install = "true";
+          }};
+   }}
+   """
+
+   d.setVar('SWU_BOOTLOADER_FILE_NODE', swu_ebg_update_node)
+   ebg_update = d.getVar('SWU_EBG_UPDATE') or ""
+   if ebg_update:
+     d.appendVar('SWU_FILE_NODES', "," + swu_ebg_update_node)
+   d.appendVar('SWU_ADDITIONAL_FILES', " " + efi_boot_loader_file)
+}
