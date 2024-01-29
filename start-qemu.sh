@@ -161,13 +161,6 @@ if [ -z "${DISPLAY}" ]; then
 	esac
 fi
 
-QEMU_COMMON_OPTIONS=" \
-	-m 1G \
-	-serial mon:stdio \
-	-netdev user,id=net,hostfwd=tcp:127.0.0.1:22222-:22 \
-	${QEMU_EXTRA_ARGS} \
-	"
-
 if [ "$TPM2_ENCRYPTION" = "true" ] && [ -x /usr/bin/swtpm ]; then
 	SWTPM_DIR="${IMAGE_PREFIX}.swtpm"
 	mkdir -p "${SWTPM_DIR}"
@@ -186,6 +179,13 @@ if [ "$TPM2_ENCRYPTION" = "true" ] && [ -x /usr/bin/swtpm ]; then
 			 -device ${TPM_DEVICE},tpmdev=tpm0"
 	fi
 fi
+
+QEMU_COMMON_OPTIONS=" \
+	-m 1G \
+	-serial mon:stdio \
+	-netdev user,id=net,hostfwd=tcp:127.0.0.1:22222-:22 \
+	${QEMU_EXTRA_ARGS} \
+	"
 
 if [ -n "${SECURE_BOOT}${SWUPDATE_BOOT}" ]; then
 	case "${arch}" in
