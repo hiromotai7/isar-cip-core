@@ -12,7 +12,7 @@
 # [Note] u-boot runs from an SPI memory device
 
 # SDCard Boot partition (copies files in IMAGE_BOOT_FILES: zImage and device tree)
-part /boot --source bootimg-partition --ondisk mmcblk0 --fstype vfat --label boot --align 1 --size 32M --extra-space 0 --fsuuid 0x4321dcba
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype vfat --label boot --align 1 --size 32M --extra-space 0 --fsuuid 0x4321dcba --uuid 28a58348-5270-44d3-bea4-b1c492a81b7f
 
 # Rootfs partition
-part / --source rootfs --ondisk mmcblk0 --fstype ext4 --label root --align 1024 --size 2G --active --fsuuid 1f55d66a-40d8-11ee-be56-0242ac120002
+part / --source rootfs --ondisk mmcblk0 --fstype ext4 --label root --align 1024 --size 2G --active --fsuuid 1f55d66a-40d8-11ee-be56-0242ac120002 --uuid d0fa8361-7deb-43df-acee-1725d40d403e
