@@ -11,4 +11,4 @@
 
 require linux-cip-common.inc
 
-SRC_URI[sha256sum] = "6cc43814b53964dd5d18a0d5e33da014773c54313ce25c57d8504a1e24fb96c3"
+SRC_URI[sha256sum] = "aa11943e7a262482b474d205b5cf0e1ff5a7ee17aa04dca9a09fcdd154cb2840"
