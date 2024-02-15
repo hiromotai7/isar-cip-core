@@ -36,10 +36,13 @@ SRC_URI:append:bullseye = " file://0004-d-swupdate-www.install-Fix-path-for-debi
 DEB_BUILD_PROFILES += "pkg.swupdate.suricattalua"
 # add suricatta wfx
 DEB_BUILD_PROFILES += "pkg.swupdate.suricattawfx"
+# add delta update build profile for bookworm
+DEB_BUILD_PROFILES:append:bookworm = " pkg.swupdate.delta"
 
 # Disable cross for arm and arm64 on bullseye
 # with cross compile we have a unsat-dependency to dh-nodejs on arm/arm64
 ISAR_CROSS_COMPILE:bullseye = "0"
+ISAR_CROSS_COMPILE:bookworm = "0"
 
 # use backport build profile for bullseye
 DEB_BUILD_PROFILES:append:bullseye = " pkg.swupdate.bpo"
