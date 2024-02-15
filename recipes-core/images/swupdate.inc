@@ -16,4 +16,7 @@ SWU_SIGNED ?= "1"
 
 IMAGE_INSTALL += " swupdate"
 
+IMAGE_INSTALL:remove:sid = "swupdate"
+IMAGE_PREINSTALL:append:sid = " swupdate"
+
 IMAGE_INSTALL += " swupdate-handler-roundrobin"
