@@ -234,6 +234,132 @@ user variables:
 
 
 ```
+# Building and testing the CIP Core image for Delta Software Update
+
+Set up `kas-container` as described in the [top-level README](../README.md), and then proceed with the following steps. Currently Delta Software Update is only supported for the root file system. 
+
+The build steps are the same for Delta software update with both rdiff_image handler and delta handler.
+
+First build an image using the following command:
+```
+host$ ./kas-container build kas-cip.yml:kas/board/qemu-amd64.yml:kas/opt/ebg-swu.yml:kas/opt/rt.yml
+```
+
+Copy the image artifacts genarated in `build/tmp/deploy/images/qemu-amd64/` into a separate folder (ex: ./image1).
+```
+host$ cp -r build/tmp/deploy/images/qemu-amd64/ ./image1
+```
+Currently, Delta Software Update is supported only for root file system.
+Now, to create a delta update file, make some modifications to the root file system (ex: Add additional packages).
+For this example, add the packages vim and nano (since the packages are not already included in the base image) to the image. This can be done by modifying the `recipes-core/images/cip-core-image.bb` file as shown below.
+```
+diff --git a/recipes-core/images/cip-core-image.bb b/recipes-core/images/cip-core-image.bb
+index 0ec7220..f61ce23 100644
+--- a/recipes-core/images/cip-core-image.bb
++++ b/recipes-core/images/cip-core-image.bb
+@@ -14,6 +14,7 @@ inherit image
+ ISAR_RELEASE_CMD = "git -C ${LAYERDIR_cip-core} describe --tags --dirty --always --match 'v[0-9].[0-9]*'"
+ DESCRIPTION = "CIP Core image"
+
++IMAGE_PREINSTALL += "vim nano"
+ IMAGE_INSTALL += "customizations"
+
+ CIP_IMAGE_OPTIONS ?= ""
+```
+
+Now build an image with the above mentioned recipe changes with the following command:
+```
+host$ ./kas-container build kas-cip.yml:kas/board/qemu-amd64.yml:kas/opt/ebg-swu.yml
+```
+
+Copy the image artifacts genarated in `build/tmp/deploy/images/qemu-amd64/` into a separate folder (ex: ./image2).
+```
+host$ cp -r build/tmp/deploy/images/qemu-amd64/ ./image2
+```
+
+## Delta Software Update using rdiff_image handler 
+
+Before proceeding, make sure the package `librsync2` is available in the system.
+
+Under Debian/Ubuntu, librsync2 can be installed using the following command:  
+```
+host$ sudo apt-get install librsync2
+```
+
+For creating a delta update artifact for the rdiff_image handler, navigate to the `scripts` folder and run the `create_delta_swu.sh` file with the following commands:
+```
+host$ cd scripts
+host$ sudo ./create_delta_swu.sh --type rdiff ../image1 ../image2
+host$ cd ../
+```
+
+The `create_delta_swu.sh` creates a folder named `delta_update_artifacts` in the current directory which has the delta update artifacts. 
+
+Now start the first image (which does not contain the packages vim and nano), run the following commands:
+```
+host$ sudo rm -r build/tmp/deploy/images/qemu-amd64/*
+host$ cp -r ./image1/* build/tmp/deploy/images/qemu-amd64/
+host$ DISTRO_RELEASE=bookworm SWUPDATE_BOOT=y ./start-qemu.sh amd64
+```
+Copy `update.swu` file from `delta_update_artifacts` folder into the running system:
+```
+host$ cd scripts/delta_update_artifacts
+host$ scp -P 22222 ./update.swu root@localhost:
+```
+### Delta Software Update Verification
+
+Follow the steps mentioned in the section [SWUpdate verification](#swupdate-verification) for verification.
+
+Since our target was to update the root file system by adding a few packages (vim and nano in this example), Check if the packages are available after the update by running either the `vim` command or `nano` command.
+
+## Delta Software Update using delta handler
+
+Before proceeding, make sure the package `zchunk` is available in the system.
+
+Under Debian/Ubuntu, zchunk can be installed using the following command:  
+```
+host$ sudo apt-get install zchunk
+```
+
+Delta software update with delta handler (zchunk) requires the zck file to be uploaded to a server and the url of the zck file to be included in the `sw-description` file.
+
+For example, Apache server can be used to host the .zck file and make sure the server is accessible to the target (QEMU or HW).
+
+Under Debian/Ubuntu, Apache can be installed using the following command:  
+```
+host$ sudo apt-get install apache2
+```
+The files that are served by the Apache server are placed in `/var/www/html`
+
+If Apache server is used, then create a directory named `artifacts` inside `/var/www/html` and copy the .zck file (which will be created in the next step) in the `artifacts` folder.
+
+In the above case, the file url will be `http://<SERVER_IP>/artifacts/update.delta.zck`
+
+For creating a delta update artifact for the delta handler, navigate to the `scripts` folder and run the `create_delta_swu.sh` file with the following commands:
+```
+host$ cd scripts
+host$ sudo ./create_delta_swu.sh --type zchunk --url <url of the zck file> ../image1 ../image2
+host$ cd ../
+```
+
+The `create_delta_swu.sh` creates a folder named `delta_update_artifacts` in the current directory which has the delta update artifacts. 
+
+Now start the first image (which does not contain the packages vim and nano), run the following commands:
+```
+host$ sudo rm -r build/tmp/deploy/images/qemu-amd64/*
+host$ cp -r ./image1/* build/tmp/deploy/images/qemu-amd64/
+host$ DISTRO_RELEASE=bookworm SWUPDATE_BOOT=y ./start-qemu.sh amd64
+```
+Copy `update.swu` file from `delta_update_artifacts` folder into the running system:
+```
+host$ cd scripts/delta_update_artifacts
+host$ scp -P 22222 ./update.swu root@localhost:
+```
+**NOTE**: Make sure the .zck file in `delta_update_artifacts` folder is copied to the apache server directory `/var/www/html/artifacts` and is accessible through the server used.
+
+### Delta Software Update Verification
+
+Follow the steps mentioned in the section [Delta Software Update Verification](#delta-software-update-verification) for verification.
 
 # Building and testing the CIP Core image for BBB
 
