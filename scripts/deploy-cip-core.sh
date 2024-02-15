@@ -15,6 +15,7 @@ TARGET=$2
 EXTENSION=$3
 DTB=$4
 REF=$5
+DEPLOY=$6
 
 BASE_FILENAME=cip-core-image-cip-core-$RELEASE-$TARGET
 if [ "${EXTENSION}" != "none" ]; then
@@ -29,11 +30,18 @@ BASE_PATH=build/tmp/deploy/images/$TARGET/$BASE_FILENAME
 S3_TARGET=s3://download2.cip-project.org/cip-core/$REF/$TARGET/
 
 if [ -f "${BASE_PATH}.wic" ]; then
-	echo "Compressing $BASE_FILENAME.wic..."
-	xz -9 -k -T0 "${BASE_PATH}.wic"
-
 	echo "Uploading artifacts..."
-	aws s3 cp --no-progress --acl public-read "${BASE_PATH}.wic.xz" "${S3_TARGET}"
+	if [ "$DEPLOY" = "swu" ]; then
+		aws s3 cp --no-progress --acl public-read "${BASE_PATH}.swu" "${S3_TARGET}"
+	else
+		echo "Compressing $BASE_FILENAME.wic..."
+		xz -9 -k -T0 "${BASE_PATH}.wic"
+		aws s3 cp --no-progress --acl public-read "${BASE_PATH}.wic.xz" "${S3_TARGET}"
+
+		if [ -f "build/tmp/deploy/images/$TARGET/firmware.bin" ]; then
+			aws s3 cp --no-progress --acl public-read "build/tmp/deploy/images/$TARGET/firmware.bin" "${S3_TARGET}"
+		fi
+	fi
 else
 	if [ -f "${BASE_PATH}.tar.gz" ]; then
 		echo "Uploading artifacts..."
