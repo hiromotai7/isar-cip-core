@@ -25,6 +25,7 @@ variables:
   dtb: none
   deploy: enable
   deploy_kernelci: disable
+  build_swu_v2: disable
 
 stages:
   - build
@@ -65,7 +66,12 @@ default:
     - if [ "${encrypt}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/encrypt-partitions.yml"; fi
     - echo "Building ${base_yaml}"
     - kas build ${base_yaml}
-    - if [ "${deploy}" = "enable" ]; then scripts/deploy-cip-core.sh ${release} ${target} ${extension} ${dtb} ${CI_COMMIT_REF_SLUG}; fi
+    - if [ "${deploy}" = "enable" ]; then scripts/deploy-cip-core.sh ${release} ${target} ${extension} ${dtb} ${CI_COMMIT_REF_SLUG} wic; fi
+    - if [ "${build_swu_v2}" = "enable" ]; then
+          echo "PV = \"2.0\"" >> recipes-core/images/cip-core-image-security.bb;
+          kas build ${base_yaml};
+          scripts/deploy-cip-core.sh ${release} ${target} ${extension} ${dtb} ${CI_COMMIT_REF_SLUG} swu;
+      fi
     - if [ "${deploy_kernelci}" = "enable" ]; then scripts/deploy-kernelci.py ${release} ${target} ${extension} ${dtb}; fi
 
 # base image
@@ -105,6 +111,7 @@ build:qemu-amd64-base:
     use_rt: disable
     wic_targz: disable
     targz: enable
+    build_swu_v2: enable
 
 build:qemu-amd64-base-kernelci:
   extends:
@@ -127,6 +134,7 @@ build:qemu-arm64-base:
     use_rt: disable
     wic_targz: disable
     targz: enable
+    build_swu_v2: enable
 
 build:qemu-arm64-base-kernelci:
   extends:
@@ -149,6 +157,7 @@ build:qemu-arm-base:
     use_rt: disable
     wic_targz: disable
     targz: enable
+    build_swu_v2: enable
 
 build:qemu-arm-base-kernelci:
   extends:
