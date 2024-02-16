@@ -26,6 +26,7 @@ variables:
   deploy: enable
   deploy_kernelci: disable
   build_swu_v2: disable
+  swupdate_version: default
 
 stages:
   - build
@@ -64,6 +65,7 @@ default:
     - if [ "${release}" = "bookworm" ]; then base_yaml="${base_yaml}:kas/opt/bookworm.yml"; fi
     - if [ "${release}" = "sid" ]; then base_yaml="${base_yaml}:kas/opt/sid.yml"; fi
     - if [ "${encrypt}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/encrypt-partitions.yml"; fi
+    - if [ "${swupdate_version}" = "2022.12" ]; then base_yaml="${base_yaml}:kas/opt/swupdate-2022.12.yaml"; fi
     - echo "Building ${base_yaml}"
     - kas build ${base_yaml}
     - if [ "${deploy}" = "enable" ]; then scripts/deploy-cip-core.sh ${release} ${target} ${extension} ${dtb} ${CI_COMMIT_REF_SLUG} wic; fi
@@ -312,6 +314,7 @@ build:qemu-amd64-secure-boot-bullseye:
     use_rt: disable
     wic_targz: disable
     deploy: disable
+    swupdate_version: "2022.12"
 
 # buster images
 build:iwg20m-buster:
