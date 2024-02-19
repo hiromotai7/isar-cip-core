@@ -20,6 +20,5 @@ SRC_URI = " \
 
 do_prepare_build() {
         cp -R ${WORKDIR}/debian ${S}
-        deb_create_compat
         deb_add_changelog
 }
