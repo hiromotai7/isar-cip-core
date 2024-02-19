@@ -17,6 +17,16 @@ do_image_wic[depends] += "${INITRAMFS_RECIPE}:do_build"
 IMAGE_INSTALL += "home-fs"
 IMAGE_INSTALL += "tmp-fs"
 
+# For pre bookworm images, empty /var is not usable
+IMAGE_INSTALL:append:bookworm = " immutable-rootfs"
+
+ROOTFS_POSTPROCESS_COMMAND:append:bookworm =" copy_dpkg_state"
+copy_dpkg_state() {
+    IMMUTABLE_VAR_LIB="${ROOTFSDIR}/usr/share/immutable-data/var/lib"
+    sudo mkdir -p "$IMMUTABLE_VAR_LIB"
+    sudo cp -a ${ROOTFSDIR}/var/lib/dpkg "$IMMUTABLE_VAR_LIB/"
+}
+
 image_configure_fstab() {
     sudo tee '${IMAGE_ROOTFS}/etc/fstab' << EOF
 # Begin /etc/fstab
