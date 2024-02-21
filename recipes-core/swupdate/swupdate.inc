@@ -23,7 +23,7 @@ def get_bootloader_dependencies(d):
     if bootloader == "efibootguard":
         return "libebgenv-dev"
     if bootloader == "u-boot":
-        if d.getVar("U_BOOT_CONFIG_PACKAGE") == "1":
+        if bb.utils.to_boolean(d.getVar("U_BOOT_CONFIG_PACKAGE")):
             return "libubootenv u-boot-{}-config".format(d.getVar("MACHINE"))
         else:
             return "libubootenv"
@@ -32,7 +32,7 @@ def get_bootloader_dependencies(d):
 DEPENDS += "${@get_bootloader_dependencies(d)}"
 DEPENDS += "${@bb.utils.contains('DEB_BUILD_PROFILES', 'mtd', 'mtd-utils', '', d)}"
 
-DEB_BUILD_PROFILES += "${@'pkg.swupdate.nosigning' if not d.getVar('SWU_SIGNED') == '1' else ''}"
+DEB_BUILD_PROFILES += "${@'pkg.swupdate.nosigning' if not bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}"
 
 # deactivate hardware compability for simple a/b rootfs update
 DEB_BUILD_PROFILES += "pkg.swupdate.nohwcompat"
