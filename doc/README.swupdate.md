@@ -21,6 +21,96 @@ window is still possible.
 If the variable `SWU_EBG_UPDATE` is set to `"1"` the update is also stored in
 the `*.swu` file.
 
+## SWUpdate scripts
+
+It is possible to add [scripts](https://sbabic.github.io/swupdate/sw-description.html?#scripts) to a swu file.
+
+To add a script entry in isar-cip-core set the variable `SWU_SCRIPTS`.
+The content of the variable has the following pattern:
+`script_name`
+
+For each `script_name` the following flags need to be set:
+
+```
+SWU_SCRIPT_script_name[file] = "<script_file_name>"
+```
+
+The optional flag `type` can be used to set one of the following script types:
+ - [lua](https://sbabic.github.io/swupdate/sw-description.html#lua)
+ - [shellscript](https://sbabic.github.io/swupdate/sw-description.html#shellscript)
+ - [preinstall](https://sbabic.github.io/swupdate/sw-description.html#preinstall)
+ - [postinstall](https://sbabic.github.io/swupdate/sw-description.html#postinstall)
+
+If no type is given SWUpdate defaults to "lua".
+```
+SWU_SCRIPT_script_name[type] = "<script_type>"
+```
+
+The optional flag `data` can be used as an script argument:
+
+```
+SWU_SCRIPT_script_name[data] = "<script argument>"
+```
+
+The file referenced by `<script_file_name>` is added to the variables `SRC_URI`
+and `SWU_ADDITIONAL_FILES`. Therefore, it needs to be saved in a `FILESPATH`
+location.
+
+### Example: postinstall.sh
+
+```
+SWU_SCRIPTS = "postinstall"
+SWU_SCRIPT_postinstall[file] = "postinstall.sh"
+SWU_SCRIPT_postinstall[type] = "postinstall"
+SWU_SCRIPT_postinstall[data] = "some_data"
+```
+
+This will add  `file://postinstall.sh` to the variable `SRC_URI` and
+`postinstall.sh` to `SWU_ADDTIONAL_FILES`. The sw-description will contain
+the following section:
+```
+    scripts: (
+        {
+          filename = "postinstall.sh";
+          type = "postinstall";
+          data = "some_data"
+          sha256 = "<sha256 of postinstall.sh>";
+        }):
+```
+### Example: Luascript
+The simplest lua script has the following content:
+```lua
+function preinst()
+	local message = "preinst called\n"
+	local success = true
+	return success, message
+end
+function postinst()
+	local message = "postinst called\n"
+	local success = true
+	return success, message
+end
+```
+and is added:
+
+```
+SWU_SCRIPTS = "luascript"
+SWU_SCRIPT_luascript[file] = "luascript.lua"
+SWU_SCRIPT_luascript[type] = "luascript"
+SWU_SCRIPT_luascript[data] = "some_data"
+```
+
+The sw-description will contain the following section:
+```
+    scripts: (
+        {
+          filename = "luascript.lua";
+          type = "lua";
+          data = "some_data"
+          sha256 = "<sha256 of luascript.lua>";
+        }):
+```
+
 # Building and testing the CIP Core image
 
 Set up `kas-container` as described in the [top-level README](../README.md).

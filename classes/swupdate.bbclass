@@ -57,6 +57,7 @@ IMAGE_TEMPLATE_VARS:swu = " \
     SWU_NAME \
     SWU_FILE_NODES \
     SWU_BOOTLOADER_FILE_NODE \
+    SWU_SCRIPTS_NODE \
     "
 
 # TARGET_IMAGE_UUID needs to be generated before completing the template
@@ -91,6 +92,48 @@ python add_swu_compression(){
         d.setVar('SWU_COMPRESSION_NODE', 'compressed = "' + calgo + '";')
     else:
         d.setVar('SWU_COMPRESSION_NODE', '')
+}
+
+
+SWU_EXTEND_SW_DESCRIPTION += "add_scripts"
+python add_scripts(){
+    swu_scripts = d.getVar('SWU_SCRIPTS')
+    if not swu_scripts:
+        return
+    swu_script_entries = swu_scripts.split()
+    script_node_list = []
+    for entry in swu_script_entries:
+        script_entry = f"SWU_SCRIPT_{entry}"
+
+        script_file = d.getVarFlag(script_entry, "file")
+        if not script_file:
+            bb.warn(f"flag 'file' is empty for {script_entry} ")
+            continue
+
+        script_type = d.getVarFlag(script_entry, "type") or None
+        allowed_script_types = [None, "lua", "shellscript", "preinstall", "postinstall"]
+        if script_type not in allowed_script_types:
+            bb.warn(f"flag 'type' is not of value {allowed_script_types} ")
+            continue
+
+        script_data = d.getVarFlag(script_entry, "data")
+        node = f"""
+        {{
+          filename = "{script_file}";
+        """
+        if script_type:
+            node += f"""  type = "{script_type}";"""
+        if script_data:
+            node += f"""  data = "{script_data}";"""
+        node += f"""
+          sha256 = "{script_file}-sha256";
+        }}"""
+        script_node_list.append(node)
+        d.appendVar('SWU_ADDITIONAL_FILES', " " + script_file)
+        d.appendVar('SRC_URI', f" file://{script_file}")
+
+    swu_scripts_node = "scripts: (" + ','.join([n for n in script_node_list]) + ");"
+    d.appendVar('SWU_SCRIPTS_NODE', swu_scripts_node)
 }
 
 # convert between swupdate compressor name and imagetype extension
