@@ -25,7 +25,8 @@ SRC_URI += "file://0001-debian-Remove-SWUpdate-USB-service-and-Udev-rules.patch 
             file://0002-debian-rules-Add-Embedded-Lua-handler-option.patch \
             file://0003-debian-rules-Add-option-to-disable-fs-creation.patch \
             file://0004-debian-rules-Add-option-to-disable-webserver.patch \
-            file://0005-debian-Add-patch-to-fix-bootloader_env_get-for-EBG.patch"
+            file://0005-debian-Add-patch-to-fix-bootloader_env_get-for-EBG.patch \
+            file://0006-debian-backport-raw-handler-unmount-fix.patch"
 
 # If the luahandler shall be embedded into the swupdate binary
 # include the following lines.
