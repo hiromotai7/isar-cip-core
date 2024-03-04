@@ -111,6 +111,20 @@ The sw-description will contain the following section:
         }):
 ```
 
+## SWUpdate Hardware compatibility
+
+The variable `SWU_HW_COMPAT` contains a space separate list of
+compatible hardware revisions.
+SWUpdate checks the compatibility against `/etc/hwrevision`, see
+[hardware-compatibility in the SWUpdate documentation.](https://sbabic.github.io/swupdate/sw-description.html#hardware-compatibility)
+
+For testing purpose the content of `/etc/hwrevision` can be set with
+the variable `MACHINE_HW_VERSION`.
+
+In production scenarios it is recommended to acquire a HW specific
+identifier (e.g., Board identifer with dmidecode) during boot up and
+write it to `/etc/hwrevision`.
+
 # Building and testing the CIP Core image
 
 Set up `kas-container` as described in the [top-level README](../README.md).
