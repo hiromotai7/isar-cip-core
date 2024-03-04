@@ -14,7 +14,7 @@ inherit dpkg-raw
 SRC_URI = "file://swupdate.cfg \
            file://hwrevision.tmpl"
 
-MACHINE_HW_VERSION ??= ""
+MACHINE_HW_VERSION ??= "cip-core-1.0"
 TEMPLATE_FILES += "hwrevision.tmpl"
 TEMPLATE_VARS += "MACHINE MACHINE_HW_VERSION"
 

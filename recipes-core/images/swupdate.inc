@@ -13,7 +13,7 @@ inherit image_uuid
 inherit read-only-rootfs
 
 SWU_SIGNED ?= "1"
-
+SWU_HW_COMPAT ?= "cip-core-1.0"
 IMAGE_INSTALL += " swupdate"
 
 IMAGE_INSTALL:remove:sid = "swupdate"
