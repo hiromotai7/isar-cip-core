@@ -63,7 +63,7 @@ IMAGE_TEMPLATE_VARS:swu = " \
 # TARGET_IMAGE_UUID needs to be generated before completing the template
 addtask do_transform_template after do_generate_image_uuid
 
-python do_extend_sw_description(){
+python do_extend_sw_description() {
     cmds = d.getVar("SWU_EXTEND_SW_DESCRIPTION")
     if cmds is None or not cmds.strip():
         return
@@ -74,7 +74,7 @@ python do_extend_sw_description(){
 do_transform_template[prefuncs] += "do_extend_sw_description"
 
 SWU_EXTEND_SW_DESCRIPTION += "add_swu_hw_compat"
-python add_swu_hw_compat(){
+python add_swu_hw_compat() {
     # create SWU_HW_COMPAT_NODE based on list of supported hw
     hw_compat = d.getVar('SWU_HW_COMPAT')
     if hw_compat:
@@ -86,7 +86,7 @@ python add_swu_hw_compat(){
 }
 
 SWU_EXTEND_SW_DESCRIPTION += "add_swu_compression"
-python add_swu_compression(){
+python add_swu_compression() {
     # create SWU_COMPRESSION_NODE node if compression is enabled
     calgo = d.getVar('SWU_COMPRESSION_TYPE')
     if calgo:
@@ -110,7 +110,7 @@ def add_scripts_to_src_uri(d):
 SRC_URI += "${@add_scripts_to_src_uri(d)}"
 
 SWU_EXTEND_SW_DESCRIPTION += "add_scripts_node"
-python add_scripts_node(){
+python add_scripts_node() {
     swu_scripts = d.getVar('SWU_SCRIPTS')
     if not swu_scripts:
         return
