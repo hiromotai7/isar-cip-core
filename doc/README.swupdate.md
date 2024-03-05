@@ -110,6 +110,27 @@ The sw-description will contain the following section:
           sha256 = "<sha256 of luascript.lua>";
         }):
 ```
+## SWUpdate Signing
+
+The ISAR layer isar-cip-core provides templates to sign the swu binaries with
+a CMS certificate.
+
+By default the insecure [Debian snake-oil keys](./recipes-devtools/secure-boot-secrets/files/bookworm/) are used.
+To use other key and certificate the following variables must be set:
+```
+PREFERRED_PROVIDER_swupdate-certificates-key = "swupdate-certificates-key"
+PREFERRED_PROVIDER_swupdate-certificates = "swupdate-certificates"
+SWU_SIGN_CERT = "<sigining certificate file name>"
+SWU_SIGN_KEY  = "<siging key file name>"
+```
+
+The files `<sigining certificate file name>` and `<siging key file name>` need to be stored
+in `recipes-devtools/swupdate-certificates/files/` or in a path defined by an bbappend file, e.g.`swupdate-certificates-key_%.bbappend`
+
+### signing script
+
+The provided [cms signing script](./recipes-devtools/swupdate-certificates/files/sign-swu-cms)
+can be replaced by setting the variable `SWU_SIGN_SCRIPT`.
 
 ## SWUpdate Hardware compatibility
 
