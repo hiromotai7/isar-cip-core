@@ -1,9 +1,34 @@
 #!/bin/sh
 in_file=$1
 out_file=$2
+inkey="/usr/share/swupdate-signing/swupdate-sign.key"
+cert="/usr/share/swupdate-signing/swupdate-sign.crt"
+
+error_msg() {
+	echo "$1" 1>&2
+	exit 1
+}
+
+if ! openssl rsa -check -noout -in "$inkey"; then
+	error_msg "key '$inkey' is not a rsa key "
+fi
+
+# if openssl > 3.0 we have the x509 check option
+if openssl version | grep -q "3.[0-9].[0-9]"; then
+	if ! openssl x509 -check -noout -in "$cert"; then
+		error_msg  "certificate '$cert' is not a certificate"
+	fi
+fi
+
+key_md5=$(openssl rsa -modulus -noout -in "$inkey" | openssl md5)
+cert_md5=$(openssl x509 -modulus -noout -in "$cert" | openssl md5)
+if [ "$key_md5" != "$cert_md5" ]; then
+	error_msg "key '$inkey' does not match certificate '$cert' "
+fi
+
 openssl cms \
 	-sign -in "$in_file" \
 	-out "$out_file" \
-	-signer "/usr/share/swupdate-signing/swupdate-sign.crt" \
-	-inkey "/usr/share/swupdate-signing/swupdate-sign.key" \
+	-signer "$cert" \
+	-inkey "$inkey" \
 	-outform DER -noattr -binary
