@@ -191,24 +191,40 @@ IMAGE_CMD:swu() {
                     "${PP_WORK}/$swu_file_base/${SWU_DESCRIPTION_FILE}"
             done
             cd "${PP_WORK}/$swu_file_base"
-            for file in "${SWU_DESCRIPTION_FILE}" ${SWU_ADDITIONAL_FILES}; do
-                if [ "$file" = "${SWU_DESCRIPTION_FILE}" ] || \
-                    grep -q "$file" "${PP_WORK}/$swu_file_base/${SWU_DESCRIPTION_FILE}"; then
+            cpio_files="${SWU_DESCRIPTION_FILE}"
+
+            if [ -n "$sign" ]; then
+                signature_file="${SWU_DESCRIPTION_FILE}.${SWU_SIGNATURE_EXT}"
+                if ! /usr/bin/sign-swu "${SWU_DESCRIPTION_FILE}" "$signature_file" > /dev/null 2>&1 || \
+                        [ ! -f "$signature_file" ]; then
+                    echo "Could not create swupdate signature file '$signature_file'" 1>&2
+                    exit 1
+                fi
+                cpio_files="$cpio_files $signature_file"
+            fi
+
+            # sw-description must be first file in *.swu
+            for cpio_file in $cpio_files ${SWU_ADDITIONAL_FILES}; do
+                if [ -f "$cpio_file" ]; then
                     # Set file timestamps for reproducible builds
                     if [ -n "${SOURCE_DATE_EPOCH}" ]; then
                         touch -d@"${SOURCE_DATE_EPOCH}" "$file"
                     fi
-                    echo "$file"
-                    if [ -n "$sign" -a "${SWU_DESCRIPTION_FILE}" = "$file" ]; then
-                        sign-swu "$file" "$file.${SWU_SIGNATURE_EXT}"
-                        # Set file timestamps for reproducible builds
-                        if [ -n "${SOURCE_DATE_EPOCH}" ]; then
-                            touch -d@"${SOURCE_DATE_EPOCH}" "$file.${SWU_SIGNATURE_EXT}"
-                        fi
-                        echo "$file.${SWU_SIGNATURE_EXT}"
-                    fi
+                    case "$cpio_file" in
+                        sw-description*)
+                            echo "$cpio_file"
+                            ;;
+                        *)
+                            if grep -q "$cpio_file" \
+                                    "${WORKDIR}/$swu_file_base/${SWU_DESCRIPTION_FILE}"; then
+                                echo "$cpio_file"
+                            fi
+                            ;;
+                    esac
                 fi
-            done | cpio -ovL --reproducible -H crc > "${PP_DEPLOY}/${SWU_IMAGE_FILE}$swu_file_extension.swu"
+            done | cpio \
+                --verbose --dereference --create --reproducible --format=crc \
+                > "${PP_DEPLOY}/${SWU_IMAGE_FILE}$swu_file_extension.swu"
 EOIMAGER
     done
 }
