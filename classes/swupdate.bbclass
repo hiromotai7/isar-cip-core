@@ -63,7 +63,7 @@ IMAGE_TEMPLATE_VARS:swu = " \
 # TARGET_IMAGE_UUID needs to be generated before completing the template
 addtask do_transform_template after do_generate_image_uuid
 
-python(){
+python do_extend_sw_description(){
     cmds = d.getVar("SWU_EXTEND_SW_DESCRIPTION")
     if cmds is None or not cmds.strip():
         return
@@ -71,6 +71,7 @@ python(){
     for cmd in cmds:
         bb.build.exec_func(cmd, d)
 }
+do_transform_template[prefuncs] += "do_extend_sw_description"
 
 SWU_EXTEND_SW_DESCRIPTION += "add_swu_hw_compat"
 python add_swu_hw_compat(){
@@ -94,9 +95,22 @@ python add_swu_compression(){
         d.setVar('SWU_COMPRESSION_NODE', '')
 }
 
+def add_scripts_to_src_uri(d):
+    swu_scripts = d.getVar('SWU_SCRIPTS')
+    if not swu_scripts:
+        return ""
+    swu_script_entries = swu_scripts.split()
+    script_file_list = []
+    for entry in swu_script_entries:
+        script_entry = f"SWU_SCRIPT_{entry}"
+        script_file = d.getVarFlag(script_entry, "file")
+        script_file_list.append(f" file://{script_file}")
+    return ' '.join([n for n in script_file_list])
 
-SWU_EXTEND_SW_DESCRIPTION += "add_scripts"
-python add_scripts(){
+SRC_URI += "${@add_scripts_to_src_uri(d)}"
+
+SWU_EXTEND_SW_DESCRIPTION += "add_scripts_node"
+python add_scripts_node(){
     swu_scripts = d.getVar('SWU_SCRIPTS')
     if not swu_scripts:
         return
@@ -129,8 +143,6 @@ python add_scripts(){
           sha256 = "{script_file}-sha256";
         }}"""
         script_node_list.append(node)
-        d.appendVar('SWU_ADDITIONAL_FILES', " " + script_file)
-        d.appendVar('SRC_URI', f" file://{script_file}")
 
     swu_scripts_node = "scripts: (" + ','.join([n for n in script_node_list]) + ");"
     d.appendVar('SWU_SCRIPTS_NODE', swu_scripts_node)
@@ -155,6 +167,7 @@ FILESEXTRAPATHS:append = ":${LAYERDIR_cip-core}/recipes-core/images/swu"
 do_image_swu[depends] += "${PN}:do_transform_template"
 do_image_swu[stamp-extra-info] = "${DISTRO}-${MACHINE}"
 do_image_swu[cleandirs] += "${WORKDIR}/swu ${WORKDIR}/swu-${SWU_BOOTLOADER}"
+do_image_swu[prefuncs] = "do_extend_sw_description"
 IMAGE_CMD:swu() {
     rm -f '${DEPLOY_DIR_IMAGE}/${SWU_IMAGE_FILE}'*.swu
     cp '${WORKDIR}/${SWU_DESCRIPTION_FILE}' '${WORKDIR}/swu/${SWU_DESCRIPTION_FILE}'
@@ -165,13 +178,14 @@ IMAGE_CMD:swu() {
     for swu_file in "${WORKDIR}"/swu*; do
         swu_file_base=$(basename $swu_file)
         # Create symlinks for files used in the update image
-        for file in ${SWU_ADDITIONAL_FILES}; do
-            if grep -q "$file" "${WORKDIR}/$swu_file_base/${SWU_DESCRIPTION_FILE}"; then
-                if [ -e "${WORKDIR}/$file" ]; then
-                    ln -s "${PP_WORK}/$file" "${WORKDIR}/$swu_file_base/$file"
-                else
-                    ln -s "${PP_DEPLOY}/$file" "${WORKDIR}/$swu_file_base/$file"
-                fi
+        swu_files=$(awk '$1=="filename"{gsub(/[",;]/, "", $3); print $3}' \
+            "${WORKDIR}/$swu_file_base/${SWU_DESCRIPTION_FILE}")
+        export swu_files
+        for file in $swu_files; do
+            if [ -e "${WORKDIR}/$file" ]; then
+                ln -s "${PP_WORK}/$file" "${WORKDIR}/$swu_file_base/$file"
+            else
+                ln -s "${PP_DEPLOY}/$file" "${WORKDIR}/$swu_file_base/$file"
             fi
         done
 
@@ -186,7 +200,7 @@ IMAGE_CMD:swu() {
         export swu_file_extension
         imager_run -p -d ${PP_WORK} -u root <<'EOIMAGER'
             # Fill in file check sums
-            for file in ${SWU_ADDITIONAL_FILES}; do
+            for file in $swu_files; do
                 sed -i "s:$file-sha256:$(sha256sum "${PP_WORK}/$swu_file_base/"$file | cut -f 1 -d " "):g" \
                     "${PP_WORK}/$swu_file_base/${SWU_DESCRIPTION_FILE}"
             done
@@ -204,7 +218,7 @@ IMAGE_CMD:swu() {
             fi
 
             # sw-description must be first file in *.swu
-            for cpio_file in $cpio_files ${SWU_ADDITIONAL_FILES}; do
+            for cpio_file in $cpio_files $swu_files; do
                 if [ -f "$cpio_file" ]; then
                     # Set file timestamps for reproducible builds
                     if [ -n "${SOURCE_DATE_EPOCH}" ]; then

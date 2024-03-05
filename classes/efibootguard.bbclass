@@ -67,5 +67,4 @@ python add_ebg_update(){
    ebg_update = d.getVar('SWU_EBG_UPDATE') or ""
    if ebg_update:
      d.appendVar('SWU_FILE_NODES', "," + swu_ebg_update_node)
-   d.appendVar('SWU_ADDITIONAL_FILES', " " + efi_boot_loader_file)
 }
