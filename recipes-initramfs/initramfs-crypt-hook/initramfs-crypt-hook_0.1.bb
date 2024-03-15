@@ -48,8 +48,8 @@ TEMPLATE_FILES = "encrypt_partition.env.tmpl"
 do_install[cleandirs] += " \
     ${D}/usr/share/initramfs-tools/hooks \
     ${D}/usr/share/encrypt_partition \
-    ${D}/usr/share/initramfs-tools/scripts/local-bottom \
-    ${D}/usr/lib/encrypt_partition"
+    ${D}/usr/share/initramfs-tools/scripts/local-bottom"
+
 do_install() {
     install -m 0600 "${WORKDIR}/encrypt_partition.env" "${D}/usr/share/encrypt_partition/encrypt_partition.env"
     install -m 0755 "${WORKDIR}/encrypt_partition.${CRYPT_BACKEND}.script" \
