@@ -1,0 +1,24 @@
+From 2b1f4d9344f4855cd646f87df5fba57f52cf6535 Mon Sep 17 00:00:00 2001
+From: Quirin Gylstorff <quirin.gylstorff@siemens.com>
+Date: Thu, 16 Nov 2023 16:40:19 +0100
+Subject: [PATCH 2/2] d/swupdate-www.install: Fix path for debian-bullseye
+
+Signed-off-by: Quirin Gylstorff <quirin.gylstorff@siemens.com>
+---
+ debian/swupdate-www.install | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/debian/swupdate-www.install b/debian/swupdate-www.install
+index 7e3d95c6..9c6113cc 100644
+--- a/debian/swupdate-www.install
++++ b/debian/swupdate-www.install
+@@ -1,5 +1,5 @@
+ web-app/css          /usr/share/swupdate/www
+ web-app/images       /usr/share/swupdate/www
+-index.html           /usr/share/swupdate/www
++web-app/index.html   /usr/share/swupdate/www
+ web-app/js           /usr/share/swupdate/www
+ web-app/node_modules /usr/share/swupdate/www
+-- 
+2.43.0
+
