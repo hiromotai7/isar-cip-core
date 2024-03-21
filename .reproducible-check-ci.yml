@@ -38,12 +38,16 @@
     # Build 2nd time
     - !reference [.build_base, script]
     - mv build/tmp/deploy/images/${target} image2
+    # Compute checksum of wic image
+    - md5sum image1/*.wic > image1/image1_wic.md5sum
+    - md5sum image2/*.wic > image2/image2_wic.md5sum
   artifacts:
     expire_in: 1 day
     paths:
       - scripts/repro-tests.sh
       - image*/*.wic.p*
       - image*/*.swu
+      - image*/*.md5sum
 
 .repro-test:
   image:
@@ -60,7 +64,22 @@
   before_script:
     - apt update && DEBIAN_FRONTEND=noninteractive apt install -y diffoscope
   script:
-    - ./scripts/repro-tests.sh --release ${release} --target ${target} --extension ${extension} image1 image2
+    - |
+      set +e
+      # check reproducibility of wic images
+      if [ $(cat image1/image1_wic.md5sum | awk '{ print $1 }') != $(cat image2/image2_wic.md5sum | awk '{ print $1 }') ]; then
+        ./scripts/repro-tests.sh --release ${release} --target ${target} --extension ${extension} --artifact_type wic-partitions image1 image2
+        wic_reproducibility=$?
+      else
+        image_name=$(basename $(cat image1/image1_wic.md5sum | awk '{ print $2 }'))
+        echo "${image_name}: Reproducible"
+        wic_reproducibility=0
+      fi
+      # check reproducibility of swu files"
+      ./scripts/repro-tests.sh --release ${release} --target ${target} --extension ${extension} --artifact_type swu image1 image2
+      swu_reproducibility=$?
+      exit_status=$wic_reproducibility || $swu_reproducibility
+      exit $exit_status
   artifacts:
     when: always
     expire_in: 1 day
