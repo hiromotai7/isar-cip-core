@@ -81,4 +81,5 @@ for _LIBRARY in /usr/lib/*/libtss2*; do
 done
 
 copy_file library /usr/share/encrypt_partition/encrypt_partition.env /usr/share/encrypt_partition/encrypt_partition.env
+copy_file library /usr/share/encrypt_partition/encrypt_partition_tpm2 /usr/share/encrypt_partition/encrypt_partition_tpm2
 copy_file pwmake-config /usr/share/encrypt_partition/pwquality.conf /etc/security/pwquality.conf

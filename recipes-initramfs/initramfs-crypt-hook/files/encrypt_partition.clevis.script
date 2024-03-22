@@ -9,176 +9,38 @@
 #
 # SPDX-License-Identifier: MIT
 
-prereqs()
-{
-	# Make sure that this script is run last in local-top
-	local req
-	for req in "${0%/*}"/*; do
-		script="${req##*/}"
-		if [ "$script" != "${0##*/}" ]; then
-			printf '%s\n' "$script"
-		fi
-	done
-}
-case $1 in
-prereqs)
-	prereqs
-	exit 0
-	;;
-esac
-
-. /scripts/functions
-
-# get configuration variables
-. /usr/share/encrypt_partition/encrypt_partition.env
-
-# load necessary kernel modules:
-modprobe tpm_tis
-modprobe tpm_crb
-
-modprobe ecb
-modprobe aes_generic
-modprobe xts
-
-# this needs to be probed particularly for re-encryption
-modprobe loop
-
-partition_sets="$PARTITIONS"
-create_file_system_cmd="$CREATE_FILE_SYSTEM_CMD"
-pcr_bank_hash_type="$HASH_TYPE"
-tpm_key_algorithm="$KEY_ALGORITHM"
-tpm_encryption_optional="$ENCRYPTION_IS_OPTIONAL"
-if [ -z "${create_file_system_cmd}" ]; then
-	create_file_system_cmd="mke2fs -t ext4"
-fi
-
-service_watchdog() {
-	for n in $(seq $(($SETUP_TIMEOUT / 10)) ); do
-		printf '\0'
-		sleep 10
-	done > "$WATCHDOG_DEV"
-}
 
 open_tpm2_partition() {
+	partition_device="$1"
+	crypt_mount_name="$2"
+	#tpm_device="$3"
 	if ! /usr/bin/clevis luks unlock -n "$crypt_mount_name" \
-		 -d "$1"; then
-		panic "Can't decrypt '$1' !"
+		 -d "$partition_device"; then
+		panic "Can't decrypt '$partition_device' !"
 	fi
 }
 
 enroll_tpm2_token() {
+	partition_device="$1"
+	passphrase="$2"
+	#tpm_device="$3"
+	tpm_key_algorithm="$4"
+	pcr_bank_hash_type="$5"
 	if [ -x /usr/bin/clevis ]; then
-		clevis luks bind -d "$1" tpm2 '{"key":"'"$tpm_key_algorithm"'", "pcr_bank":"'"$pcr_bank_hash_type"'","pcr_ids":"7"}' < "$2"
+		clevis luks bind -d "$partition_device" tpm2 '{"key":"'"$tpm_key_algorithm"'", "pcr_bank":"'"$pcr_bank_hash_type"'","pcr_ids":"7"}' < "$passphrase"
 	else
 		panic "clevis not available cannot enroll tpm2 key!"
 	fi
 }
 
-reencrypt_existing_partition() {
-	part_size_blocks="$(cat /sys/class/block/"$(awk -v dev="$1" 'BEGIN{split(dev,a,"/"); print a[3]}' )"/size)"
-	# reduce the filesystem and partition by 32M to fit the LUKS header
-	reduce_device_size=32768
-	reduced_size="$(expr "$part_size_blocks" - 65536 )"
-	reduced_size_in_byte="$(expr "$reduced_size" \* 512)"
-	reduced_size_in_kb="$(expr "$reduced_size_in_byte" / 1024)K"
-	e2fsck -f "$1"
-	if ! resize2fs "$1" "${reduced_size_in_kb}"; then
-		panic "reencryption of filesystem $1 cannot continue!"
-	fi
-	if [ -x /usr/sbin/cryptsetup-reencrypt ]; then
-		/usr/sbin/cryptsetup-reencrypt --new --reduce-device-size "$reduce_device_size"k "$1" < "$2"
-	else
-		/usr/sbin/cryptsetup reencrypt --encrypt --reduce-device-size "$reduce_device_size"k "$1" < "$2"
+prepare_for_encryption() {
+	# clevis needs /dev/fd create it in the initramfs
+	if [ ! -e /dev/fd ]; then
+		ln -s /proc/self/fd /dev/fd
 	fi
 }
 
-for candidate in /dev/tpm*; do
-	if [ -x /usr/bin/tpm2_pcrread ]; then
-		if ! tpm2_pcrread -T device:"$candidate" "$pcr_bank_hash_type":7 --quiet ; then
-			continue
-		fi
-	elif [ -x /usr/bin/tpm2_pcrlist ]; then
-		export TPM2TOOLS_DEVICE_FILE="$candidate"
-		if ! tpm2_pcrlist -L "$pcr_bank_hash_type":7 > /dev/null; then
-			continue
-		fi
-	fi
-	# Debian buster does not have tpm_testparms
-	if [ -x /usr/bin/tpm2_testparms ]; then
-		if ! tpm2_testparms -T device:"$candidate" "$tpm_key_algorithm" --quiet; then
-			continue
-		fi
-	fi
-	tpm_device=$candidate
-done
-
-if [ ! -e "$tpm_device" ]; then
-	if [ "$tpm_encryption_optional" = "true" ]; then
-		echo "No tpm_device exists abort optional encryption"
-		exit 0
-	fi
-	panic "No tpm device exists or supports pcr_hash '$pcr_bank_hash_type' or '$tpm_key_algorithm' - cannot create a encrypted device!"
-fi
-
-# clevis needs /dev/fd create it in the initramfs
-if [ ! -e /dev/fd ]; then
-	ln -s /proc/self/fd /dev/fd
-fi
-
-for partition_set in $partition_sets; do
-	partition_label="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[1]}')"
-	partition_mountpoint="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[2]}')"
-	partition_format="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[3]}')"
-	partition=/dev/disk/by-partlabel/"$partition_label"
-	crypt_mount_name="encrypted_$partition_label"
-	decrypted_part=/dev/mapper/"$crypt_mount_name"
-	# clevis does not work with links in /dev/disk*
-	part_device=$(readlink -f "$partition")
-	# check if we are trying to mount root
-	if [ "$partition_mountpoint" = "/" ]; then
-		echo "ROOT=$decrypted_part" >/conf/param.conf
-	fi
-
-	if /usr/sbin/cryptsetup luksDump --batch-mode "$partition" \
-			| grep -q "clevis"; then
-		open_tpm2_partition "$part_device"
-		continue
-	fi
-
-	# service watchdog in the background during lengthy re-encryption
-	if [ -z "$watchdog_pid" ]; then
-		service_watchdog &
-		watchdog_pid=$!
-	fi
-
-	# create random password for initial encryption
-	# this will be dropped after reboot
-	tmp_key=/tmp/"$partition_label-lukskey"
-	openssl rand -base64 32 > "$tmp_key"
-
-	case "${partition_format}" in
-		"reencrypt")
-			reencrypt_existing_partition "$part_device" "$tmp_key"
-			enroll_tpm2_token "$part_device" "$tmp_key"
-			open_tpm2_partition "$part_device"
-		;;
-		"format")
-			/usr/sbin/cryptsetup luksFormat --batch-mode \
-				 --type luks2 "$partition" < "$tmp_key"
-			enroll_tpm2_token "$part_device" "$tmp_key"
-			open_tpm2_partition "$part_device"
-			eval "${create_file_system_cmd} ${decrypted_part}"
-		;;
-		*)
-			panic "Unknown value ${partition_format}. Cannot create a encrypted partition !"
-		 ;;
-	esac
-
-	# delete initial key
-	# afterwards no new keys can be enrolled
-	cryptsetup -v luksKillSlot -q  "$part_device" 0
-done
-
-if [ -n "$watchdog_pid" ]; then
-	kill "$watchdog_pid"
-fi
+finalize_tpm2_encryption() {
+	partition_device="$1"
+	cryptsetup -v luksKillSlot -q  "$partition_device" 0
+}

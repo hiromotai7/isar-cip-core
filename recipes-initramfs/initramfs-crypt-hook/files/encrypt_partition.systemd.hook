@@ -61,4 +61,5 @@ for _LIBRARY in /usr/lib/*/libtss2* /usr/lib/*/libgcc_s.so.1; do
     copy_exec "$_LIBRARY"
 done
 
+copy_file library /usr/share/encrypt_partition/encrypt_partition_tpm2 /usr/share/encrypt_partition/encrypt_partition_tpm2
 copy_file library /usr/share/encrypt_partition/encrypt_partition.env /usr/share/encrypt_partition/encrypt_partition.env

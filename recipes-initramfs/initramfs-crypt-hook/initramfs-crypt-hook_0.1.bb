@@ -44,6 +44,7 @@ CRYPT_BACKEND:bullseye = "clevis"
 CRYPT_BACKEND = "systemd"
 
 SRC_URI += "file://encrypt_partition.env.tmpl \
+            file://encrypt_partition.script \
             file://encrypt_partition.${CRYPT_BACKEND}.script \
             file://mount_crypt_partitions.script \
             file://encrypt_partition.${CRYPT_BACKEND}.hook \
@@ -77,8 +78,10 @@ do_install[cleandirs] += " \
 
 do_install() {
     install -m 0600 "${WORKDIR}/encrypt_partition.env" "${D}/usr/share/encrypt_partition/encrypt_partition.env"
-    install -m 0755 "${WORKDIR}/encrypt_partition.${CRYPT_BACKEND}.script" \
+    install -m 0755 "${WORKDIR}/encrypt_partition.script" \
         "${D}/usr/share/initramfs-tools/scripts/local-top/encrypt_partition"
+    install -m 0755 "${WORKDIR}/encrypt_partition.${CRYPT_BACKEND}.script" \
+        "${D}/usr/share/encrypt_partition/encrypt_partition_tpm2"
     install -m 0755 "${WORKDIR}/mount_crypt_partitions.script" \
         "${D}/usr/share/initramfs-tools/scripts/local-bottom/mount_decrypted_partition"
     install -m 0755 "${WORKDIR}/encrypt_partition.${CRYPT_BACKEND}.hook" \
