@@ -35,6 +35,7 @@ CRYPT_BACKEND = "systemd"
 
 SRC_URI += "file://encrypt_partition.env.tmpl \
             file://encrypt_partition.${CRYPT_BACKEND}.script \
+            file://mount_crypt_partitions.script \
             file://encrypt_partition.${CRYPT_BACKEND}.hook \
             file://pwquality.conf"
 
@@ -60,12 +61,15 @@ TEMPLATE_FILES = "encrypt_partition.env.tmpl"
 do_install[cleandirs] += " \
     ${D}/usr/share/initramfs-tools/hooks \
     ${D}/usr/share/encrypt_partition \
+    ${D}/usr/share/initramfs-tools/scripts/local-top \
     ${D}/usr/share/initramfs-tools/scripts/local-bottom"
 
 do_install() {
     install -m 0600 "${WORKDIR}/encrypt_partition.env" "${D}/usr/share/encrypt_partition/encrypt_partition.env"
     install -m 0755 "${WORKDIR}/encrypt_partition.${CRYPT_BACKEND}.script" \
-        "${D}/usr/share/initramfs-tools/scripts/local-bottom/encrypt_partition"
+        "${D}/usr/share/initramfs-tools/scripts/local-top/encrypt_partition"
+    install -m 0755 "${WORKDIR}/mount_crypt_partitions.script" \
+        "${D}/usr/share/initramfs-tools/scripts/local-bottom/mount_decrypted_partition"
     install -m 0755 "${WORKDIR}/encrypt_partition.${CRYPT_BACKEND}.hook" \
         "${D}/usr/share/initramfs-tools/hooks/encrypt_partition"
     install -m 0644 "${WORKDIR}/pwquality.conf" "${D}/usr/share/encrypt_partition/pwquality.conf"

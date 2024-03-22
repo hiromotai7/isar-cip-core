@@ -105,16 +105,6 @@ reencrypt_existing_partition() {
 	fi
 }
 
-mount_partition() {
-	partition_dev_path=$1
-	partition_mountpoint=$2
-	echo "mount device: '$partition' to '$partition_mountpoint'"
-	if ! mount -t "$(get_fstype "${partition_dev_path}")" "${partition_dev_path}" \
-		 "${partition_mountpoint}"; then
-		panic "Can't mount encrypted partition '${partition_dev_path}'!"
-	fi
-}
-
 for candidate in /dev/tpm*; do
 	if ! tpm2_pcrread -T device:"$candidate" "$pcr_bank_hash_type":7 --quiet 2>/dev/null; then
 		continue
@@ -128,19 +118,6 @@ done
 if [ ! -e "$tpm_device" ]; then
 	if [ "$tpm_encryption_optional" = "true" ]; then
 		echo "No tpm_device exists abort optional encryption"
-		for partition_set in $partition_sets; do
-			partition_label="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[1]}')"
-			partition_mountpoint="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[2]}')"
-			partition_format="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[3]}')"
-			partition=/dev/disk/by-partlabel/"$partition_label"
-			case "${partition_format}" in
-			"reencrypt")
-				mount_partition "$partition" "$rootmnt""$partition_mountpoint"
-				;;
-			*)
-				echo "cannot mount partition '$partition' as it is marked for formatting."
-			esac
-		done
 		exit 0
 	fi
 	panic "No tpm device exists or supports pcr_hash '$pcr_bank_hash_type' or '$tpm_key_algorithm' - cannot create a encrypted device!"
@@ -148,7 +125,6 @@ fi
 
 for partition_set in $partition_sets; do
 	partition_label="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[1]}')"
-	partition_mountpoint="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[2]}')"
 	partition_format="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[3]}')"
 	partition=/dev/disk/by-partlabel/"$partition_label"
 	crypt_mount_name="encrypted_$partition_label"
@@ -159,7 +135,6 @@ for partition_set in $partition_sets; do
 	if /usr/sbin/cryptsetup luksDump --batch-mode "$partition" \
 			| grep -q "systemd-tpm2"; then
 		open_tpm2_partition "$part_device"
-		mount_partition "$decrypted_part" "${rootmnt}""$partition_mountpoint"
 		continue
 	fi
 
@@ -191,8 +166,6 @@ for partition_set in $partition_sets; do
 			panic "Unknown value ${partition_format}. Cannot create a encrypted partition !"
 		 ;;
 	esac
-
-	mount_partition "$decrypted_part" "${rootmnt}""$partition_mountpoint"
 
 	# delete initial key
 	# afterwards no new keys can be enrolled
