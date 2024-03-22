@@ -48,3 +48,23 @@ Each entry uses the schema `<partition-label>:<mountpoint>:<reencrypt or format>
 
 The variable `CRYPT_CREATE_FILE_SYSTEM_CMD` contains the command to create a new file system on a newly
 encrypted partition. The Default (`mke2fs -t ext4`) creates an ext4 partition.
+
+# Convert clevis based encryption to systemd-cryptenroll
+## Prerequisites
+The following packages are necessary to convert a clevis based encryption to a systemd-cryptenroll
+based encryption:
+ - clevis-luks
+ - clevis-tpm2
+ - cryptsetup
+ - jq
+
+## steps to convert clevis to systemd
+The following script shows how to enroll a systemd-tpm2 token with a existinng clevis based encryption:
+```bash
+export device=/dev/sda6
+export keyslot=$(sudo cryptsetup luksDump "$device" --dump-json-metadata | jq -c '.tokens.[] | select( .type == "clevis") | .keyslots | first' | head -n1)
+if [ -n "$keyslot" ]; then
+  export PASSWORD=$(clevis luks pass -d "$device" -s"$keyslot")
+  systemd-cryptenroll --tpm2-device="$tpm_device" --tpm2-pcrs=7 "$device"
+fi
+```
