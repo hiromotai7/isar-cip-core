@@ -94,6 +94,7 @@ reencrypt_existing_partition() {
 	reduced_size="$(expr "$part_size_blocks" - 65536 )"
 	reduced_size_in_byte="$(expr "$reduced_size" \* 512)"
 	reduced_size_in_kb="$(expr "$reduced_size_in_byte" / 1024)K"
+	e2fsck -f "$1"
 	if ! resize2fs "$1" "${reduced_size_in_kb}"; then
 		panic "reencryption of filesystem $1 cannot continue!"
 	fi
