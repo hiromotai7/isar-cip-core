@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2020-2023
+# Copyright (c) Siemens AG, 2020-2024
 #
 # Authors:
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
@@ -17,7 +17,17 @@ CLEVIS_DEPEND = ", clevis-luks, jose, bash, luksmeta, file, libpwquality-tools"
 
 DEBIAN_DEPENDS:append:buster = "${CLEVIS_DEPEND}, libgcc-7-dev"
 DEBIAN_DEPENDS:append:bullseye = "${CLEVIS_DEPEND}"
-DEBIAN_DEPENDS:append = ", systemd (>= 251) | clevis-tpm2"
+DEBIAN_DEPENDS:append = "${@encryption_dependency(d)}"
+
+def encryption_dependency(d):
+    crypt_backend = d.getVar('CRYPT_BACKEND')
+    if crypt_backend == 'clevis':
+        clevis_depends= d.getVar('CLEVIS_DEPEND')
+        return f"{clevis_depends}, clevis-tpm2"
+    elif crypt_backend == 'systemd':
+        return ", systemd (>= 251)"
+    else:
+        bb.error("unkown cryptbackend defined")
 
 CRYPT_BACKEND:buster = "clevis"
 CRYPT_BACKEND:bullseye = "clevis"
