@@ -29,6 +29,16 @@ def encryption_dependency(d):
     else:
         bb.error("unkown cryptbackend defined")
 
+def add_additional_clevis_hooks(d):
+    base_distro_code_name = d.getVar('BASE_DISTRO_CODENAME') or ""
+    crypt_backend = d.getVar('CRYPT_BACKEND') or ""
+    if crypt_backend != 'clevis':
+        return ""
+    if base_distro_code_name == "buster":
+        return f"encrypt_partition.{crypt_backend}.buster.hook"
+    else:
+        return f"encrypt_partition.{crypt_backend}.bullseye_or_later.hook"
+
 CRYPT_BACKEND:buster = "clevis"
 CRYPT_BACKEND:bullseye = "clevis"
 CRYPT_BACKEND = "systemd"
@@ -38,7 +48,8 @@ SRC_URI += "file://encrypt_partition.env.tmpl \
             file://mount_crypt_partitions.script \
             file://encrypt_partition.${CRYPT_BACKEND}.hook \
             file://pwquality.conf"
-
+ADDITIONAL_CLEVIS_HOOK = "${@add_additional_clevis_hooks(d)}"
+SRC_URI += "${@ 'file://' + d.getVar('ADDITIONAL_CLEVIS_HOOK') if d.getVar('ADDITIONAL_CLEVIS_HOOK')else ''}"
 # CRYPT_PARTITIONS elements are <partition-label>:<mountpoint>:<reencrypt or format>
 CRYPT_PARTITIONS ??= "home:/home:reencrypt var:/var:reencrypt"
 # CRYPT_CREATE_FILE_SYSTEM_CMD contains the shell command to create the filesystem
@@ -72,5 +83,10 @@ do_install() {
         "${D}/usr/share/initramfs-tools/scripts/local-bottom/mount_decrypted_partition"
     install -m 0755 "${WORKDIR}/encrypt_partition.${CRYPT_BACKEND}.hook" \
         "${D}/usr/share/initramfs-tools/hooks/encrypt_partition"
+    if [ -f "${WORKDIR}"/"${ADDITIONAL_CLEVIS_HOOK}" ]; then
+        install -m 0755 "${WORKDIR}"/"${ADDITIONAL_CLEVIS_HOOK}" \
+            "${D}/usr/share/initramfs-tools/hooks/encrypt_partition.${BASE_DISTRO_CODENAME}"
+    fi
+
     install -m 0644 "${WORKDIR}/pwquality.conf" "${D}/usr/share/encrypt_partition/pwquality.conf"
 }
