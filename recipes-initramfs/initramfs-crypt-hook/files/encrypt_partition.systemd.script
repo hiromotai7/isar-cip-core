@@ -43,10 +43,10 @@ modprobe xts
 # this needs to be probed particularly for re-encryption
 modprobe loop
 
-# fixed tpm device or do we need to find it
-tpm_device=/dev/tpmrm0
 partition_sets="$PARTITIONS"
 create_file_system_cmd="$CREATE_FILE_SYSTEM_CMD"
+pcr_bank_hash_type="$HASH_TYPE"
+tpm_key_algorithm="$KEY_ALGORITHM"
 if [ -z "${create_file_system_cmd}" ]; then
 	create_file_system_cmd="mke2fs -t ext4"
 fi
@@ -71,6 +71,7 @@ enroll_tpm2_token() {
 		systemd_version=$(systemd-cryptenroll --version | \
 			  awk -F " " 'NR==1{print $2 }')
 		# check systemd version and export password if necessary
+		# systemd version 251 does not suport hash_types
 		if [ "$systemd_version" -ge "251" ]; then
 			PASSWORD=$(cat "$2" )
 			export PASSWORD
@@ -111,6 +112,16 @@ mount_partition() {
 		panic "Can't mount encrypted partition '${partition_dev_path}'!"
 	fi
 }
+
+for candidate in /dev/tpm*; do
+	if ! tpm2_pcrread -T device:"$candidate" "$pcr_bank_hash_type":7 --quiet 2>/dev/null; then
+		continue
+	fi
+	if ! tpm2_testparms -T device:"$candidate" "$tpm_key_algorithm" --quiet 2>/dev/null; then
+		continue
+	fi
+	tpm_device=$candidate
+done
 
 if [ ! -e "$tpm_device" ]; then
 	panic "tpm device '$tpm_device' does not exists - cannot create a encrypted device!"

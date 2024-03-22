@@ -43,12 +43,10 @@ modprobe xts
 # this needs to be probed particularly for re-encryption
 modprobe loop
 
-# fixed tpm device or do we need to find it
-tpm_device=/dev/tpmrm0
 partition_sets="$PARTITIONS"
 create_file_system_cmd="$CREATE_FILE_SYSTEM_CMD"
-hash_type="$HASH_TYPE"
-
+pcr_bank_hash_type="$HASH_TYPE"
+tpm_key_algorithm="$KEY_ALGORITHM"
 if [ -z "${create_file_system_cmd}" ]; then
 	create_file_system_cmd="mke2fs -t ext4"
 fi
@@ -69,7 +67,7 @@ open_tpm2_partition() {
 
 enroll_tpm2_token() {
 	if [ -x /usr/bin/clevis ]; then
-		clevis luks bind -d "$1" tpm2 '{"pcr_bank":"'"$hash_type"'","pcr_ids":"7"}' < "$2"
+		clevis luks bind -d "$1" tpm2 '{"key":"'"$tpm_key_algorithm"'", "pcr_bank":"'"$pcr_bank_hash_type"'","pcr_ids":"7"}' < "$2"
 	else
 		panic "clevis not available cannot enroll tpm2 key!"
 	fi
@@ -101,6 +99,26 @@ mount_partition() {
 		panic "Can't mount encrypted partition '${partition_dev_path}'!"
 	fi
 }
+
+for candidate in /dev/tpm*; do
+	if [ -x /usr/bin/tpm2_pcrread ]; then
+		if ! tpm2_pcrread -T device:"$candidate" "$pcr_bank_hash_type":7 --quiet ; then
+			continue
+		fi
+	elif [ -x /usr/bin/tpm2_pcrlist ]; then
+		export TPM2TOOLS_DEVICE_FILE="$candidate"
+		if ! tpm2_pcrlist -L "$pcr_bank_hash_type":7 > /dev/null; then
+			continue
+		fi
+	fi
+	# Debian buster does not have tpm_testparms
+	if [ -x /usr/bin/tpm2_testparms ]; then
+		if ! tpm2_testparms -T device:"$candidate" "$tpm_key_algorithm" --quiet; then
+			continue
+		fi
+	fi
+	tpm_device=$candidate
+done
 
 if [ ! -e "$tpm_device" ]; then
 	panic "tpm device '$tpm_device' does not exists - cannot create a encrypted device!"
