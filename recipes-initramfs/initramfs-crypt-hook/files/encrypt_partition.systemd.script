@@ -102,6 +102,16 @@ reencrypt_existing_partition() {
 	fi
 }
 
+mount_partition() {
+	partition_dev_path=$1
+	partition_mountpoint=$2
+	echo "mount device: '$partition' to '$partition_mountpoint'"
+	if ! mount -t "$(get_fstype "${partition_dev_path}")" "${partition_dev_path}" \
+		 "${partition_mountpoint}"; then
+		panic "Can't mount encrypted partition '${partition_dev_path}'!"
+	fi
+}
+
 if [ ! -e "$tpm_device" ]; then
 	panic "tpm device '$tpm_device' does not exists - cannot create a encrypted device!"
 fi
@@ -118,11 +128,8 @@ for partition_set in $partition_sets; do
 	# check if partition is already encrypted with systemd-tpm2
 	if /usr/sbin/cryptsetup luksDump --batch-mode "$partition" \
 			| grep -q "systemd-tpm2"; then
-		if ! mount -t "$(get_fstype "${decrypted_part}")" "${decrypted_part}" \
-			 "${rootmnt}${partition_mountpoint}"; then
-			panic "Can't mount encrypted partition '${decrypted_part}'!"
-		fi
 		open_tpm2_partition "$part_device"
+		mount_partition "$decrypted_part" "${rootmnt}""$partition_mountpoint"
 		continue
 	fi
 
@@ -155,10 +162,7 @@ for partition_set in $partition_sets; do
 		 ;;
 	esac
 
-	if ! mount -t "$(get_fstype "${decrypted_part}")" "${decrypted_part}" \
-		 "${rootmnt}${partition_mountpoint}"; then
-		panic "Can't mount encrypted partition '${decrypted_part}'!"
-	fi
+	mount_partition "$decrypted_part" "${rootmnt}""$partition_mountpoint"
 
 	# delete initial key
 	# afterwards no new keys can be enrolled
