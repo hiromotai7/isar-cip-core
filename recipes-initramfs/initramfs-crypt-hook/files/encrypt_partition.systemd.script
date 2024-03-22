@@ -2,7 +2,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2023
+# Copyright (c) Siemens AG, 2023-2024
 #
 # Authors:
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
@@ -47,6 +47,9 @@ modprobe loop
 tpm_device=/dev/tpmrm0
 partition_sets="$PARTITIONS"
 create_file_system_cmd="$CREATE_FILE_SYSTEM_CMD"
+if [ -z "${create_file_system_cmd}" ]; then
+	create_file_system_cmd="mke2fs -t ext4"
+fi
 
 service_watchdog() {
 	for n in $(seq $(($SETUP_TIMEOUT / 10)) ); do
@@ -83,8 +86,7 @@ enroll_tpm2_token() {
 }
 
 reencrypt_existing_partition() {
-	part_device="$(readlink -f "$partition")"
-	part_size_blocks="$(cat /sys/class/block/"$(awk -v dev="$part_device" 'BEGIN{split(dev,a,"/"); print a[3]}' )"/size)"
+	part_size_blocks="$(cat /sys/class/block/"$(awk -v dev="$1" 'BEGIN{split(dev,a,"/"); print a[3]}' )"/size)"
 	# reduce the filesystem and partition by 32M to fit the LUKS header
 	reduce_device_size=32768
 	reduced_size="$(expr "$part_size_blocks" - 65536 )"
@@ -111,15 +113,16 @@ for partition_set in $partition_sets; do
 	partition=/dev/disk/by-partlabel/"$partition_label"
 	crypt_mount_name="encrypted_$partition_label"
 	decrypted_part=/dev/mapper/"$crypt_mount_name"
+	part_device=$(readlink -f "$partition")
 
 	# check if partition is already encrypted with systemd-tpm2
 	if /usr/sbin/cryptsetup luksDump --batch-mode "$partition" \
 			| grep -q "systemd-tpm2"; then
-		open_tpm2_partition "$partition"
 		if ! mount -t "$(get_fstype "${decrypted_part}")" "${decrypted_part}" \
 			 "${rootmnt}${partition_mountpoint}"; then
 			panic "Can't mount encrypted partition '${decrypted_part}'!"
 		fi
+		open_tpm2_partition "$part_device"
 		continue
 	fi
 
@@ -136,15 +139,15 @@ for partition_set in $partition_sets; do
 
 	case "${partition_format}" in
 		"reencrypt")
-			reencrypt_existing_partition "$partition" "$tmp_key"
-			enroll_tpm2_token "$partition" "$tmp_key"
-			open_tpm2_partition "$partition"
+			reencrypt_existing_partition "$part_device" "$tmp_key"
+			enroll_tpm2_token "$part_device" "$tmp_key"
+			open_tpm2_partition "$part_device"
 		;;
 		"format")
 			/usr/sbin/cryptsetup luksFormat --batch-mode \
 				 --type luks2 "$partition" < "$tmp_key"
-			enroll_tpm2_token "$partition" "$tmp_key"
-			open_tpm2_partition "$partition"
+			enroll_tpm2_token "$part_device" "$tmp_key"
+			open_tpm2_partition "$part_device"
 			eval "${create_file_system_cmd} ${decrypted_part}"
 		;;
 		*)
