@@ -47,6 +47,7 @@ partition_sets="$PARTITIONS"
 create_file_system_cmd="$CREATE_FILE_SYSTEM_CMD"
 pcr_bank_hash_type="$HASH_TYPE"
 tpm_key_algorithm="$KEY_ALGORITHM"
+tpm_encryption_optional="$ENCRYPTION_IS_OPTIONAL"
 if [ -z "${create_file_system_cmd}" ]; then
 	create_file_system_cmd="mke2fs -t ext4"
 fi
@@ -124,7 +125,24 @@ for candidate in /dev/tpm*; do
 done
 
 if [ ! -e "$tpm_device" ]; then
-	panic "tpm device '$tpm_device' does not exists - cannot create a encrypted device!"
+	if [ "$tpm_encryption_optional" = "true" ]; then
+		echo "No tpm_device exists abort optional encryption"
+		for partition_set in $partition_sets; do
+			partition_label="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[1]}')"
+			partition_mountpoint="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[2]}')"
+			partition_format="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[3]}')"
+			partition=/dev/disk/by-partlabel/"$partition_label"
+			case "${partition_format}" in
+			"reencrypt")
+				mount_partition "$partition" "$rootmnt""$partition_mountpoint"
+				;;
+			*)
+				echo "cannot mount partition '$partition' as it is marked for formatting."
+			esac
+		done
+		exit 0
+	fi
+	panic "No tpm device exists or supports pcr_hash '$pcr_bank_hash_type' or '$tpm_key_algorithm' - cannot create a encrypted device!"
 fi
 
 for partition_set in $partition_sets; do
