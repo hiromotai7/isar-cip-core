@@ -18,9 +18,13 @@ IMAGE_INSTALL += "home-fs"
 IMAGE_INSTALL += "tmp-fs"
 
 # For pre bookworm images, empty /var is not usable
-IMAGE_INSTALL:append:bookworm = " immutable-rootfs"
+IMAGE_INSTALL:append = " immutable-rootfs"
+IMAGE_INSTALL:remove:buster = " immutable-rootfs"
+IMAGE_INSTALL:remove:bullseye = " immutable-rootfs"
 
-ROOTFS_POSTPROCESS_COMMAND:append:bookworm =" copy_dpkg_state"
+ROOTFS_POSTPROCESS_COMMAND:append =" copy_dpkg_state"
+ROOTFS_POSTPROCESS_COMMAND:remove:buster =" copy_dpkg_state"
+ROOTFS_POSTPROCESS_COMMAND:remove:bullseye =" copy_dpkg_state"
 copy_dpkg_state() {
     IMMUTABLE_VAR_LIB="${ROOTFSDIR}/usr/share/immutable-data/var/lib"
     sudo mkdir -p "$IMMUTABLE_VAR_LIB"
