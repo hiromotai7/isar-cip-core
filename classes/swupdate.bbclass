@@ -222,7 +222,7 @@ IMAGE_CMD:swu() {
                 if [ -f "$cpio_file" ]; then
                     # Set file timestamps for reproducible builds
                     if [ -n "${SOURCE_DATE_EPOCH}" ]; then
-                        touch -d@"${SOURCE_DATE_EPOCH}" "$file"
+                        touch -d@"${SOURCE_DATE_EPOCH}" "$cpio_file"
                     fi
                     case "$cpio_file" in
                         sw-description*)
