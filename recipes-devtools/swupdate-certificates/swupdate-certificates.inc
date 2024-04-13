@@ -13,6 +13,8 @@ inherit dpkg-raw
 
 FILESEXTRAPATHS:prepend := "${FILE_DIRNAME}/files:"
 
+DPKG_ARCH = "all"
+DEBIAN_MULTI_ARCH = "foreign"
 PROVIDES += "swupdate-certificates"
 
 SWU_SIGN_CERT ??= ""

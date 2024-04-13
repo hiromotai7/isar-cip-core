@@ -11,6 +11,8 @@
 
 inherit dpkg-raw
 
+DPKG_ARCH = "all"
+DEBIAN_MULTI_ARCH = "foreign"
 PROVIDES += "secure-boot-secrets"
 
 SB_KEY ??= ""

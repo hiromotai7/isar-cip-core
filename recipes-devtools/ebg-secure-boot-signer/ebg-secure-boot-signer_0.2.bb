@@ -16,6 +16,8 @@ DESCRIPTION = "Signing script for EFI Boot Guard setups"
 
 DEPENDS = "secure-boot-secrets"
 DEBIAN_DEPENDS = "sbsigntool, secure-boot-secrets, faketime"
+DPKG_ARCH = "all"
+DEBIAN_MULTI_ARCH = "foreign"
 
 SRC_URI = "file://sign_secure_image.sh"
 
