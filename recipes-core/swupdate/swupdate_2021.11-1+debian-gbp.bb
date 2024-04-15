@@ -34,6 +34,16 @@ SRC_URI += "file://0001-debian-Remove-SWUpdate-USB-service-and-Udev-rules.patch 
 # GBP_DEPENDS += "swupdate-handlers"
 # DEB_BUILD_PROFILES += "pkg.swupdate.embeddedlua"
 
+def get_bootloader_build_profile(d):
+    bootloader = d.getVar("SWUPDATE_BOOTLOADER") or ""
+    if bootloader == "efibootguard":
+        return "pkg.swupdate.efibootguard"
+    if bootloader == "u-boot":
+        return "pkg.swupdate.uboot"
+    return ""
+
+DEB_BUILD_PROFILES += "${@get_bootloader_build_profile(d)}"
+
 # modify for debian buster build
 SRC_URI:append = " file://0006-debian-prepare-build-for-isar-debian-buster.patch"
 
