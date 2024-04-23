@@ -96,4 +96,4 @@ IMAGE_CMD:delta_update() {
     esac
 }
 
-addtask do_image_delta_update before do_image_swu after do_image_wic
+addtask image_delta_update before do_image_swu after do_image_wic

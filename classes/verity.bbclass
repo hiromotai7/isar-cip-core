@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2021-2022
+# Copyright (c) Siemens AG, 2021-2024
 #
 # Authors:
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
@@ -104,4 +104,4 @@ IMAGE_CMD:verity() {
         >>"${WORKDIR}/${VERITY_IMAGE_METADATA}"
     create_verity_env_file
 }
-addtask do_image_verity after do_generate_image_uuid
+addtask image_verity after do_generate_image_uuid

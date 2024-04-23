@@ -71,7 +71,7 @@ IMAGE_TEMPLATE_VARS:swu = " \
     "
 
 # TARGET_IMAGE_UUID needs to be generated before completing the template
-addtask do_transform_template after do_generate_image_uuid
+addtask transform_template after do_generate_image_uuid
 
 python do_extend_sw_description() {
     cmds = d.getVar("SWU_EXTEND_SW_DESCRIPTION")

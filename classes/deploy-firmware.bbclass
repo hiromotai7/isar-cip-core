@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2023
+# Copyright (c) Siemens AG, 2023-2024
 #
 # Authors:
 #  Felix Moessbauer <felix.moessbauer@siemens.com>
@@ -27,6 +27,6 @@ do_deploy_firmware() {
 python do_deploy_firmware_setscene () {
     sstate_setscene(d)
 }
-addtask do_deploy_firmware_setscene
+addtask deploy_firmware_setscene
 
 addtask deploy_firmware after do_dpkg_build before do_deploy_deb

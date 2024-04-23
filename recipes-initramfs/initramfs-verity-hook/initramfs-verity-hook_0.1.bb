@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2021
+# Copyright (c) Siemens AG, 2021-2024
 #
 # Authors:
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
@@ -53,4 +53,4 @@ do_install() {
         "${D}/usr/share/initramfs-tools/hooks/verity"
 }
 
-addtask do_install after do_transform_template
+addtask install after do_transform_template
