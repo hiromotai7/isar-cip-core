@@ -151,6 +151,14 @@ config KAS_INCLUDE_DEBIAN
 
 comment "Image features"
 
+config EXPAND_ON_FIRST_BOOT
+	bool "Grow last partition to full medium during first boot"
+
+config KAS_INCLUDE_EXPAND_ON_FIRST_BOOT
+	string
+	default "kas/opt/expand-on-first-boot.yml"
+	depends on EXPAND_ON_FIRST_BOOT
+
 config IMAGE_TESTING
 	bool "Test extensions"
 
