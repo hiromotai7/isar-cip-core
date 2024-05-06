@@ -64,14 +64,26 @@ service_watchdog() {
 reencrypt_existing_partition() {
 	part_size_blocks="$(cat /sys/class/block/"$(awk -v dev="$1" 'BEGIN{split(dev,a,"/"); print a[3]}' )"/size)"
 	# reduce the filesystem and partition by 32M to fit the LUKS header
+	partition_fstype=$(get_fstype "${1}")
 	reduce_device_size=32768
 	reduced_size="$(expr "$part_size_blocks" - 65536 )"
 	reduced_size_in_byte="$(expr "$reduced_size" \* 512)"
 	reduced_size_in_kb="$(expr "$reduced_size_in_byte" / 1024)K"
-	e2fsck -f "$1"
-	if ! resize2fs "$1" "${reduced_size_in_kb}"; then
-		panic "reencryption of filesystem $1 cannot continue!"
-	fi
+	case $partition_fstype in
+	ext*)
+		# reduce the filesystem and partition by 32M to fit the LUKS header
+		e2fsck -f "$1"
+		if ! resize2fs "$1" "${reduced_size_in_kb}"; then
+			panic "reencryption of filesystem $1 cannot continue!"
+		fi
+		;;
+	squashfs|"")
+		echo "skip disk resize as it is not supported or unnecessary for fstype: '$partition_fstype'"
+		;;
+	*)
+		panic "cannot resize parition. unsupport fstype: $partition_fstype"
+		;;
+	esac
 	if [ -x /usr/sbin/cryptsetup-reencrypt ]; then
 		/usr/sbin/cryptsetup-reencrypt --new --reduce-device-size "$reduce_device_size"k "$1" < "$2"
 	else
