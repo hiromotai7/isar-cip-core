@@ -121,19 +121,34 @@ fi
 prepare_for_encryption
 
 for partition_set in $partition_sets; do
-	partition_label="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[1]}')"
+	partition="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[1]}')"
 	partition_mountpoint="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[2]}')"
 	partition_format="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[3]}')"
-	partition=/dev/disk/by-partlabel/"$partition_label"
-	crypt_mount_name="encrypted_$partition_label"
+	case "$partition" in
+		/*)
+			part_device=$(readlink -f "$partition")
+			crypt_mount_name="$( basename "$partition")"
+			;;
+		*)
+			if uuidparse "$partition" -n -o TYPE | grep -q invalid; then
+				part_device=$(readlink -f /dev/disk/by-partlabel/"$partition")
+				crypt_mount_name="encrypted_${partition}"
+			else
+				part_device=$(readlink -f /dev/disk/by-partuuid/"$partition")
+				crypt_mount_name="${partition}"
+			fi
+			;;
+	esac
+	if [ ! -e  "$part_device" ]; then
+		panic "Could not find device  mapped to '$partition' cannot be encrypted!"
+	fi
 	decrypted_part=/dev/mapper/"$crypt_mount_name"
-	part_device=$(readlink -f "$partition")
 	# check if we are trying to mount root
 	if [ "$partition_mountpoint" = "/" ]; then
 		echo "ROOT=$decrypted_part" >/conf/param.conf
 	fi
 
-	if /usr/sbin/cryptsetup luksDump --batch-mode "$partition" \
+	if /usr/sbin/cryptsetup luksDump --batch-mode "$part_device" \
 			| grep -q "luks2"; then
 		open_tpm2_partition "$part_device" "$crypt_mount_name" "$tpm_device"
 		continue
@@ -147,7 +162,7 @@ for partition_set in $partition_sets; do
 
 	# create random password for initial encryption
 	# this will be dropped after reboot
-	tmp_key=/tmp/"$partition_label-lukskey"
+	tmp_key=/tmp/"$(basename "$part_device")-lukskey"
 	openssl rand -base64 32 > "$tmp_key"
 
 	case "${partition_format}" in

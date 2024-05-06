@@ -11,7 +11,8 @@
 inherit dpkg-raw
 DEBIAN_DEPENDS = "initramfs-tools, cryptsetup, \
     awk, openssl, libtss2-esys-3.0.2-0 | libtss2-esys0, \
-    libtss2-rc0 | libtss2-esys0, libtss2-mu0 | libtss2-esys0, e2fsprogs, tpm2-tools"
+    libtss2-rc0 | libtss2-esys0, libtss2-mu0 | libtss2-esys0, \
+    e2fsprogs, tpm2-tools, coreutils, uuid-runtime"
 
 CLEVIS_DEPEND = ", clevis-luks, jose, bash, luksmeta, file, libpwquality-tools"
 

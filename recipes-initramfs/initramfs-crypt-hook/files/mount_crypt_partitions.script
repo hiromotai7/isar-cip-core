@@ -45,11 +45,23 @@ mount_partition() {
 }
 partition_sets="$PARTITIONS"
 for partition_set in $partition_sets; do
-	partition_label="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[1]}')"
+	partition="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[1]}')"
 	partition_mountpoint="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[2]}')"
-	partition=/dev/disk/by-partlabel/"$partition_label"
-	part_device=$(readlink -f "$partition")
-	crypt_mount_name="encrypted_$partition_label"
+	case "$partition" in
+		/*)
+			part_device=$(readlink -f "$partition")
+			crypt_mount_name="$( basename "$partition")"
+			;;
+		*)
+			if uuidparse "$partition" -n -o TYPE | grep -q invalid; then
+				part_device=$(readlink -f /dev/disk/by-partlabel/"$partition")
+				crypt_mount_name="encrypted_${partition}"
+			else
+				part_device=$(readlink -f /dev/disk/by-partuuid/"$partition")
+				crypt_mount_name="${partition}"
+			fi
+			;;
+	esac
 	decrypted_part=/dev/mapper/"$crypt_mount_name"
 	if [ -z "$partition_mountpoint" ]; then
 		continue
