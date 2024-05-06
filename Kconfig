@@ -221,12 +221,24 @@ config KAS_INCLUDE_DELTA_UPDATE
 config IMAGE_DATA_ENCRYPTION
 	bool "Encrypt data partitions on first boot"
 	depends on TARGET_QEMU_AMD64 || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM
-	select IMAGE_SECURE_BOOT
 	help
 	  This enables LUKS encryption for the partitions /var and /home.
+
+config IMAGE_FULL_ENCRYPTION
+	bool "Encrypt rootfs and data partitions"
+	depends on TARGET_QEMU_AMD64 || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM
+	select IMAGE_DATA_ENCRYPTION
+	help
+	  This enables LUKS encryption for all non-boot partitions on first boot.
+	  If the partitions contain secrets the first boot must occur in a secure
+	  location.
 
 config KAS_INCLUDE_DATA_ENCRYPTION
 	string
 	default "kas/opt/encrypt-data.yml" if IMAGE_DATA_ENCRYPTION
+
+config KAS_INCLUDE_FULL_ENCRYPTION
+	string
+	default "kas/opt/encrypt-all.yml" if IMAGE_FULL_ENCRYPTION
 
 endif
