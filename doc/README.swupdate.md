@@ -7,6 +7,22 @@ Start with cloning the isar-cip-core repository:
 ```
 host$ git clone https://gitlab.com/cip-project/cip-core/isar-cip-core.git
 ```
+
+## Update Partition selector(swupdate-handler-roundrobin)
+
+SWUpdate uses the handler [swupdate-handler-roundrobin](https://gitlab.com/cip-project/cip-sw-updates/swupdate-handler-roundrobin) to select the partition to update.
+The handler uses the information from sw-description file  to select the boot partition.
+In the cip-core provided images the boot partitions are labeled `BOOT0`
+and `BOOT1`, see [ebg-sysparts.inc](../wic/ebg-sysparts.inc).
+
+The [sw-description](recipes-core/images/swu/sw-description.tmpl) contains the mapping from boot
+partition to root file system partition, e.g.:
+```
+device = "C:BOOT0:linux.efi->${ABROOTFS_PART_UUID_A},C:BOOT1:linux.efi->${ABROOTFS_PART_UUID_B}";
+```
+The variables `ABROOTFS_PART_UUID_A` and `ABROOTFS_PART_UUID_B` contain partition uuids. The handler searches
+for the matching device and SWUpdate writes the image to the selected device.
+
 ## SWUpdate Efibootguard update
 
 :warning: **If the efibootguard binary is corrupted the system can no longer boot**
