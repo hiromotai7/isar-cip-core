@@ -52,6 +52,6 @@ prepare_for_encryption() {
 
 finalize_tpm2_encryption() {
 	partition_device="$1"
--	/usr/bin/systemd-cryptenroll --wipe-slot=0 "$partition_device"
+	/usr/bin/systemd-cryptenroll --wipe-slot=0 "$partition_device"
 }
 

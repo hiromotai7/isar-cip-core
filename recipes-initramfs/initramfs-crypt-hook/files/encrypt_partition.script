@@ -183,7 +183,7 @@ for partition_set in $partition_sets; do
 		 ;;
 	esac
 
-	finalize_tpm2_encryption
+	finalize_tpm2_encryption "$part_device"
 done
 
 if [ -n "$watchdog_pid" ]; then
