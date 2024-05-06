@@ -78,7 +78,7 @@ reencrypt_existing_partition() {
 		fi
 		;;
 	squashfs|"")
-		echo "skip disk resize as it is not supported or unnecessary for fstype: '$partition_fstype'"
+		[ "$debug" = "y" ] && echo "skip disk resize as it is not supported or unnecessary for fstype: '$partition_fstype'"
 		;;
 	*)
 		panic "cannot resize parition. unsupport fstype: $partition_fstype"
@@ -112,7 +112,7 @@ done
 
 if [ ! -e "$tpm_device" ]; then
 	if [ "$tpm_encryption_optional" = "true" ]; then
-		echo "No tpm_device exists abort optional encryption"
+		log_warning_msg "No tpm_device exists abort optional encryption"
 		exit 0
 	fi
 	panic "No tpm device exists or supports pcr_hash '$pcr_bank_hash_type' or '$tpm_key_algorithm' - cannot create a encrypted device!"
@@ -167,16 +167,20 @@ for partition_set in $partition_sets; do
 
 	case "${partition_format}" in
 		"reencrypt")
+			log_begin_msg "Encryption of ${part_device}"
 			reencrypt_existing_partition "$part_device" "$tmp_key"
 			enroll_tpm2_token "$part_device" "$tmp_key" "$tpm_device" "$tpm_key_algorithm" "$pcr_bank_hash_type"
 			open_tpm2_partition "$part_device" "$crypt_mount_name" "$tpm_device"
+			log_end_msg
 		;;
 		"format")
+			log_begin_msg "Encryption of ${part_device}"
 			/usr/sbin/cryptsetup luksFormat --batch-mode \
 				 --type luks2 "$partition" < "$tmp_key"
 			enroll_tpm2_token "$part_device" "$tmp_key" "$tpm_device" "$tpm_key_algorithm" "$pcr_bank_hash_type"
 			open_tpm2_partition "$part_device" "$crypt_mount_name" "$tpm_device"
 			eval "${create_file_system_cmd} ${decrypted_part}"
+			log_end_msg
 		;;
 		*)
 			panic "Unknown value ${partition_format}. Cannot create a encrypted partition !"

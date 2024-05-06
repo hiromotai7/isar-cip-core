@@ -35,7 +35,7 @@ esac
 mount_partition() {
 	partition_dev_path=$1
 	partition_mountpoint=$2
-	echo "mount device: '$partition_dev_path' to '$partition_mountpoint'"
+	[ "$debug" = "y" ] && echo "mount device: '$partition_dev_path' to '$partition_mountpoint'"
 	if ! mountpoint -q "${partition_mountpoint}"; then
 		if ! mount -t "$(get_fstype "${partition_dev_path}")" "${partition_dev_path}" \
 			 "${partition_mountpoint}"; then
