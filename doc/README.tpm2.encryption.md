@@ -4,6 +4,10 @@ By adding the recipe `initramfs-crypt-hook` to the initramfs build user defined 
 encrypted during first boot. The encrypted partition is a LUKS partition and uses a TPM to secure the
 passphrase on the device.
 
+> :exclamation:**IMPORTANT**
+> All selected partitions are encrypted on first boot. In order to avoid the leakage of secrets
+> the disk encryption must occur in a secure environment.
+
 ## Requirements
 
 Testing with qemu-amd64 requires the package `swtpm`. Under Debian/Ubuntu this can be installed
@@ -38,11 +42,21 @@ The initramfs-crypt-hook recipe has the following variables which can be overwri
 ### CRYPT_PARTITIONS
 
 The variable `CRYPT_PARTITIONS` contains the information which partition shall be encrypted where to mount it.
-Each entry uses the schema `<partition-label>:<mountpoint>:<reencrypt or format>`.
-- The `partition-label` is used to identify the partition on the disk
+Each entry uses the schema `<partition-identifier>:<mountpoint>:<reencrypt or format>`.
+- The `partition-idenitifer` is used to identify the partition on the disk, it can contain a partition label, partition UUID or absolute path to the partition device, e.g. `/dev/sda`.
 - The `mountpoint` is used mount the decrypted partition in the root file system
 - `reencrypt` uses `cryptsetup reencrypt` to encrypt the exiting content of the partition. This reduces the partition by 32MB and the file system by a similar amount
 - `format` creates a empty LUKS partition and creates a file system defined with the shell command given in `CRYPT_CREATE_FILE_SYSTEM_CMD`
+
+#### Encrypted root file system
+
+To encrypt the root file system the variable `CRYPT_PARTITIONS` needs to be set to:
+```
+CRYPT_PARTITIONS = "${ABROOTFS_PART_UUID_A}::reencrypt ${ABROOTFS_PART_UUID_B}::reencrypt"
+```
+The mountpoint is empty as the root partition is mounted  by a seperate initramfs hook.
+Both partitions are encrypted during first boot. The initramfs hook opens `${ABROOTFS_PART_UUID_A}` and `${ABROOTFS_PART_UUID_B}`
+during boot.
 
 ### CRYPT_CREATE_FILE_SYSTEM_CMD
 
@@ -59,7 +73,7 @@ based encryption:
  - jq
 
 ## steps to convert clevis to systemd
-The following script shows how to enroll a systemd-tpm2 token with a existinng clevis based encryption:
+The following script shows how to enroll a systemd-tpm2 token with a existing clevis based encryption:
 ```bash
 export device=/dev/sda6
 export keyslot=$(sudo cryptsetup luksDump "$device" --dump-json-metadata | jq -c '.tokens.[] | select( .type == "clevis") | .keyslots | first' | head -n1)
