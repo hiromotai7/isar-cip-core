@@ -227,6 +227,6 @@ config IMAGE_DATA_ENCRYPTION
 
 config KAS_INCLUDE_DATA_ENCRYPTION
 	string
-	default "kas/opt/encrypt-partitions.yml" if IMAGE_DATA_ENCRYPTION
+	default "kas/opt/encrypt-data.yml" if IMAGE_DATA_ENCRYPTION
 
 endif

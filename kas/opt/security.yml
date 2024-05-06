@@ -11,7 +11,7 @@
 header:
   version: 14
   includes:
-   - kas/opt/encrypt-partitions.yml
+   - kas/opt/encrypt-data.yml
    - kas/opt/ebg-secure-boot-snakeoil.yml
 
 target: cip-core-image-security
