@@ -192,6 +192,18 @@ config IMAGE_SWUPDATE
 	bool "SWUpdate support for root partition"
 	depends on TARGET_QEMU_AMD64 || TARGET_SIMATIC_IPC227E || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM || TARGET_BBB || ( TARGET_QEMU_RISCV64 && KERNEL_6_1 ) || TARGET_HIHOPE_RZG2M
 
+choice
+	prompt "Update type"
+	depends on IMAGE_SWUPDATE
+
+config IMAGE_COMPLETE_SWUPDATE
+	bool "Complete Update"
+
+config IMAGE_DELTA_SWUPDATE
+	bool "Delta Update"
+
+endchoice
+
 config IMAGE_SECURE_BOOT
 	bool "Secure boot support"
 	depends on TARGET_QEMU_AMD64 || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM
@@ -201,6 +213,10 @@ config KAS_INCLUDE_SWUPDATE_SECBOOT
 	string
 	default "kas/opt/ebg-swu.yml" if IMAGE_SWUPDATE && !IMAGE_SECURE_BOOT
 	default "kas/opt/ebg-secure-boot-snakeoil.yml" if IMAGE_SECURE_BOOT
+
+config KAS_INCLUDE_DELTA_UPDATE
+	string
+	default "kas/opt/delta-update.yml" if IMAGE_DELTA_SWUPDATE
 
 config IMAGE_DATA_ENCRYPTION
 	bool "Encrypt data partitions on first boot"
