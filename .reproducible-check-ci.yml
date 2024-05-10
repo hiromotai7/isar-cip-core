@@ -18,7 +18,7 @@
     deploy: disable
     deploy_kernelci: disable
     artifact_suffix: ".tar.gz"
-    base_yaml: "kas-cip.yml:kas/board/${target}.yml"
+    base_yaml: "kas-cip.yml:kas/board/${target}.yml:kas/opt/reproducible.yml"
     release: bookworm
     # This target include base + swupdate + secureboot + security
     extension: security
@@ -28,7 +28,6 @@
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule" && $REPRODUCIBLE_BUILDS
   script:
-    - if [ -f kas/opt/reproducible.yml ]; then base_yaml="${base_yaml}:kas/opt/reproducible.yml"; fi
     # Build 1st time
     - !reference [.build_base, script]
     - mv build/tmp/deploy/images/${target} image1
