@@ -31,12 +31,6 @@ SQUASHFS_MEMLIMIT ?= "${@int(get_free_mem() * 3/4)}"
 SQUASHFS_CREATION_LIMITS = "-mem ${SQUASHFS_MEMLIMIT} -processors ${SQUASHFS_THREADS}"
 
 python __anonymous() {
-    # Set file timestamps for reproducible builds
-    source_date_epoch = d.getVar('SOURCE_DATE_EPOCH')
-    if source_date_epoch:
-        args = " -fstime {time}".format(time=source_date_epoch)
-        d.appendVar('SQUASHFS_CREATION_ARGS', args)
-
     exclude_directories = d.getVar('SQUASHFS_EXCLUDE_DIRS').split()
     if len(exclude_directories) == 0:
         return

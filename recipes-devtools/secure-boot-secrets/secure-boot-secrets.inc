@@ -14,6 +14,7 @@ inherit dpkg-raw
 DPKG_ARCH = "all"
 DEBIAN_MULTI_ARCH = "foreign"
 PROVIDES += "secure-boot-secrets"
+DEBIAN_PROVIDES = "secure-boot-secrets"
 
 SB_KEY ??= ""
 SB_CERT ??= ""
@@ -31,6 +32,3 @@ do_install() {
     install -m 0700 ${WORKDIR}/${SB_CERT} ${TARGET}/secure-boot.pem
 }
 
-do_prepare_build:append() {
-    echo "Provides: secure-boot-secrets" >> ${S}/debian/control
-}

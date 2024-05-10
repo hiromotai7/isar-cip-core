@@ -16,6 +16,7 @@ FILESEXTRAPATHS:prepend := "${FILE_DIRNAME}/files:"
 DPKG_ARCH = "all"
 DEBIAN_MULTI_ARCH = "foreign"
 PROVIDES += "swupdate-certificates"
+DEBIAN_PROVIDES = "swupdate-certificates"
 
 SWU_SIGN_CERT ??= ""
 
@@ -30,6 +31,3 @@ do_install() {
     install -m 0700 ${WORKDIR}/${SWU_SIGN_CERT} ${TARGET}/swupdate-sign.crt
 }
 
-do_prepare_build:append() {
-    echo "Provides: swupdate-certificates" >> ${S}/debian/control
-}

@@ -22,7 +22,7 @@ repos:
 
   isar:
     url: https://github.com/ilbers/isar.git
-    commit: 9dc362cd7115074c0f60843e687ed89db5c9339a
+    commit: 3d863aad5e12c7bef382cb6fb3f1f5e18b236156
     layers:
       meta:
 
@@ -42,7 +42,7 @@ local_conf_header:
     USER_root[password] = "root"
     USER_root[flags] = "clear-text-password"
   source_epoch: |
-    SOURCE_DATE_EPOCH := "${@bb.process.run("git -C ${LAYERDIR_cip-core} log -1 --pretty=%ct | tr -d '\n'")[0]}"
+    SOURCE_DATE_EPOCH_FALLBACK := "${@bb.process.run("git -C ${LAYERDIR_cip-core} log -1 --pretty=%ct | tr -d '\n'")[0]}"
 
 env:
   DISTRO_APT_PREMIRRORS: ""

@@ -15,6 +15,7 @@ FILESEXTRAPATHS:prepend := "${FILE_DIRNAME}/files:"
 
 DPKG_ARCH = "all"
 PROVIDES += "swupdate-certificates-key"
+DEBIAN_PROVIDES = "swupdate-certificates-key"
 
 SWU_SIGN_KEY ??= ""
 SWU_SIGN_SCRIPT ??= "sign-swu-cms"
@@ -35,6 +36,3 @@ do_install() {
     install -m 0600 ${WORKDIR}/${SWU_SIGN_KEY} ${TARGET}/swupdate-sign.key
 }
 
-do_prepare_build:append() {
-    echo "Provides: swupdate-certificates-key" >> ${S}/debian/control
-}

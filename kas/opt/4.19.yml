@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2021
+# Copyright (c) Siemens AG, 2021-2024
 #
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
@@ -15,4 +15,8 @@ header:
 local_conf_header:
   kernel-version: |
     PREFERRED_VERSION_linux-cip = "4.19.%"
+    PREFERRED_VERSION_linux-cip-native = "4.19.%"
+    PREFERRED_VERSION_linux-cip-kbuildtarget = "4.19.%"
     PREFERRED_VERSION_linux-cip-rt = "4.19.%"
+    PREFERRED_VERSION_linux-cip-rt-native = "4.19.%"
+    PREFERRED_VERSION_linux-cip-rt-kbuildtarget = "4.19.%"
