@@ -70,8 +70,14 @@ default:
     - kas build ${base_yaml}
     - if [ "${deploy}" = "enable" ]; then scripts/deploy-cip-core.sh ${release} ${target} ${extension} ${dtb} ${CI_COMMIT_REF_SLUG} wic; fi
     - if [ "${build_swu_v2}" = "enable" ]; then
+          mkdir build/previous-image;
+          if [ "${extension}" = "security" ] || [ "${extension}" = "ebg-secure-boot-snakeoil" ]; then
+              cp build/tmp/deploy/images/${target}/*.verity build/previous-image;
+          else
+              cp build/tmp/deploy/images/${target}/*.squashfs build/previous-image;
+          fi;
           echo "PV = \"2.0\"" >> recipes-core/images/cip-core-image-security.bb;
-          kas build ${base_yaml};
+          kas build ${base_yaml}:kas/opt/delta-update.yml;
           scripts/deploy-cip-core.sh ${release} ${target} ${extension} ${dtb} ${CI_COMMIT_REF_SLUG} swu;
       fi
     - if [ "${deploy_kernelci}" = "enable" ]; then scripts/deploy-kernelci.py ${release} ${target} ${extension} ${dtb}; fi
