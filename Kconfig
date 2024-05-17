@@ -151,23 +151,6 @@ config KAS_INCLUDE_DEBIAN
 
 comment "Image features"
 
-choice
-	prompt "Image formats"
-	default IMAGE_FLASH
-
-config IMAGE_FLASH
-	bool "Flashable image"
-
-config IMAGE_ARTIFACTS
-	bool "Separate artifacts for NFS boot"
-
-endchoice
-
-config KAS_INCLUDE_IMAGE_FORMAT
-	string
-	default "kas/opt/targz-img.yml" if IMAGE_ARTIFACTS && (TARGET_QEMU_AMD64 || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM)
-	default "kas/opt/wic-targz-img.yml" if IMAGE_ARTIFACTS && !(TARGET_QEMU_AMD64 || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM)
-
 config IMAGE_SECURITY
 	bool "Security extensions"
 	select IMAGE_DATA_ENCRYPTION
@@ -186,7 +169,7 @@ config KAS_INCLUDE_TESTING
 	string
 	default "kas/opt/test.yml" if IMAGE_TESTING
 
-if IMAGE_FLASH && !KERNEL_4_4 && !KERNEL_4_19
+if !KERNEL_4_4 && !KERNEL_4_19
 
 config IMAGE_SWUPDATE
 	bool "SWUpdate support for root partition"
@@ -242,3 +225,11 @@ config KAS_INCLUDE_FULL_ENCRYPTION
 	default "kas/opt/encrypt-all.yml" if IMAGE_FULL_ENCRYPTION
 
 endif
+
+config IMAGE_TAR_FORMAT
+	bool "Separate artifacts for NFS boot"
+	depends on !IMAGE_SWUPDATE
+
+config KAS_INCLUDE_TAR_FORMAT
+	string
+	default "kas/opt/targz.yml" if IMAGE_TAR_FORMAT

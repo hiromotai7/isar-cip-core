@@ -20,8 +20,7 @@ variables:
   extension: none
   use_rt: enable
   encrypt: disable
-  wic_targz: enable
-  targz: disable
+  targz: enable
   dtb: none
   deploy: enable
   deploy_kernelci: disable
@@ -58,8 +57,7 @@ default:
   script:
     - if [ "${use_rt}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/rt.yml"; fi
     - if [ "${extension}" != "none" ]; then base_yaml="${base_yaml}:kas/opt/${extension}.yml"; fi
-    - if [ "${wic_targz}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/wic-targz-img.yml"; fi
-    - if [ "${targz}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/targz-img.yml"; fi
+    - if [ "${targz}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/targz.yml"; fi
     - if [ "${release}" = "buster" ]; then base_yaml="${base_yaml}:kas/opt/buster.yml"; fi
     - if [ "${release}" = "bullseye" ]; then base_yaml="${base_yaml}:kas/opt/bullseye.yml"; fi
     - if [ "${release}" = "bookworm" ]; then base_yaml="${base_yaml}:kas/opt/bookworm.yml"; fi
@@ -111,8 +109,6 @@ build:qemu-amd64-base:
     target: qemu-amd64
     extension: security
     use_rt: disable
-    wic_targz: disable
-    targz: enable
     build_swu_v2: enable
 
 build:qemu-amd64-base-kernelci:
@@ -122,8 +118,6 @@ build:qemu-amd64-base-kernelci:
     target: qemu-amd64
     extension: kernelci
     use_rt: disable
-    wic_targz: disable
-    targz: enable
     deploy: disable
     deploy_kernelci: enable
 
@@ -134,8 +128,6 @@ build:qemu-arm64-base:
     target: qemu-arm64
     extension: security
     use_rt: disable
-    wic_targz: disable
-    targz: enable
     build_swu_v2: enable
 
 build:qemu-arm64-base-kernelci:
@@ -145,8 +137,6 @@ build:qemu-arm64-base-kernelci:
     target: qemu-arm64
     extension: kernelci
     use_rt: disable
-    wic_targz: disable
-    targz: enable
     deploy: disable
     deploy_kernelci: enable
 
@@ -157,8 +147,6 @@ build:qemu-arm-base:
     target: qemu-arm
     extension: security
     use_rt: disable
-    wic_targz: disable
-    targz: enable
     build_swu_v2: enable
 
 build:qemu-arm-base-kernelci:
@@ -168,8 +156,6 @@ build:qemu-arm-base-kernelci:
     target: qemu-arm
     extension: kernelci
     use_rt: disable
-    wic_targz: disable
-    targz: enable
     deploy: disable
     deploy_kernelci: enable
 
@@ -211,8 +197,6 @@ build:qemu-amd64-test:
   variables:
     target:  qemu-amd64
     extension: test
-    wic_targz: disable
-    targz: enable
 
 build:qemu-arm64-test:
   extends:
@@ -220,8 +204,6 @@ build:qemu-arm64-test:
   variables:
     target:  qemu-arm64
     extension: test
-    wic_targz: disable
-    targz: enable
 
 build:qemu-arm-test:
   extends:
@@ -229,8 +211,6 @@ build:qemu-arm-test:
   variables:
     target:  qemu-arm
     extension: test
-    wic_targz: disable
-    targz: enable
 
 # secure boot images
 build:qemu-amd64-secure-boot:
@@ -240,7 +220,7 @@ build:qemu-amd64-secure-boot:
     target: qemu-amd64
     extension: ebg-secure-boot-snakeoil
     use_rt: disable
-    wic_targz: disable
+    targz: disable
     deploy: disable
 
 build:qemu-amd64-secure-boot-encrypt:
@@ -250,7 +230,7 @@ build:qemu-amd64-secure-boot-encrypt:
     target: qemu-amd64
     extension: ebg-secure-boot-snakeoil
     use_rt: disable
-    wic_targz: disable
+    targz: disable
     deploy: disable
     encrypt: enable
 
@@ -261,7 +241,7 @@ build:qemu-amd64-swupdate:
     target: qemu-amd64
     extension: ebg-swu
     use_rt: disable
-    wic_targz: disable
+    targz: disable
     deploy: disable
 
 # secure boot images arm64
@@ -272,7 +252,7 @@ build:qemu-arm64-secure-boot:
     target: qemu-arm64
     extension: ebg-secure-boot-snakeoil
     use_rt: disable
-    wic_targz: disable
+    targz: disable
     deploy: disable
 
 # secure boot images arm
@@ -283,7 +263,7 @@ build:qemu-arm-secure-boot:
     target: qemu-arm
     extension: ebg-secure-boot-snakeoil
     use_rt: disable
-    wic_targz: disable
+    targz: disable
     deploy: disable
 
 # bullseye images
@@ -312,7 +292,7 @@ build:qemu-amd64-secure-boot-bullseye:
     target: qemu-amd64
     extension: ebg-secure-boot-snakeoil
     use_rt: disable
-    wic_targz: disable
+    targz: disable
     deploy: disable
     swupdate_version: "2022.12"
 
@@ -342,7 +322,7 @@ build:qemu-amd64-secure-boot-buster:
     target: qemu-amd64
     extension: ebg-secure-boot-snakeoil
     use_rt: disable
-    wic_targz: disable
+    targz: disable
     deploy: disable
     encrypt: enable
 
@@ -354,7 +334,7 @@ build:qemu-riscv64:
     target: qemu-riscv64
     release: sid
     use_rt: disable
-    wic_targz: disable
+    targz: disable
     deploy: disable
 
 cve-checks:
