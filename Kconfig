@@ -175,9 +175,10 @@ config IMAGE_SWUPDATE
 	bool "SWUpdate support for root partition"
 	depends on TARGET_QEMU_AMD64 || TARGET_SIMATIC_IPC227E || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM || TARGET_BBB || ( TARGET_QEMU_RISCV64 && KERNEL_6_1 ) || TARGET_HIHOPE_RZG2M
 
+if IMAGE_SWUPDATE
+
 choice
 	prompt "Update type"
-	depends on IMAGE_SWUPDATE
 
 config IMAGE_COMPLETE_SWUPDATE
 	bool "Complete Update"
@@ -190,7 +191,6 @@ endchoice
 config IMAGE_SECURE_BOOT
 	bool "Secure boot support"
 	depends on TARGET_QEMU_AMD64 || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM
-	select IMAGE_SWUPDATE
 
 config KAS_INCLUDE_SWUPDATE_SECBOOT
 	string
@@ -223,6 +223,8 @@ config KAS_INCLUDE_DATA_ENCRYPTION
 config KAS_INCLUDE_FULL_ENCRYPTION
 	string
 	default "kas/opt/encrypt-all.yml" if IMAGE_FULL_ENCRYPTION
+
+endif
 
 endif
 
