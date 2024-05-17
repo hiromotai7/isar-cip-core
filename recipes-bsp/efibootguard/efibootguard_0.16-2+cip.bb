@@ -34,7 +34,7 @@ PATCHTOOL = "git"
 
 inherit dpkg
 
-DEPENDS = "python3-shtab"
+DEPENDS = "python-shtab"
 # needed for buster, bullseye could use compat >= 13
 python() {
     arch = d.getVar('DISTRO_ARCH')
