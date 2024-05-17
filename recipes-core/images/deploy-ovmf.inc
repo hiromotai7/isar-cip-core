@@ -13,7 +13,7 @@
 
 INSTALL_deploy_ovmf_binaries += "ovmf"
 
-do_deploy_ovmf_binaries[network] += "${TASK_USE_SUDO}"
+do_deploy_ovmf_binaries[network] = "${TASK_USE_SUDO}"
 do_deploy_ovmf_binaries[cleandirs] += "${DEPLOY_DIR_IMAGE}/OVMF"
 do_deploy_ovmf_binaries[depends] += "${SCHROOT_DEP}"
 do_deploy_ovmf_binaries() {
