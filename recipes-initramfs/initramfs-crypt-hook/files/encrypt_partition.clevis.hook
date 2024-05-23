@@ -73,6 +73,7 @@ copy_exec /usr/bin/pwmake || hook_error "Unable to copy /usr/bin/pwmake"
 copy_exec /usr/bin/file || hook_error "Unable to copy /usr/bin/file "
 copy_exec /usr/lib/*/libgcc_s.so.1 || hook_error "Unable to copy /usr/lib/*/libgcc_s.so.1 "
 copy_exec /usr/bin/uuidparse || hook_error "Unable to copy /usr/bin/uuidparse"
+copy_exec /usr/bin/mountpoint || hook_error "Unable to copy /usr/bin/mountpoint"
 
 if [ -x /usr/sbin/cryptsetup-reencrypt ]; then
     copy_exec /usr/sbin/cryptsetup-reencrypt
