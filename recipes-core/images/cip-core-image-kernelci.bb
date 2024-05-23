@@ -9,7 +9,7 @@
 # SPDX-License-Identifier: MIT
 #
 
-inherit image
+require cip-core-image.inc
 
 DESCRIPTION = "CIP Core image for KernelCI"
 
