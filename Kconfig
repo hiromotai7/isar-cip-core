@@ -39,8 +39,8 @@ config TARGET_QEMU_AMD64
 	bool "QEMU AMD64 (x86-64)"
 	select ARCH_AMD64
 
-config TARGET_SIMATIC_IPC227E
-	bool "Siemens SIMATIC IPC227E"
+config TARGET_X86_UEFI
+	bool "Generic x86 machine booting via UEFI"
 	select ARCH_AMD64
 
 config TARGET_QEMU_ARM64
@@ -72,7 +72,7 @@ endchoice
 config KAS_INCLUDE_BOARD
 	string
 	default "kas/board/qemu-amd64.yml" if TARGET_QEMU_AMD64
-	default "kas/board/simatic-ipc227e.yml" if TARGET_SIMATIC_IPC227E
+	default "kas/board/x86-uefi.yml" if TARGET_X86_UEFI
 	default "kas/board/qemu-arm64.yml" if TARGET_QEMU_ARM64
 	default "kas/board/hihope-rzg2m.yml" if TARGET_HIHOPE_RZG2M
 	default "kas/board/qemu-arm.yml" if TARGET_QEMU_ARM
@@ -173,7 +173,7 @@ if !KERNEL_4_4 && !KERNEL_4_19
 
 config IMAGE_SWUPDATE
 	bool "SWUpdate support for root partition"
-	depends on TARGET_QEMU_AMD64 || TARGET_SIMATIC_IPC227E || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM || TARGET_BBB || ( TARGET_QEMU_RISCV64 && KERNEL_6_1 ) || TARGET_HIHOPE_RZG2M
+	depends on TARGET_QEMU_AMD64 || TARGET_X86_UEFI || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM || TARGET_BBB || ( TARGET_QEMU_RISCV64 && KERNEL_6_1 ) || TARGET_HIHOPE_RZG2M
 
 if IMAGE_SWUPDATE
 
