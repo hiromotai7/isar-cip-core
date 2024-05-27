@@ -16,8 +16,4 @@ header:
 local_conf_header:
   kernel-version: |
     PREFERRED_VERSION_linux-cip = "4.4.%"
-    PREFERRED_VERSION_linux-cip-native = "4.4.%"
-    PREFERRED_VERSION_linux-cip-kbuildtarget = "4.4.%"
     PREFERRED_VERSION_linux-cip-rt = "4.4.%"
-    PREFERRED_VERSION_linux-cip-rt-native = "4.4.%"
-    PREFERRED_VERSION_linux-cip-rt-kbuildtarget = "4.4.%"
