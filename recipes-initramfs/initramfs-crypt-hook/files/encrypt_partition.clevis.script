@@ -13,8 +13,8 @@
 open_tpm2_partition() {
 	partition_device="$1"
 	crypt_mount_name="$2"
-	#tpm_device="$3"
-	if ! /usr/bin/clevis luks unlock -n "$crypt_mount_name" \
+	tpm_device="$3"
+	if ! TPM2TOOLS_TCTI="device:$tpm_device" usr/bin/clevis luks unlock -n "$crypt_mount_name" \
 		 -d "$partition_device"; then
 		panic "Can't decrypt '$partition_device' !"
 	fi
@@ -23,11 +23,11 @@ open_tpm2_partition() {
 enroll_tpm2_token() {
 	partition_device="$1"
 	passphrase="$2"
-	#tpm_device="$3"
+	tpm_device="$3"
 	tpm_key_algorithm="$4"
 	pcr_bank_hash_type="$5"
 	if [ -x /usr/bin/clevis ]; then
-		clevis luks bind -d "$partition_device" tpm2 '{"key":"'"$tpm_key_algorithm"'", "pcr_bank":"'"$pcr_bank_hash_type"'","pcr_ids":"7"}' < "$passphrase"
+		TPM2TOOLS_TCTI="device:$tpm_device" clevis luks bind -d "$partition_device" tpm2 '{"key":"'"$tpm_key_algorithm"'", "pcr_bank":"'"$pcr_bank_hash_type"'","pcr_ids":"7"}' < "$passphrase"
 	else
 		panic "clevis not available cannot enroll tpm2 key!"
 	fi
