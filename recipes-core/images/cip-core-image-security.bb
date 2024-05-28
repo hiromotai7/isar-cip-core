@@ -25,7 +25,6 @@ IMAGE_PREINSTALL += " \
 	libpam-pkcs11 \
 	chrony \
 	tpm2-tools \
-	tpm2-abrmd \
 	acl \
 	audispd-plugins \
 	uuid-runtime \
