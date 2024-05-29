@@ -290,3 +290,35 @@ sda              8:0    0     6G  0 disk
 ├─sda6           8:6    0   1.3G  0 part  /home
 └─sda7           8:7    0   2.6G  0 part  /var
 ```
+
+## Secure boot on Generic UEFI x86
+
+Secureboot for a generic UEFI x86 target works similar to the QEMU target,
+except the enrollment of the secure boot keys.
+
+### Secure boot key enrollment
+
+> :exclamation:**IMPORTANT** This document is not for generating a Machine Owner Key(MOK).
+
+> :exclamation:**IMPORTANT** Enrollment of secure boot keys must occur
+> in a secure environment.
+
+The following keys need to be enrolled onto the device:
+ - The Platform Key (PK)
+ - The Key Exchange Key (KEK)
+ - Allowed Signatures Database
+
+The enrollment can typically be achieved with the help of
+[efi-updatevar](https://manpages.debian.org/bookworm/efitools/efi-updatevar.1.en.html)
+on the device. Otherwise, consult the manual of the specific UEFI Firmware.
+
+Use the recipes [secure-boot-key](###secure-boot-key) to provided the keys
+to the signing script contained in
+[ebg-secure-boot-signer](###ebg-secure-boot-signer).
+
+### [ebg-secure-boot-signer](./recipes-devtools/ebg-secure-boot-signer/ebg-secure-boot-signer_0.2.bb)
+
+During building a efibootguard based wic image the scripts contained in
+the recipe ebg-secure-boot-signer can be used to sign the bootloader and
+unified kernel image(UKI). If the keys are stored in a HSM the script can
+be exchanged to sign the artifacts in a more secure way.

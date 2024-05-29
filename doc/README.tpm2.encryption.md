@@ -82,3 +82,15 @@ if [ -n "$keyslot" ]; then
   systemd-cryptenroll --tpm2-device="$tpm_device" --tpm2-pcrs=7 "$device"
 fi
 ```
+# TPM2 based encryption on generic x86
+
+For a generic x86 platform with TPM2  module the build can be started with:
+
+```bash
+kas-container menu
+```
+
+The TPM2 module should support:
+ - a sha256 pcr bar with the ecc algorithm.
+
+If only a sha1 pcr bar is avaiable the variable `CRYPT_HASH_TYPE` needs to be set to `sha1`.
