@@ -15,3 +15,5 @@ SRC_URI:append = " ${@ \
     }"
 
 SRCREV_cip-kernel-config ?= "93b9ba271c14556a24b3f8392d10a8647b496f1f"
+
+do_fetch[vardeps] += "SRCREV_cip-kernel-config"
