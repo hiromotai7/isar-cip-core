@@ -151,17 +151,6 @@ config KAS_INCLUDE_DEBIAN
 
 comment "Image features"
 
-config IMAGE_SECURITY
-	bool "Security extensions"
-	select IMAGE_DATA_ENCRYPTION
-	depends on TARGET_QEMU_AMD64 || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM
-	help
-	  This enables security, encryption, secureboot and swupdate for IEC 62443-4-2.
-
-config KAS_INCLUDE_SECURITY
-	string
-	default "kas/opt/security.yml" if IMAGE_SECURITY
-
 config IMAGE_TESTING
 	bool "Test extensions"
 
@@ -170,6 +159,18 @@ config KAS_INCLUDE_TESTING
 	default "kas/opt/test.yml" if IMAGE_TESTING
 
 if !KERNEL_4_4 && !KERNEL_4_19
+
+config IMAGE_SECURITY
+	bool "Security extensions"
+	select IMAGE_SWUPDATE
+	select IMAGE_DATA_ENCRYPTION
+	depends on TARGET_QEMU_AMD64 || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM || TARGET_X86_UEFI
+	help
+	  This enables security, encryption, secureboot and swupdate for IEC 62443-4-2.
+
+config KAS_INCLUDE_SECURITY
+	string
+	default "kas/opt/security.yml" if IMAGE_SECURITY
 
 config IMAGE_SWUPDATE
 	bool "SWUpdate support for root partition"
