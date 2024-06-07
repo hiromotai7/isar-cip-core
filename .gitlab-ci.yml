@@ -343,6 +343,39 @@ build:qemu-riscv64:
     targz: disable
     deploy: disable
 
+.test-cip-core:
+  stage: test
+  needs: ["build:qemu-amd64-base","build:qemu-arm64-base","build:qemu-arm-base"]
+  tags:
+    - small
+  allow_failure: true
+  artifacts:
+    name: "$CI_JOB_NAME"
+    when: always
+    expire_in: 1 day
+    paths:
+      - results
+    reports:
+      junit: results/results*.xml
+
+test-qemu-secure-boot:
+  extends:
+    - .test-cip-core
+  script:
+    - scripts/submit_lava.sh secure-boot ${CI_COMMIT_SHA} ${release} ${CI_COMMIT_REF_SLUG}
+
+test-qemu-swupdate:
+  extends:
+    - .test-cip-core
+  script:
+    - scripts/submit_lava.sh swupdate ${CI_COMMIT_SHA} ${release} ${CI_COMMIT_REF_SLUG}
+
+test-qemu-IEC:
+  extends:
+   - .test-cip-core
+  script:
+    - scripts/submit_lava.sh IEC ${CI_COMMIT_SHA} ${release} ${CI_COMMIT_REF_SLUG}
+
 cve-checks:
   stage: cve-check
   needs: []
