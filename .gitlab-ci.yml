@@ -345,6 +345,12 @@ build:qemu-riscv64:
 
 .test-cip-core:
   stage: test
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_BRANCH != "master"
   needs: ["build:qemu-amd64-base","build:qemu-arm64-base","build:qemu-arm-base"]
   tags:
     - small
