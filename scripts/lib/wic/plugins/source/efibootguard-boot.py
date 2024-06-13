@@ -136,40 +136,20 @@ class EfibootguardBootPlugin(SourcePlugin):
                 msger.error("file %s not found in directory %s",
                             boot_file, kernel_dir)
                 exit(1)
-        cls._create_img(part_rootfs_dir, part, cr_workdir)
+        cls._create_img(part_rootfs_dir, part, cr_workdir,
+                        native_sysroot, oe_builddir)
 
     @classmethod
-    def _create_img(cls, part_rootfs_dir, part, cr_workdir):
-            # Write label as utf-16le to EFILABEL file
+    def _create_img(cls, part_rootfs_dir, part, cr_workdir,
+                    native_sysroot, oe_builddir):
+        # Write label as utf-16le to EFILABEL file
         with open("%s/EFILABEL" % part_rootfs_dir, 'wb') as filedescriptor:
             filedescriptor.write(part.label.upper().encode("utf-16le"))
 
-        du_cmd = "du --apparent-size -ks %s" % part_rootfs_dir
-        blocks = int(exec_cmd(du_cmd).split()[0])
-
-        extra_blocks = part.get_extra_block_count(blocks)
-        if extra_blocks < BOOTDD_EXTRA_SPACE:
-            extra_blocks = BOOTDD_EXTRA_SPACE
-
-        blocks += extra_blocks
-        blocks = blocks + (16 - (blocks % 16))
-
-        msger.debug("Added %d extra blocks to %s to get to %d total blocks",
-                    extra_blocks, part.mountpoint, blocks)
-
-        # dosfs image, created by mkdosfs
         bootimg = "%s/%s.%s.img" % (cr_workdir, part.label, part.lineno)
 
-        dosfs_cmd = "mkdosfs -F 16 -S 512 -n %s -C %s %d -i %s" % \
-            (part.label.upper(), bootimg, blocks, part.fsuuid)
-        exec_cmd(dosfs_cmd)
-
-        mcopy_cmd = "mcopy -v -i %s -s %s/* ::/" % (bootimg, part_rootfs_dir)
-        exec_cmd(mcopy_cmd, True)
-
-        chmod_cmd = "chmod 644 %s" % bootimg
-        exec_cmd(chmod_cmd)
-
+        part.prepare_rootfs_msdos(bootimg, cr_workdir, oe_builddir,
+                                  part_rootfs_dir, native_sysroot, None)
         du_cmd = "du -Lbks %s" % bootimg
         bootimg_size = int(exec_cmd(du_cmd).split()[0])
 

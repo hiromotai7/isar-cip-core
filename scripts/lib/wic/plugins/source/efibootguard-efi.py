@@ -100,35 +100,9 @@ class EfibootguardEFIPlugin(SourcePlugin):
                                                name)
         exec_cmd(cp_to_deploy_cmd, True)
 
-        du_cmd = "du --apparent-size -ks %s" % part_rootfs_dir
-        blocks = int(exec_cmd(du_cmd).split()[0])
-
-        extra_blocks = part.get_extra_block_count(blocks)
-        if extra_blocks < BOOTDD_EXTRA_SPACE:
-            extra_blocks = BOOTDD_EXTRA_SPACE
-        blocks += extra_blocks
-        blocks = blocks + (16 - (blocks % 16))
-
-        msger.debug("Added %d extra blocks to %s to get to %d total blocks",
-                    extra_blocks, part.mountpoint, blocks)
-
-        # dosfs image, created by mkdosfs
         efi_part_image = "%s/%s.%s.img" % (cr_workdir, part.label, part.lineno)
-
-        dosfs_cmd = "mkdosfs -S 512 -n %s -C %s %d -i %s" % \
-            (part.label.upper(), efi_part_image, blocks, part.fsuuid)
-        exec_cmd(dosfs_cmd)
-
-        # mtools for buster have problems with resursive mcopy.
-        # Therefore, create the target dir via mmd first.
-        mmd_cmd = "mmd -i %s ::/EFI ::/EFI/BOOT" % (efi_part_image)
-        exec_cmd(mmd_cmd, True)
-        mcopy_cmd = "mcopy -v -i %s -s %s/EFI/BOOT/* ::/EFI/BOOT" % \
-            (efi_part_image, part_rootfs_dir)
-        exec_cmd(mcopy_cmd, True)
-
-        chmod_cmd = "chmod 644 %s" % efi_part_image
-        exec_cmd(chmod_cmd)
+        part.prepare_rootfs_msdos(efi_part_image, cr_workdir, oe_builddir,
+                                  part_rootfs_dir, native_sysroot, None)
 
         du_cmd = "du -Lbks %s" % efi_part_image
         efi_part_image_size = int(exec_cmd(du_cmd).split()[0])
