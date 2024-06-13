@@ -77,7 +77,7 @@ reencrypt_existing_partition() {
 			panic "reencryption of filesystem $1 cannot continue!"
 		fi
 		;;
-	squashfs|"")
+	squashfs|swap|"")
 		[ "$debug" = "y" ] && echo "skip disk resize as it is not supported or unnecessary for fstype: '$partition_fstype'"
 		;;
 	*)
