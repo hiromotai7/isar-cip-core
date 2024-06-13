@@ -208,8 +208,6 @@ root@demo:~# uname -a
 Linux demo 4.19.233-cip69-rt24 #1 SMP PREEMPT RT Tue Apr 12 09:23:51 UTC 2022 x86_64 GNU/Linux
 root@demo:~# ls /lib/modules
 4.19.233-cip69-rt24
-root@demo:~# cat /sys/kernel/realtime
-1
 ```
 
 Now apply swupdate and reboot
@@ -217,6 +215,7 @@ Now apply swupdate and reboot
 root@demo:~# swupdate -i cip-core-image-cip-core-bullseye-qemu-amd64.swu
 root@demo:~# reboot
 ```
+Use the `-v` flag when running swupdate for verbose logs of any errors.
 
 Check which partition is booted, e.g. with lsblk and the rootfs should have changed
 ```
@@ -384,7 +383,7 @@ First build an image using the following command:
 ```
 host$ ./kas-container build kas-cip.yml:kas/board/qemu-amd64.yml:kas/opt/ebg-swu.yml:kas/opt/rt.yml
 ```
-The above image will be used as the base image to which the update is applied.
+The image is built with the RT kernel just so that there are some differences between the two images used. The above image will be used as the base image to which the update is applied.
 
 ## Delta Software Update using rdiff_image handler
 
@@ -413,7 +412,10 @@ host$ scp -P 22222 ./cip-core-image-cip-core-bookworm-qemu-amd64.swu root@localh
 
 ## Delta Software Update using zchunk handler
 
-Currently zchunk based delta updates are supported only in Sid images. Make sure to build the first image with Sid as the distribution (use `sid.yml` file as part of the build command).
+Currently zchunk based delta updates are supported only in Sid images. Make sure to build the first image with Sid as the distribution with the following command:
+```
+host$ ./kas-container build kas-cip.yml:kas/board/qemu-amd64.yml:kas/opt/ebg-swu.yml:kas/opt/sid.yml
+```
 For Delta update with zchunk, set the variable `DELTA_ZCK_URL` with the URL of the zck file that is hosted in a http server and set the `DELTA_UPDATE_TYPE` to `zchunk` in `delta-update.yml` file.
 
 Build the second image with the modification as shown above with the following command:
@@ -430,6 +432,7 @@ host$ cd build-v2/tmp/deploy/images/qemu-amd64/
 host$ scp -P 22222 ./cip-core-image-cip-core-sid-qemu-amd64.swu root@localhost:
 ```
 The `cip-core-image-cip-core-sid-qemu-amd64.zck` file must be hosted in a http server.
+Any http server (service) can be used to host the .zck file as long as the http server supports http range requests. Copy the `build-v2/tmp/deploy/images/qemu-amd64/cip-core-image-cip-core-sid-qemu-amd64.zck` to the server directory. For more information on the integration of zchunk handler in swupdate, refer the [documentation](https://sbabic.github.io/swupdate/delta-update.html#integration-in-swupdate-the-delta-handler)
 
 ## Delta Software Update Verification
 
