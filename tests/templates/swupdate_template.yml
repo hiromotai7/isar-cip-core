@@ -1,10 +1,10 @@
 device_type: qemu
-job_name: qemu #architecture# software update testing
+job_name: #architecture# software update testing
 timeouts:
   job:
-    minutes: 30
+    minutes: 50
   action:
-   minutes: 20
+   minutes: 40
   actions:
     power-off:
       seconds: 60
@@ -30,14 +30,14 @@ actions:
 # DEPLOY BLOCK
 - deploy:
     timeout:
-      minutes: 15
+      minutes: 30
     to: tmpfs
     images:
       system:
         image_arg: '-drive file={system},discard=unmap,if=none,id=disk,format=raw -m 1G -serial mon:stdio -smp 4
                     -nographic -netdev user,id=net,hostfwd=tcp:127.0.0.1:22222-:22 -chardev socket,id=chrtpm,path=/tmp/qemu-swtpm.sock
                     -tpmdev emulator,id=tpm0,chardev=chrtpm #imageargs#'
-        url: #project_url#/#branch#/qemu-#architecture#/cip-core-image-security-cip-core-#distribution#-qemu-#architecture#.wic.xz
+        url: #project_url#/#branch#/#architecture#/cip-core-image-security-cip-core-#distribution#-#architecture#.wic.xz
         compression: xz
 
       #Firmware#
@@ -47,7 +47,7 @@ actions:
 # BOOT BLOCK
 - boot:
     timeout:
-      minutes: 15
+      minutes: 25
     method: qemu
     media: tmpfs
     prompts: ["root@demo:~#"]
@@ -61,7 +61,7 @@ actions:
 # Sleep 200s is added to make the job incomplete with a timeout if software update application failed
 - test:
     timeout:
-      minutes: 5
+      minutes: 15
     definitions:
     - repository:
         metadata:
@@ -70,7 +70,7 @@ actions:
           description: "Test software update"
         run:
           steps:
-            - if swupdate -d "-u #project_url#/#branch#/qemu-#architecture#/cip-core-image-security-cip-core-#distribution#-qemu-#architecture#.swu"; then echo software update is successful!!; else sleep 200s; fi
+            - if swupdate -d "-u #project_url#/#branch#/#architecture#/cip-core-image-security-cip-core-#distribution#-#architecture#.swu"; then echo software update is successful!!; else sleep 200s; fi
       from: inline
       name: sample-test-1
       path: inline/sample-test.yaml
@@ -120,6 +120,6 @@ actions:
       path: inline/sample-test.yaml
 
 context:
-  arch: #architecture#
+  arch: #context-architecture#
   guestfs_interface: virtio
   lava_test_results_dir: '/home/lava-%s'
