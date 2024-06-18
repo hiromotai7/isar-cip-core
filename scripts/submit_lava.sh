@@ -54,13 +54,13 @@ add_firmware_artifacts () {
 # The created job definitions test SWUpdate, Secureboot and IEC layer
 create_job () {
 	if [ "$1" = "IEC" ]; then
-		cp $LAVA_TEMPLATES/IEC_template.yml "${job_dir}"/${1}_${2}.yml
+		cp $LAVA_TEMPLATES/IEC_template.yml "${job_dir}/${1}_${2}.yml"
 
 	elif [ "$1" = "swupdate" ]; then
-		cp $LAVA_TEMPLATES/swupdate_template.yml "${job_dir}"/${1}_${2}.yml
+		cp $LAVA_TEMPLATES/swupdate_template.yml "${job_dir}/${1}_${2}.yml"
 
 	elif [ "$1" = "kernel-panic" ] || [ "$1" = "initramfs-crash" ]; then
-		cp $LAVA_TEMPLATES/swupdate_template.yml "${job_dir}"/"${1}".yml
+		cp $LAVA_TEMPLATES/swupdate_template.yml "${job_dir}/${1}.yml"
 		sed -i "s@software update testing@${1}_rollback_testing@g" "${job_dir}"/*.yml
 		sed -i "s@) = 2@) = 0@g" "${job_dir}"/*.yml
 		if [ "$1" = "kernel-panic" ]; then
@@ -71,7 +71,7 @@ create_job () {
 			sed -i "s@echo software update is successful!!@dd if=/dev/urandom of=/dev/sda5 bs=512 count=1@g" "${job_dir}"/*.yml
 		fi
 	else
-		cp $LAVA_TEMPLATES/secureboot_template.yml "${job_dir}"/${1}_${2}.yml
+		cp $LAVA_TEMPLATES/secureboot_template.yml "${job_dir}/${1}_${2}.yml"
 	fi
 
 	if [ "$1" != "kernel-panic" ]; then
@@ -79,7 +79,7 @@ create_job () {
 	fi
 
 	if [ "$2" != "qemu-amd64" ]; then
-		add_firmware_artifacts "${job_dir}"/*.yml $2
+		add_firmware_artifacts "${job_dir}"/*.yml "$2"
 	fi
 
 	sed -i -e "s@#distribution#@${RELEASE}@g" -e "s@#project_url#@${PROJECT_URL}@g" "${job_dir}"/*.yml
@@ -88,7 +88,7 @@ create_job () {
 	# Target is recieved from gitlab job in form of qemu-"architecture"
 	# In the template context field needs only architecture excepting the device type
 	local arch
-	arch=$(echo ${2} | cut -d '-' -f 2)
+	arch=$(echo "$2" | cut -d '-' -f 2)
 	sed -i "s@#context-architecture#@${arch}@g" "${job_dir}"/*.yml
 }
 
@@ -117,7 +117,7 @@ submit_squad_watch_job(){
 		--header "Authorization: token $CIP_SQUAD_LAB_TOKEN" \
 		--form backend="$SQUAD_LAVA_BACKEND" \
 		--form testjob_id="$1" \
-		--form metadata='{"device": "'${DEVICE}'", "CI pipeline": "'${CI_PIPELINE_URL}'", "CI job": "'${CI_JOB_URL}'"}' \
+		--form metadata='{"device": "'"${DEVICE}"'", "CI pipeline": "'"${CI_PIPELINE_URL}"'", "CI job": "'"${CI_JOB_URL}"'"}' \
 		"$squad_url")
 
 	if [[ $ret != [0-9]* ]]
@@ -135,12 +135,13 @@ submit_squad_watch_job(){
 # $1: Job definition file
 submit_job() {
         # First check if respective device is online
-	local job device ret status health device test
+	local job device ret device
 	job=$1
 	device=$(grep device_type "$job" | cut -d ":" -f 2 | awk '{$1=$1};1')
 	if is_device_online "$device"; then
 		echo "Submitting $1 to LAVA master..."
 		# Catch error that occurs if invalid yaml file is submitted
+		# shellcheck disable=2086
 		ret=$(lavacli $LAVACLI_ARGS jobs submit "$1") || error=true
 
 		if [[ $ret != [0-9]* ]]
@@ -151,38 +152,31 @@ submit_job() {
 			echo "Job submitted successfully as #${ret}."
 
 			local lavacli_output=${job_dir}/lavacli_output
+			# shellcheck disable=2086
 			lavacli $LAVACLI_ARGS jobs show "${ret}" \
 				> "$lavacli_output"
 
-			status=$(cat "$lavacli_output" \
-				| grep "state" \
+			STATUS=$(grep "state" "$lavacli_output" \
 				| cut -d ":" -f 2 \
 				| awk '{$1=$1};1')
-			STATUS=$status
 
-			health=$(cat "$lavacli_output" \
-				| grep "Health" \
+			HEALTH=$(grep "Health" "$lavacli_output" \
 				| cut -d ":" -f 2 \
 				| awk '{$1=$1};1')
-			HEALTH=$health
 
-			device=$(cat "$lavacli_output" \
-				| grep "device      :" \
+			DEVICE=$(grep "device      :" "$lavacli_output" \
 				| cut -d ":" -f 2 \
 				| awk '{$1=$1};1')
-			DEVICE=$device
 
-			test=$(cat "$lavacli_output" \
-				| grep "description" \
+			TESTING=$(grep "description" "$lavacli_output" \
 				| rev | cut -d "_" -f 1 | rev)
-			TESTING=$test
 
-			submit_squad_watch_job "${ret}" "${device}"
+			submit_squad_watch_job "${ret}" "${DEVICE}"
 
-			if ! check_status $ret; then
+			if ! check_status "$ret"; then
 				ERROR=true
 			fi
-			get_junit_test_results $ret
+			get_junit_test_results "$ret"
 		fi
 	else
 		return 1
@@ -195,6 +189,7 @@ is_device_online () {
 	local lavacli_output=${job_dir}/lavacli_output
 
 	# Get list of all devices
+	# shellcheck disable=2086
 	lavacli $LAVACLI_ARGS devices list > "$lavacli_output"
 
 	# Count the number of online devices
@@ -213,6 +208,7 @@ is_device_online () {
 validate_jobs () {
 	local ret=0
 	for JOB in "${job_dir}"/*.yml; do
+		# shellcheck disable=2086
 		if lavacli $LAVACLI_ARGS jobs validate "$JOB"; then
 			echo "$JOB is a valid definition"
 			if ! submit_job $JOB; then
@@ -246,6 +242,7 @@ check_for_test_error () {
 # $1: LAVA job ID to show results for
 get_test_result () {
 	if [ -n "${1}" ]; then
+		# shellcheck disable=2086
 		lavacli "$LAVACLI_ARGS" results "${1}"
 	fi
 }
@@ -287,7 +284,7 @@ print_summary () {
 }
 
 check_status () {
-	local end_time status health device now
+	local end_time status now
 	if [ -n "$TEST_TIMEOUT" ]; then
 		# Current time + timeout time
 		end_time=$(date +%s -d "+ $TEST_TIMEOUT min")
@@ -295,7 +292,7 @@ check_status () {
 
 	local error=false
 
-	if [ ! -z $1 ]; then
+	if [ -n "$1" ]; then
 		print_status "Current job status:"
 		while true
 		do
@@ -303,31 +300,27 @@ check_status () {
 			if [ "${STATUS}" != "Finished" ]
 			then
 				local lavacli_output=${job_dir}/lavacli_output
+				# shellcheck disable=2086
 				lavacli $LAVACLI_ARGS jobs show "$1" \
 					> "$lavacli_output"
 
-				status=$(cat "$lavacli_output" \
-					| grep "state" \
+				status=$(grep "state" "$lavacli_output" \
 					| cut -d ":" -f 2 \
 					| awk '{$1=$1};1')
 
-				health=$(cat "$lavacli_output" \
-					| grep "Health" \
+				HEALTH=$(grep "Health" "$lavacli_output" \
 					| cut -d ":" -f 2 \
 					| awk '{$1=$1};1')
-				HEALTH=$health
 
-				device=$(cat "$lavacli_output" \
-					| grep "device      :" \
+				DEVICE=$(grep "device      :" "$lavacli_output" \
 					| cut -d ":" -f 2 \
 					| awk '{$1=$1};1')
-				DEVICE=$device
 
 				if [ "${STATUS}" != "$status" ]; then
 					STATUS=$status
 
 					# Something has changed
-					print_status "Current job status:" $1
+					print_status "Current job status:" "$1"
 				else
 					STATUS=$status
 				fi
@@ -353,7 +346,7 @@ check_status () {
 
 		if check_if_finished; then
 			# Print job outcome
-			print_status "Final job status:" $1
+			print_status "Final job status:" "$1"
 
 			if check_for_test_error; then
 				error=true
@@ -365,7 +358,7 @@ check_status () {
 		echo "---------------------"
 		echo "Errors during testing"
 		echo "---------------------"
-		print_summary $1
+		print_summary "$1"
 		clean_up
 		return 1
 	fi
@@ -373,12 +366,12 @@ check_status () {
 	echo "-----------------------------------"
 	echo "Submitted test is successful"
 	echo "-----------------------------------"
-	print_summary $1
+	print_summary "$1"
 	return 0
 }
 
 set_up
-create_job $TEST $TARGET
+create_job "$TEST" "$TARGET"
 
 if ! validate_jobs; then
 	clean_up
