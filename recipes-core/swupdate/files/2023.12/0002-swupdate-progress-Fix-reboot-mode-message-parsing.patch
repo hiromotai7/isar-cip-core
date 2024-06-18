@@ -1,0 +1,52 @@
+From c65f5435eec2a0c51f6f0c356451c2091b2f3fdc Mon Sep 17 00:00:00 2001
+From: "Storm, Christian" <christian.storm@siemens.com>
+Date: Wed, 5 Jun 2024 06:35:24 +0000
+Subject: [PATCH 2/2] swupdate-progress: Fix reboot-mode message parsing
+
+The incoming msg.info reads, e.g.,
+{"0": {"1": { "reboot-mode" : "no-reboot"}}}
+and sscanf() also needs to parse/read over the enclosing
+{"0": <...>}
+part, though discarding it.
+
+While at it, use static buffer allocation as the BSDs don't have %m
+
+Signed-off-by: Christian Storm <christian.storm@siemens.com>
+---
+ tools/swupdate-progress.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
+
+diff --git a/tools/swupdate-progress.c b/tools/swupdate-progress.c
+index 584910d4..14040757 100644
+--- a/tools/swupdate-progress.c
++++ b/tools/swupdate-progress.c
+@@ -339,7 +339,7 @@ int main(int argc, char **argv)
+ 		 * Be sure that string in message are Null terminated
+ 		 */
+ 		if (msg.infolen > 0) {
+-			char *reboot_mode;
++			char reboot_mode[20] = { 0 };
+ 			int n, cause;
+ 
+ 			if (msg.infolen >= sizeof(msg.info) - 1) {
+@@ -354,15 +354,14 @@ int main(int argc, char **argv)
+ 			 * will be added, JSON lib should be linked.
+ 			 * NOTE: Until then, the exact string format is imperative!
+ 			 */
+-			n = sscanf(msg.info, "{\"%d\": { \"reboot-mode\" : \"%m[-a-z]\"}}",
+-				   &cause, &reboot_mode);
++			n = sscanf(msg.info, "{\"%*d\": {\"%d\": { \"reboot-mode\" : \"%19[-a-z]\"}}}",
++				   &cause, reboot_mode);
+ 			if (n == 2) {
+ 				if (cause == CAUSE_REBOOT_MODE) {
+ 					if (!strcmp(reboot_mode, "no-reboot")) {
+ 						disable_reboot = true;
+ 					}
+ 				}
+-				free(reboot_mode);
+ 			}
+ 		}
+ 		msg.cur_image[sizeof(msg.cur_image) - 1] = '\0';
+-- 
+2.43.0
+

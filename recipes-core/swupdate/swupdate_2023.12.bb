@@ -27,7 +27,8 @@ SRCREV = "6ccd44a8539ebb880bf0dac408d5db5de7e2de99"
 # patches
 SRC_URI += "file://0001-d-rules-Add-seperate-build_profile-option-for-delta-.patch"
 SRC_URI += "file://0002-d-swupdate-www.install-Fix-path-for-debian-bullseye.patch"
-
+SRC_URI += "file://0001-suricatta-lua-Add-suricatta.ipc.progress_cause-table.patch"
+SRC_URI += "file://0002-swupdate-progress-Fix-reboot-mode-message-parsing.patch"
 # suricatta wfx requires suricatta lua and the dependency
 # is not set automatically
 DEB_BUILD_PROFILES += "pkg.swupdate.suricattalua"

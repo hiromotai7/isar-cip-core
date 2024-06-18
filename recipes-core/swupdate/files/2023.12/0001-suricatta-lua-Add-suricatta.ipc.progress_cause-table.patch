@@ -1,0 +1,30 @@
+From 3ac2b34958a31c3694a78f840201373cfaff6c10 Mon Sep 17 00:00:00 2001
+From: "Storm, Christian" <christian.storm@siemens.com>
+Date: Mon, 3 Jun 2024 20:16:56 +0000
+Subject: [PATCH 1/2] suricatta/lua: Add suricatta.ipc.progress_cause table
+
+Reported-by: Adithya Balakumar <adithya190298@gmail.com>
+Signed-off-by: Christian Storm <christian.storm@siemens.com>
+---
+ suricatta/server_lua.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/suricatta/server_lua.c b/suricatta/server_lua.c
+index 7ac5e972..2641a037 100644
+--- a/suricatta/server_lua.c
++++ b/suricatta/server_lua.c
+@@ -1592,6 +1592,11 @@ static int suricatta_lua_module(lua_State *L)
+ 	push_to_table(L, "SUBPROCESS", SUBPROCESS);
+ 	push_to_table(L, "PROGRESS", PROGRESS);
+ 	lua_settable(L, -3);
++	lua_pushstring(L, "progress_cause");
++	lua_newtable(L);
++	push_to_table(L, "CAUSE_NONE", CAUSE_NONE);
++	push_to_table(L, "CAUSE_REBOOT_MODE", CAUSE_REBOOT_MODE);
++	lua_settable(L, -3);
+ 	lua_settable(L, -3);
+ 
+ 	lua_pushstring(L, "status");
+-- 
+2.43.0
+
