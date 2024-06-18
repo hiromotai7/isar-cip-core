@@ -26,6 +26,7 @@ variables:
   deploy_kernelci: disable
   build_swu_v2: disable
   swupdate_version: default
+  test_function: swupdate
 
 stages:
   - build
@@ -355,6 +356,8 @@ build:qemu-riscv64:
   tags:
     - small
   allow_failure: true
+  script:
+    - scripts/submit_lava.sh ${test_function} ${target} ${CI_COMMIT_SHORT_SHA} ${release} ${CI_COMMIT_REF_SLUG}
   artifacts:
     name: "$CI_JOB_NAME"
     when: always
@@ -364,23 +367,82 @@ build:qemu-riscv64:
     reports:
       junit: results/results*.xml
 
-test-qemu-secure-boot:
+test:qemu-amd64-secure-boot:
   extends:
     - .test-cip-core
-  script:
-    - scripts/submit_lava.sh secure-boot ${CI_COMMIT_SHA} ${release} ${CI_COMMIT_REF_SLUG}
+  variables:
+    target: qemu-amd64
+    test_function: secure-boot
 
-test-qemu-swupdate:
+test:qemu-arm64-secure-boot:
   extends:
     - .test-cip-core
-  script:
-    - scripts/submit_lava.sh swupdate ${CI_COMMIT_SHA} ${release} ${CI_COMMIT_REF_SLUG}
+  variables:
+    target: qemu-arm64
+    test_function: secure-boot
 
-test-qemu-IEC:
+test:qemu-arm-secure-boot:
+  extends:
+    - .test-cip-core
+  variables:
+    target: qemu-arm
+    test_function: secure-boot
+
+test:qemu-amd64-swupdate:
+  extends:
+    - .test-cip-core
+  variables:
+    target: qemu-amd64
+    test_function: swupdate
+
+test:qemu-arm64-swupdate:
+  extends:
+    - .test-cip-core
+  variables:
+    target: qemu-arm64
+    test_function: swupdate
+
+test:qemu-arm-swupdate:
+  extends:
+    - .test-cip-core
+  variables:
+    target: qemu-arm
+    test_function: swupdate
+
+test:qemu-amd64-swupdate-kernel-panic:
+  extends:
+    - .test-cip-core
+  variables:
+    target: qemu-amd64
+    test_function: kernel-panic
+
+test:qemu-amd64-swupdate-initramfs-crash:
+  extends:
+    - .test-cip-core
+  variables:
+    target: qemu-amd64
+    test_function: initramfs-crash
+
+test:qemu-amd64-IEC:
   extends:
    - .test-cip-core
-  script:
-    - scripts/submit_lava.sh IEC ${CI_COMMIT_SHA} ${release} ${CI_COMMIT_REF_SLUG}
+  variables:
+    target: qemu-amd64
+    test_function: IEC
+
+test:qemu-arm64-IEC:
+  extends:
+   - .test-cip-core
+  variables:
+    target: qemu-arm64
+    test_function: IEC
+
+test:qemu-arm-IEC:
+  extends:
+   - .test-cip-core
+  variables:
+    target: qemu-arm
+    test_function: IEC
 
 cve-checks:
   stage: cve-check
