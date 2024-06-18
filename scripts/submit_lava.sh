@@ -58,11 +58,12 @@ create_job () {
 
 	elif [ "$1" = "swupdate" ]; then
 		cp $LAVA_TEMPLATES/swupdate_template.yml "${job_dir}/${1}_${2}.yml"
+		sed -i "s@#updatestate#@2@g" "${job_dir}"/*.yml
 
 	elif [ "$1" = "kernel-panic" ] || [ "$1" = "initramfs-crash" ]; then
 		cp $LAVA_TEMPLATES/swupdate_template.yml "${job_dir}/${1}.yml"
 		sed -i "s@software update testing@${1}_rollback_testing@g" "${job_dir}"/*.yml
-		sed -i "s@) = 2@) = 0@g" "${job_dir}"/*.yml
+		sed -i -e "s@#updatestate#@3@g" -e "s@) = 2@) = 3@g" "${job_dir}"/*.yml
 		if [ "$1" = "kernel-panic" ]; then
 			sed -i "s@kernel: C:BOOT1:linux.efi@Kernel panic - not syncing: sysrq triggered crash@g" "${job_dir}"/*.yml
 			sed -i "s@#branch#@maintain-lava-artifact@g" "${job_dir}"/*.yml
