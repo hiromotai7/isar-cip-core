@@ -458,6 +458,8 @@ cve-checks:
   stage: cve-check
   needs: []
   image: registry.gitlab.com/cip-playground/debian-cve-checker:latest
+  tags:
+    - small
   script:
     - scripts/run-cve-checks.sh
   when: manual
