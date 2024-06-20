@@ -225,6 +225,18 @@ config KAS_INCLUDE_FULL_ENCRYPTION
 	string
 	default "kas/opt/encrypt-all.yml" if IMAGE_FULL_ENCRYPTION
 
+config WDOG_TIMEOUT
+	int "EFI Boot Guard watchdog timeout in seconds"
+	default 60
+	range 0 65535
+	depends on TARGET_QEMU_AMD64 || TARGET_X86_UEFI
+	help
+	  Timeout in seconds that EFI Boot Guard should set during boot. It
+	  needs to be large enough so that systemd can take over the watchdog,
+	  continuing to drive it via Linux.
+
+	  Set to 0 for disabling the watchdog in case hardware lacks support.
+
 endif
 
 endif
