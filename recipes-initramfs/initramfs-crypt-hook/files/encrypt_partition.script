@@ -72,7 +72,12 @@ reencrypt_existing_partition() {
 	case $partition_fstype in
 	ext*)
 		# reduce the filesystem and partition by 32M to fit the LUKS header
-		e2fsck -f "$1"
+		export E2FSCK_CONFIG=/tmp/e2fsck.conf
+		cat > "$E2FSCK_CONFIG" << EOF
+[options]
+	broken_system_clock=true
+EOF
+		e2fsck -p -f "$1"
 		if ! resize2fs "$1" "${reduced_size_in_kb}"; then
 			panic "reencryption of filesystem $1 cannot continue!"
 		fi
