@@ -181,7 +181,7 @@ local_conf_header:
 ```
 
 Replace `demo` with the name of the user-generated certificates. The user-generated certificates
-need to stored in the folder `recipes-devtools/ebg-secure-boot-secrets/files`.
+need to stored in the folder `recipes-devtools/secure-boot-secrets/files`.
 
 Build the image with user-generated keys by executing the command:
 
