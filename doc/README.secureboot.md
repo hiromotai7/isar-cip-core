@@ -47,8 +47,8 @@ Supply the script name and path to wic by adding
 
 #### secure-boot-snakeoil
 
-This package uses the snakeoil key and certificate from the ovmf package(0.0~20200229-2)
-backported from Debian bullseye for signing the image.
+This package uses the snakeoil key and certificate from the ovmf package from
+Debian bullseye or later for signing the image.
 
 #### secure-boot-key
 
@@ -295,6 +295,18 @@ sda              8:0    0     6G  0 disk
 
 Secureboot for a generic UEFI x86 target works similar to the QEMU target,
 except the enrollment of the secure boot keys.
+
+### Generate keys from Debian snakeoil keys
+
+For testing purposes, the snakeoil keys from OVMF package can be used to
+convert the certificate into a efi authority file use the following commands:
+
+```bash
+cert-to-efi-sig-list recipes-devtools/secure-boot-secrets/files/bookworm/PkKek-1-snakeoil.pem PK.esl
+sign-efi-sig-list -k recipes-devtools/secure-boot-secrets/files/bookworm/PkKek-1-snakeoil.key -c recipes-devtools/secure-boot-secrets/files/bookworm/PkKek-1-snakeoil.pem PK PK.esl PK.auth
+```
+
+The package `efitools` needs to be installed for this.
 
 ### Secure boot key enrollment
 
