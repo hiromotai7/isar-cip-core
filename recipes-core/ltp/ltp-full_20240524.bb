@@ -11,4 +11,4 @@
 
 require recipes-core/ltp/ltp.inc
 
-SRC_URI[sha256sum] = "d78f4bdd5bdc9e91357631954affba7e66190a2509c369b59f55efd190268956"
+SRC_URI[sha256sum] = "2b7c07bb281b7ec49981eeb06c4b66f147b103977254632678d384034f6e9663"
