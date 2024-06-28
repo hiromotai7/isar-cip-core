@@ -154,32 +154,22 @@ submit_job() {
 			return 1
 		else
 			echo "Job submitted successfully as #${ret}."
+			echo "URL: ${LAVA_JOBS_URL}/${ret}"
 
 			local lavacli_output=${job_dir}/lavacli_output
 			# shellcheck disable=2086
 			lavacli $LAVACLI_ARGS jobs show "${ret}" \
 				> "$lavacli_output"
 
-			STATUS=$(grep "state" "$lavacli_output" \
-				| cut -d ":" -f 2 \
-				| awk '{$1=$1};1')
-
-			HEALTH=$(grep "Health" "$lavacli_output" \
-				| cut -d ":" -f 2 \
-				| awk '{$1=$1};1')
-
 			DEVICE=$(grep "device      :" "$lavacli_output" \
 				| cut -d ":" -f 2 \
 				| awk '{$1=$1};1')
 
-			TESTING=$(grep "description" "$lavacli_output" \
-				| rev | cut -d "_" -f 1 | rev)
-
 			submit_squad_watch_job "${ret}" "${DEVICE}"
 
-			if ! check_status "$ret"; then
-				ERROR=true
-			fi
+			lavacli $LAVACLI_ARGS jobs logs "${ret}"
+			lavacli $LAVACLI_ARGS results "${ret}"
+
 			get_junit_test_results "$ret"
 		fi
 	else
@@ -227,151 +217,23 @@ validate_jobs () {
 	return $ret
 }
 
-check_if_finished () {
-	if [ "${STATUS}" != "Finished" ]; then
-		return 1
-	else
-		return 0
-	fi
-}
+get_first_xml_attr_value() {
+	file=${1}
+	tag=${2}
 
-check_for_test_error () {
-	if [ "${HEALTH}" != "Complete" ]; then
-		return 0
-	else
-		return 1
-	fi
-}
-
-# $1: LAVA job ID to show results for
-get_test_result () {
-	if [ -n "${1}" ]; then
-		# shellcheck disable=2086
-		lavacli "$LAVACLI_ARGS" results "${1}"
-	fi
+	grep -m 1 -o "${tag}=\".*\"" "${file}" | cut -d\" -f2
 }
 
 get_junit_test_results () {
 	mkdir -p "${RESULTS_DIR}"
 	curl -s -o "${RESULTS_DIR}"/results_"$1".xml "${LAVA_API_URL}"/jobs/"$1"/junit/
-}
 
-# $1: Test to print before job summary
-# $2: Set to true to print results for the job
-print_status () {
-	if [ -z "${1}" ]; then
-	# Set default text
-		local message="Current job status:"
-	else
-		local message="${1}"
+	# change return code to generate a error in gitlab-ci if a test is failed
+	errors=$(get_first_xml_attr_value "${RESULTS_DIR}"/results_"$1".xml errors)
+	failures=$(get_first_xml_attr_value "${RESULTS_DIR}"/results_"$1".xml failures)
+	if [ "${errors}" -gt "0" ] || [ "${failures}" -gt "0" ]; then
+		ERROR=true
 	fi
-
-	echo "------------------------------"
-	echo "${message}"
-	echo "------------------------------"
-	echo "Job #$2: ${STATUS}"
-	echo "Health: ${HEALTH}"
-	echo "Device: ${DEVICE}"
-	echo "Test: ${TESTING}"
-	echo "URL: ${LAVA_JOBS_URL}/$2"
-	if [ -n "${2}" ]; then
-		get_test_result "$2"
-	fi
-	echo " "
-}
-
-print_summary () {
-	echo "------------------------------"
-	echo "Job Summary"
-	echo "------------------------------"
-	echo "Job #${1} ${STATUS}. Job health: ${HEALTH}. URL: ${LAVA_JOBS_URL}/${1}"
-}
-
-check_status () {
-	local end_time status now
-	if [ -n "$TEST_TIMEOUT" ]; then
-		# Current time + timeout time
-		end_time=$(date +%s -d "+ $TEST_TIMEOUT min")
-	fi
-
-	local error=false
-
-	if [ -n "$1" ]; then
-		print_status "Current job status:"
-		while true
-		do
-			# Get latest status
-			if [ "${STATUS}" != "Finished" ]
-			then
-				local lavacli_output=${job_dir}/lavacli_output
-				# shellcheck disable=2086
-				lavacli $LAVACLI_ARGS jobs show "$1" \
-					> "$lavacli_output"
-
-				status=$(grep "state" "$lavacli_output" \
-					| cut -d ":" -f 2 \
-					| awk '{$1=$1};1')
-
-				HEALTH=$(grep "Health" "$lavacli_output" \
-					| cut -d ":" -f 2 \
-					| awk '{$1=$1};1')
-
-				DEVICE=$(grep "device      :" "$lavacli_output" \
-					| cut -d ":" -f 2 \
-					| awk '{$1=$1};1')
-
-				if [ "${STATUS}" != "$status" ]; then
-					STATUS=$status
-
-					# Something has changed
-					print_status "Current job status:" "$1"
-				else
-					STATUS=$status
-				fi
-			fi
-
-			if check_if_finished; then
-				break
-			fi
-
-			if [ -n "$TEST_TIMEOUT" ]; then
-				# Check timeout
-				now=$(date +%s)
-				if [ "$now" -ge "$end_time" ]; then
-					echo "Timed out waiting for test jobs to complete"
-					error=true
-					break
-				fi
-			fi
-
-			# Wait to avoid spamming the server too hard
-			sleep 60
-		done
-
-		if check_if_finished; then
-			# Print job outcome
-			print_status "Final job status:" "$1"
-
-			if check_for_test_error; then
-				error=true
-			fi
-		fi
-	fi
-
-	if $error; then
-		echo "---------------------"
-		echo "Errors during testing"
-		echo "---------------------"
-		print_summary "$1"
-		clean_up
-		return 1
-	fi
-
-	echo "-----------------------------------"
-	echo "Submitted test is successful"
-	echo "-----------------------------------"
-	print_summary "$1"
-	return 0
 }
 
 set_up
