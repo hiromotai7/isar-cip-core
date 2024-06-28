@@ -103,12 +103,15 @@ submit_squad_watch_job(){
 		return 0
 	fi
 
-	if [ "$TEST" = "swupdate" ]; then
+	if [ "$TEST" = "swupdate" ] || [ "$TEST" = "kernel-panic" ] || [ "$TEST" = "initramfs-crash" ]; then
 		squad_project="swupdate-testing"
 	elif [ "$TEST" = "secure-boot" ]; then
 		squad_project="secure-boot-testing"
-	else
+	elif [ "$TEST" = "IEC" ]; then
 		squad_project="iec-layer-testing"
+	else
+		echo "Unable to host results in available CIP Core SQUAD projects"
+		return 1
 	fi
 
 	local DEVICE=$2
