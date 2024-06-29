@@ -146,7 +146,7 @@ submit_job() {
 		echo "Submitting $1 to LAVA master..."
 		# Catch error that occurs if invalid yaml file is submitted
 		# shellcheck disable=2086
-		ret=$(lavacli $LAVACLI_ARGS jobs submit "$1") || error=true
+		ret=$(lavacli $LAVACLI_ARGS jobs submit "$1") || ERROR=true
 
 		if [[ $ret != [0-9]* ]]
 		then
