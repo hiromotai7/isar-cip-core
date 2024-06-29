@@ -9,7 +9,7 @@ set -e
 ################################################################################
 LAVA_TEMPLATES="tests/templates"
 LAVA_JOBS_URL="https://${CIP_LAVA_LAB_SERVER:-lava.ciplatform.org}/scheduler/job"
-LAVA_API_URL="https://${CIP_LAVA_LAB_SERVER:-lava.ciplatform.org}/api/v0.2"
+LAVA_API_URL="https://$CIP_LAVA_LAB_USER:$CIP_LAVA_LAB_TOKEN@${CIP_LAVA_LAB_SERVER:-lava.ciplatform.org}/api/v0.2"
 LAVACLI_ARGS="--uri https://$CIP_LAVA_LAB_USER:$CIP_LAVA_LAB_TOKEN@${CIP_LAVA_LAB_SERVER:-lava.ciplatform.org}/RPC2"
 SQUAD_GROUP="cip-core"
 SQUAD_WATCH_JOBS_URL="${CIP_SQUAD_URL}/api/watchjob"
