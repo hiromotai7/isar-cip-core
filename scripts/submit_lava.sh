@@ -196,25 +196,21 @@ is_device_online () {
 	return 1
 }
 
-# This method is added with the intention to check if all the jobs are valid before submit
-# If even a single definition is found to be invalid, then no job shall be submitted until
-# it is fixed by the maintainer
-validate_jobs () {
-	local ret=0
-	for JOB in "${job_dir}"/*.yml; do
-		# shellcheck disable=2086
-		if lavacli $LAVACLI_ARGS jobs validate "$JOB"; then
-			echo "$JOB is a valid definition"
-			if ! submit_job $JOB; then
-				clean_up
-				exit 1
-			fi
-		else
-			echo "$JOB is not a valid definition"
-			ret=1
+# This method checks if the job is valid before submitting it later on.
+validate_job () {
+	# shellcheck disable=2086
+	local job=$(find "${job_dir}"/*.yml)
+	if lavacli $LAVACLI_ARGS jobs validate "${job}"; then
+		echo "$job is a valid definition"
+		if ! submit_job $job; then
+			clean_up
+			exit 1
 		fi
-	done
-	return $ret
+	else
+		echo "$job is not a valid definition"
+		return 1
+	fi
+	return 0
 }
 
 get_first_xml_attr_value() {
@@ -237,9 +233,10 @@ get_junit_test_results () {
 }
 
 set_up
+
 create_job "$TEST" "$TARGET"
 
-if ! validate_jobs; then
+if ! validate_job; then
 	clean_up
 	exit 1
 fi
