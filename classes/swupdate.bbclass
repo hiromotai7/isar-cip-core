@@ -205,7 +205,7 @@ IMAGE_CMD:swu() {
         swu_file_base=$(basename $swu_file)
         # Create symlinks for files used in the update image
         swu_files=$(awk '$1=="filename"{gsub(/[",;]/, "", $3); print $3}' \
-            "${WORKDIR}/$swu_file_base/${SWU_DESCRIPTION_FILE}")
+            "${WORKDIR}/$swu_file_base/${SWU_DESCRIPTION_FILE}" | sort | uniq)
         export swu_files
         for file in $swu_files; do
             if [ -e "${WORKDIR}/$file" ]; then
