@@ -322,7 +322,28 @@ The following keys need to be enrolled onto the device:
 
 The enrollment can typically be achieved with the help of
 [efi-updatevar](https://manpages.debian.org/bookworm/efitools/efi-updatevar.1.en.html)
-on the device. Otherwise, consult the manual of the specific UEFI Firmware.
+on the device.
+
+If the device supports built in EFI shell then the enrollment of keys can also be done by KeyTool.efi tool like below:
+
+Format the USB memory stick
+
+```
+host$ sudo mkfs.vfat <usb device>
+host$ sudo mount -t vfat /dev/<usb device> /mnt/
+```
+
+Copy the KeyTool.efi binary and self signed Secure Boot keys to USB stick
+
+Here the folder "keys" contains Secure Boot keys(DB, KEK and PK).
+```
+host$ sudo apt install efitools
+host$ sudo mkdir -p /mnt/efi/boot
+host$ sudo cp /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi /mnt/efi/boot/KeyTool.efi
+host$ sudo cp -r keys /mnt/
+host$ sudo umount /mnt
+```
+Launch KeyTool.efi binary from the built in EFI shell and follow step-4 from the section [Add Keys to OVMF](#add-keys-to-ovmf) to inject Secure Boot keys. Otherwise, consult the manual of the specific UEFI Firmware.
 
 Use the recipes [secure-boot-key](###secure-boot-key) to provided the keys
 to the signing script contained in
