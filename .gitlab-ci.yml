@@ -436,7 +436,6 @@ test:qemu-amd64-IEC:
   variables:
     target: qemu-amd64
     test_function: IEC
-  allow_failure: true
 
 test:qemu-arm64-IEC:
   extends:
@@ -445,7 +444,6 @@ test:qemu-arm64-IEC:
   variables:
     target: qemu-arm64
     test_function: IEC
-  allow_failure: true
 
 test:qemu-arm-IEC:
   extends:
@@ -454,7 +452,6 @@ test:qemu-arm-IEC:
   variables:
     target: qemu-arm
     test_function: IEC
-  allow_failure: true
 
 cve-checks:
   stage: cve-check
