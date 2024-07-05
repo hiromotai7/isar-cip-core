@@ -35,7 +35,7 @@ image_args[qemu-arm]="-cpu cortex-a15 -machine virt -device virtio-serial-device
 
 set_up (){
 	echo "Installing dependencies to run this script..."
-	sudo apt update && sudo apt install -y --no-install-recommends lavacli curl
+	sudo apt update && sudo apt install -y --no-install-recommends lavacli curl xmlstarlet
 	job_dir="$(mktemp -d)"
 }
 
@@ -225,9 +225,7 @@ get_junit_test_results () {
 	curl -s -o "${RESULTS_DIR}"/results_"$1".xml "${LAVA_API_URL}"/jobs/"$1"/junit/
 
 	# change return code to generate a error in gitlab-ci if a test is failed
-	errors=$(get_first_xml_attr_value "${RESULTS_DIR}"/results_"$1".xml errors)
-	failures=$(get_first_xml_attr_value "${RESULTS_DIR}"/results_"$1".xml failures)
-	if [ "${errors}" -gt "0" ] || [ "${failures}" -gt "0" ]; then
+	if xmlstarlet sel -t  -v "/testsuites/testsuite/testcase[@name='job']/failure/@type" "${RESULTS_DIR}"/results_"$1".xml; then
 		ERROR=true
 	fi
 }
