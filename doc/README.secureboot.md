@@ -308,6 +308,8 @@ sign-efi-sig-list -k recipes-devtools/secure-boot-secrets/files/bookworm/PkKek-1
 
 The package `efitools` needs to be installed for this.
 
+In this case, the PK.esl can be used as DB and KEK keys. The PK.auth file is for PK key.
+
 ### Secure boot key enrollment
 
 > :exclamation:**IMPORTANT** This document is not for generating a Machine Owner Key(MOK).
