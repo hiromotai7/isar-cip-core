@@ -42,14 +42,27 @@ For verification, please follow the [SWUpdate verification steps](../README.swup
 **Note:**
 * All the steps are specific to M-COM RT X86 V1 device hence consult device specific manual for other devices for Secure Boot verification.
 
-Copy KeyTool.efi and UEFI keys into USB stick as mentioned in [Secure boot key enrollment](../README.secureboot.md#secure-boot-key-enrollment)
+The isar-cip-core supports secure boot using below keys,
+
+* Debian snakeoil keys --> The current build system selects this method as default
+* User generated keys
+
+### Debian snakeoil keys
+
+Refer the section [Generate keys from Debian snakeoil keys](../README.secureboot.md#generate-keys-from-debian-snakeoil-keys) to generate required UEFI keys and copy them (PK.esl and PK.auth) to `keys` folder. create `keys` folder in the isar-cip-core if doen't exist.
+
+### User generated keys
+
+Refer the section [Generate keys](../README.secureboot.md#generate-keys-1) to generate required UEFI keys. It will generate the UEFI keys in `keys` folder.
+
+Once the UEFI keys are generated, copy `KeyTool.efi` and `keys` folder (i.e UEFI keys) into USB stick as mentioned in [Secure boot key enrollment](../README.secureboot.md#secure-boot-key-enrollment)
 
 Insert USB memory stick to M-COM device.
 
 Power on and Press F12 key to Enter BIOS setup.
 
 **Note:**
-* if you want to restore the default BIOS settings then
+* In order to restore the default BIOS settings then
 Under "Save & Exit" tab, Click on "Restore User Defaults" and select "Yes" to restore default values.
 
 Enable Secure Boot and enter to Setup Mode by following below steps
@@ -69,7 +82,7 @@ Under Save & Exit tab,
 
 Exit from the KeyTool.efi and built-in EFI shell to BIOS.
 
-Optionally you can confirm the injected keys like below:
+Optionally the injected keys can be confirmed like below:
 
 Under security tab,
 * Click on "Secure Boot" and then "Key Management" to confirm the injected Secure Boot keys (DB, KEK and PK).
@@ -79,7 +92,9 @@ Under Save & Exit" tab
 
 Now the keys are injected, remove the USB stick.
 
-Refer the section [Build the cip core image](README.m-com-x86.md#build-the-cip-core-image) to create secure boot enabled image,
+For Debian snakeoil keys method, refer the section [Build the cip core image](README.m-com-x86.md#build-the-cip-core-image) to create secure boot enabled image.
+
+For User generated keys method, refer the build steps here [Build image](../README.secureboot.md#build-image), please note the following keys `keys/demoDB.crt` and `keys/demoDB.key` needs to be copied under `recipes-devtools/secure-boot-secrets/files` path before building the image.
 
 Once build is completed, flash the Secure Boot image to USB stick and insert the USB memory stick to M-COM device.
 
