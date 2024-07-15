@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2021-2023
+# Copyright (c) Siemens AG, 2019 - 2023
 #
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
@@ -11,4 +11,4 @@
 
 require linux-cip-common.inc
 
-SRC_URI[sha256sum] = "b9ea6a4f6f7f18d3d1abad24be311e3dcbf4b1ce3d08e600eb100a46b069b0c4"
+SRC_URI[sha256sum] = "6732ac0e7260d91eb3aa15818629eb48b192a2a2d44ad283c797576e77c1daa7"
