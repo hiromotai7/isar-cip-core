@@ -1,0 +1,25 @@
+From b4c2637b415b9e9e60fca2f8feb98ad1589ac181 Mon Sep 17 00:00:00 2001
+From: Adithya Balakumar <Adithya.Balakumar@toshiba-tsip.com>
+Date: Mon, 15 Jul 2024 10:30:35 +0530
+Subject: [PATCH 2/2] Print ROOTFS_SIZE for debugging
+
+Signed-off-by: Adithya Balakumar <Adithya.Balakumar@toshiba-tsip.com>
+---
+ meta/classes/image.bbclass | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/meta/classes/image.bbclass b/meta/classes/image.bbclass
+index 9497fe5e..841533c4 100644
+--- a/meta/classes/image.bbclass
++++ b/meta/classes/image.bbclass
+@@ -96,6 +96,7 @@ python set_image_size () {
+     rootfs_size = get_rootfs_size(d)
+     d.setVar('ROOTFS_SIZE', str(rootfs_size))
+     d.setVarFlag('ROOTFS_SIZE', 'export', '1')
++    bb.warn("ROOTFS_SIZE "+ str(rootfs_size))
+ }
+ 
+ def get_base_type(t, d):
+-- 
+2.39.2
+

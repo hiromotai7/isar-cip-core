@@ -17,14 +17,24 @@ target: cip-core-image
 
 build_system: isar
 
+defaults:
+  repos:
+    patches:
+      repo: cip-core
+
 repos:
   cip-core:
 
   isar:
     url: https://github.com/ilbers/isar.git
-    commit: d2d3b3e94874d62d48c0cafb99dfffde6afbc6ce
+    commit: 604e662c707cb79235a473bff36a8b4cc5c6b2c0
     layers:
       meta:
+    patches:
+      p1:
+        path: patches/0001-image.bbclass-use-oe.utils.directory_size-instead-of.patch
+      p2:
+        path: patches/0002-Print-ROOTFS_SIZE-for-debugging.patch
 
 bblayers_conf_header:
   standard: |

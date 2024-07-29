@@ -1,0 +1,41 @@
+From 5478903db77ec377dba366796a1cbdf5e64f04e7 Mon Sep 17 00:00:00 2001
+From: Adithya Balakumar <Adithya.Balakumar@toshiba-tsip.com>
+Date: Mon, 15 Jul 2024 10:20:39 +0530
+Subject: [PATCH 1/2] image.bbclass: use oe.utils.directory_size() instead of
+ du
+
+Instead of using du (which has issues as discussed in the commit that
+introduced the change in oe-core See [1] and [2]), use the
+oe.utils.directory_size() function to align with oe-core
+
+[1] https://github.com/openembedded/openembedded-core/commit/d8f1f3a6b024a2ae6631d1ce25421e8d94b69a12
+[2] https://github.com/openembedded/openembedded-core/commit/6ca53ad7b26ee2b4e6d2c121c6f6d6eed7f6b56f
+
+Signed-off-by: Adithya Balakumar <Adithya.Balakumar@toshiba-tsip.com>
+---
+ meta/classes/image.bbclass | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/meta/classes/image.bbclass b/meta/classes/image.bbclass
+index c29d9e26..9497fe5e 100644
+--- a/meta/classes/image.bbclass
++++ b/meta/classes/image.bbclass
+@@ -85,13 +85,10 @@ inherit image-account-extension
+ ROOTFS_EXTRA ?= "64"
+ 
+ def get_rootfs_size(d):
+-    import subprocess
++    import subprocess, oe.utils
+     rootfs_extra = int(d.getVar("ROOTFS_EXTRA"))
+ 
+-    output = subprocess.check_output(
+-        ["sudo", "du", "-xs", "--block-size=1k", d.getVar("IMAGE_ROOTFS")]
+-    )
+-    base_size = int(output.split()[0])
++    base_size = int(oe.utils.directory_size(d.getVar("IMAGE_ROOTFS")) / 1024)
+ 
+     return base_size + rootfs_extra * 1024
+ 
+-- 
+2.39.2
+
