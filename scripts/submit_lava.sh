@@ -104,19 +104,18 @@ submit_squad_watch_job(){
 	fi
 
 	if [ "$TEST" = "swupdate" ] || [ "$TEST" = "kernel-panic" ] || [ "$TEST" = "initramfs-crash" ]; then
-		squad_project="swupdate-testing"
+		SQUAD_PROJECT="swupdate-testing"
 	elif [ "$TEST" = "secure-boot" ]; then
-		squad_project="secure-boot-testing"
+		SQUAD_PROJECT="secure-boot-testing"
 	elif [ "$TEST" = "IEC" ]; then
-		squad_project="iec-layer-testing"
+		SQUAD_PROJECT="iec-layer-testing"
 	else
 		echo "Unable to host results in available CIP Core SQUAD projects"
 		return 1
 	fi
 
-	local DEVICE=$2
-	local ENV="${DEVICE}_${squad_project}"
-	local squad_url="$SQUAD_WATCH_JOBS_URL/${SQUAD_GROUP}/${squad_project}/${COMMIT_REF}/${ENV}"
+	local ENV="${SQUAD_PROJECT}_${TARGET}"
+	local squad_url="$SQUAD_WATCH_JOBS_URL/${SQUAD_GROUP}/${SQUAD_PROJECT}/${COMMIT_REF}/${ENV}"
 	ret=$(curl -s \
 		--header "Authorization: token $CIP_SQUAD_LAB_TOKEN" \
 		--form backend="$SQUAD_LAVA_BACKEND" \
@@ -165,7 +164,7 @@ submit_job() {
 				| cut -d ":" -f 2 \
 				| awk '{$1=$1};1')
 
-			submit_squad_watch_job "${ret}" "${DEVICE}"
+			submit_squad_watch_job "${ret}"
 
 			lavacli $LAVACLI_ARGS jobs logs "${ret}"
 			lavacli $LAVACLI_ARGS results "${ret}"
