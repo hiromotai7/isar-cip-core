@@ -12,9 +12,12 @@
 
 inherit dpkg-raw
 
+INITRAMFS_OVERLAY_RECOVERY_SCRIPT ??= "overlay_recovery_action.script"
+
 SRC_URI += " \
     file://overlay.hook \
     file://overlay.script.tmpl \
+    file://${INITRAMFS_OVERLAY_RECOVERY_SCRIPT} \
     "
 
 # The variable INITRAMFS_OVERLAY_PATHS contains the directories which are
@@ -35,7 +38,8 @@ TEMPLATE_FILES = "overlay.script.tmpl"
 TEMPLATE_VARS += " INITRAMFS_OVERLAY_STORAGE_PATH \
     INITRAMFS_OVERLAY_PATHS \
     INITRAMFS_OVERLAY_STORAGE_DEVICE \
-    INITRAMFS_OVERLAY_MOUNT_OPTION"
+    INITRAMFS_OVERLAY_MOUNT_OPTION \
+    INITRAMFS_OVERLAY_RECOVERY_SCRIPT"
 
 DEBIAN_DEPENDS = "initramfs-tools, awk, coreutils, util-linux"
 
@@ -48,4 +52,6 @@ do_install() {
         "${D}/usr/share/initramfs-tools/hooks/overlay"
     install -m 0755 "${WORKDIR}/overlay.script" \
         "${D}/usr/share/initramfs-tools/scripts/local-bottom/overlay"
+    install -m 0755 "${WORKDIR}/${INITRAMFS_OVERLAY_RECOVERY_SCRIPT}" \
+        "${D}/usr/share/initramfs-tools/scripts"
 }

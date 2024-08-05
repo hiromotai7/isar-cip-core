@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# CIP Core, generic profile
+#
+# Copyright (c) Siemens AG, 2024
+#
+# Authors:
+#  Clara Kowalsky <clara.kowalsky@siemens.com>
+#
+
+partition_fstype="$1"
+ovl_partition_device="$2"
+
+mke2fs -t "$partition_fstype" "$ovl_partition_device"
