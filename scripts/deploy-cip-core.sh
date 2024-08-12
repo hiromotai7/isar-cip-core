@@ -71,4 +71,10 @@ fi
 #     * cve-reports: folder to store the cve-reports generated from the dpkg status files
 #       * they can be linked from the release website
 DPKG_STATUS_FILENAME=${CI_JOB_NAME#build:}.dpkg_status
+
+# As default release name is not included in CI_JOB_NAME, it is appended to dpkg status file name
+# For further use in  run-cve-checks.sh script to get the right suite
+if ! echo "$CI_JOB_NAME" | grep -q "$1"; then
+	DPKG_STATUS_FILENAME=${CI_JOB_NAME#build:}-$1.dpkg_status
+fi
 aws s3 cp --no-progress build/tmp/deploy/images/"$TARGET"/cip-core-image-*.dpkg_status s3://download.cip-project.org/cip-core/cve-checks/dpkg-status/"$DPKG_STATUS_FILENAME"
