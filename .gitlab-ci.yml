@@ -456,7 +456,7 @@ test:qemu-arm-IEC:
 cve-checks:
   stage: cve-check
   needs: []
-  image: registry.gitlab.com/cip-playground/debian-cve-checker:latest
+  image: registry.gitlab.com/cip-project/cip-core/debian-cve-checker:build-latest
   tags:
     - small
   script:
