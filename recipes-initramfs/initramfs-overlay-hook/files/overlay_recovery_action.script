@@ -11,4 +11,4 @@
 partition_fstype="$1"
 ovl_partition_device="$2"
 
-mke2fs -t "$partition_fstype" "$ovl_partition_device"
+mke2fs -q -FF -t "$partition_fstype" "$ovl_partition_device"
