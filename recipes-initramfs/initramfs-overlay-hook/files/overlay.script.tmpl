@@ -40,7 +40,11 @@ partition_fstype=$(get_fstype "${ovl_partition_device}")
 if ! mountpoint -q "${rootmnt}${storage_mount_point}"; then
 	case $partition_fstype in
 	ext*)
-		if ! e2fsck -p -f "$ovl_partition_device" && [ -x "$ovl_recovery_script" ]; then
+		e2fsck -p -f "$ovl_partition_device"
+		fsck_ret="$?"
+		# e2fsck returns a 1 in case of repairing the file system
+		# https://man7.org/linux/man-pages/man8/e2fsck.8.html#EXIT_CODE
+		if [ "$fsck_ret" -gt "1" ]  && [ -x "$ovl_recovery_script" ]; then
 			"$ovl_recovery_script" "$partition_fstype" "$ovl_partition_device"
 		fi
 		;;
