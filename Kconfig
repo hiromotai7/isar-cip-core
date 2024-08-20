@@ -140,6 +140,9 @@ config DEBIAN_SID
 	bool "sid (unstable)"
 	depends on ARCH_RISCV64
 
+config DEBIAN_TRIXIE
+	bool "trixie (testing)"
+
 endchoice
 
 config KAS_INCLUDE_DEBIAN
@@ -147,6 +150,7 @@ config KAS_INCLUDE_DEBIAN
 	default "kas/opt/buster.yml" if DEBIAN_BUSTER
 	default "kas/opt/bullseye.yml" if DEBIAN_BULLSEYE
 	default "kas/opt/bookworm.yml" if DEBIAN_BOOKWORM
+	default "kas/opt/trixie.yml" if DEBIAN_TRIXIE
 	default "kas/opt/sid.yml" if DEBIAN_SID
 
 comment "Image features"

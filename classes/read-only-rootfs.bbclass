@@ -16,6 +16,7 @@ do_image_wic[depends] += "${INITRAMFS_RECIPE}:do_build"
 
 IMAGE_INSTALL += "home-fs"
 IMAGE_INSTALL += "tmp-fs"
+IMAGE_INSTALL:remove:trixie = "tmp-fs"
 
 # For pre bookworm images, empty /var is not usable
 IMAGE_INSTALL:append = " immutable-rootfs"
