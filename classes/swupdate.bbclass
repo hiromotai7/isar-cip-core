@@ -233,6 +233,10 @@ IMAGE_CMD:swu() {
             cpio_files="${SWU_DESCRIPTION_FILE}"
 
             if [ -n "$sign" ]; then
+                if [ ! -x /usr/bin/sign-swu ]; then
+                    echo "Could not find the executable '/usr/bin/sign-swu'" 1>&2
+                    exit 1
+                fi
                 signature_file="${SWU_DESCRIPTION_FILE}.${SWU_SIGNATURE_EXT}"
                 if ! /usr/bin/sign-swu "${SWU_DESCRIPTION_FILE}" "$signature_file" > /dev/null 2>&1 || \
                         [ ! -f "$signature_file" ]; then
