@@ -136,8 +136,9 @@ To use other key and certificate the following variables must be set:
 ```
 PREFERRED_PROVIDER_swupdate-certificates-key = "swupdate-certificates-key"
 PREFERRED_PROVIDER_swupdate-certificates = "swupdate-certificates"
-SWU_SIGN_CERT = "<sigining certificate file name>"
+PREFERRED_PROVIDER_swupdate-signer = "swupdate-signer-cms"
 SWU_SIGN_KEY  = "<siging key file name>"
+IMAGE_INSTALL += "${@'swupdate-certificates' if bb.utils.to_boolean(d.getVar('SWU_SIGNED')) else ''}"
 ```
 
 The files `<sigining certificate file name>` and `<siging key file name>` need to be stored
@@ -145,8 +146,26 @@ in `recipes-devtools/swupdate-certificates/files/` or in a path defined by an bb
 
 ### signing script
 
-The provided [cms signing script](./recipes-devtools/swupdate-certificates/files/sign-swu-cms)
-can be replaced by setting the variable `SWU_SIGN_SCRIPT`.
+The package [swupdate-signer-cms](recipes-devtools/swupdate-signer/) provides a [cms signing script](./recipes-devtools/swupdate-certificates/files/sign-swu-cms).
+When signing requires a project specific signing script,
+e.g. for using a hardware security module(HSM), an own package can be added.
+The package can replace the default package by adding the following lines:
+
+```
+PREFERRED_PROVIDER_swupdate-signer = "<own swupdate signer>"
+PREFERRED_PROVIDER_swupdate-certificates = "<own certificate provider>"
+```
+
+The packages `swupdate-signer` and `swupdate-certificate` must be set to sign the swu-binary
+and verify the signed swu-binary during an update.
+An key to the signing script can be provided with:
+```
+PREFERRED_PROVIDER_swupdate-certificates-key = "<own key provider>"
+```
+
+The package `<own signing package>` needs to install a executable to `/usr/bin/sign-swu`.
+
+An empty signer to be used as a template is provided in [swupdate-signer-empty](recipes-devtools/swupdate-signer/swupdate-signer-empty.bb).
 
 ## SWUpdate Hardware compatibility
 
