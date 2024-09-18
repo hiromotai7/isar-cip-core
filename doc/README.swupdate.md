@@ -23,6 +23,10 @@ device = "C:BOOT0:linux.efi->${ABROOTFS_PART_UUID_A},C:BOOT1:linux.efi->${ABROOT
 The variables `ABROOTFS_PART_UUID_A` and `ABROOTFS_PART_UUID_B` contain partition uuids. The handler searches
 for the matching device and SWUpdate writes the image to the selected device.
 
+> :exclamation: For production image the content of the variable
+`ABROOTFS_PART_UUID_A` and `ABROOTFS_PART_UUID_B` must contain project specific
+values.
+
 ## SWUpdate Efibootguard update
 
 :warning: **If the efibootguard binary is corrupted the system can no longer boot**
