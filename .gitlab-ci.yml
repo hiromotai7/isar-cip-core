@@ -458,7 +458,7 @@ cve-checks:
   needs: []
   image: registry.gitlab.com/cip-project/cip-core/debian-cve-checker:build-latest
   tags:
-    - small
+    - large
   script:
     - scripts/run-cve-checks.sh
   when: manual
