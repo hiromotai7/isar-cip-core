@@ -46,6 +46,8 @@ if [ -z "${DISTRO_RELEASE}" ]; then
 		DISTRO_RELEASE="buster"
 	elif grep -s -q "DEBIAN_BOOKWORM: true" .config.yaml; then
 		DISTRO_RELEASE="bookworm"
+	elif grep -s -q "DEBIAN_TRIXIE: true" .config.yaml; then
+		DISTRO_RELEASE="trixie"
 	else
 		DISTRO_RELEASE="bullseye"
 	fi
