@@ -84,7 +84,7 @@ comment "Kernel options"
 
 choice
 	prompt "CIP kernel version"
-	default KERNEL_5_10
+	default KERNEL_6_1
 
 config KERNEL_4_4
 	bool "Kernel 4.4.x-cip"
