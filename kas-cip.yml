@@ -17,26 +17,12 @@ target: cip-core-image
 
 build_system: isar
 
-defaults:
-  repos:
-    patches:
-      repo: cip-core
-
 repos:
   cip-core:
 
   isar:
     url: https://github.com/ilbers/isar.git
-    commit: 36b04737a07baafc5af64cdc8aa61fad13fb494a
-    patches:
-      01:
-        path: isar-patches/0001-image-Avoid-breaking-the-build-when-mounts-are-no-lo.patch
-      02:
-        path: isar-patches/0002-rootfs-Provide-rootfs_do_umounts.patch
-      03:
-        path: isar-patches/0003-initramfs-Add-missing-umounts-after-generation.patch
-      04:
-        path: isar-patches/0004-rootfs-Add-missing-umounts-in-rootfs_postprocess-and.patch
+    commit: 8c9bdd3cb0ac93aa46552d4554bafaea5d1d7d13
     layers:
       meta:
 
