@@ -60,10 +60,14 @@ class EfibootguardBootPlugin(SourcePlugin):
             kernel_image = "vmlinuz"
         boot_image = kernel_image
 
-        initrd_image = get_bitbake_var("INITRD_DEPLOY_FILE")
-        if not initrd_image:
-            msger.warning("INITRD_DEPLOY_FILE not set\n")
-            initrd_image = "initrd.img"
+        no_initrd = source_params.get("no_initrd") or 'n'
+        if no_initrd == 'y':
+            initrd_image = None
+        else:
+            initrd_image = get_bitbake_var("INITRD_DEPLOY_FILE")
+            if not initrd_image:
+                msger.warning("INITRD_DEPLOY_FILE not set\n")
+                initrd_image = "initrd.img"
         bootloader = creator.ks.bootloader
 
         dtb_files = (get_bitbake_var("DTB_FILES") or '').split()
@@ -179,15 +183,16 @@ class EfibootguardBootPlugin(SourcePlugin):
             .format(deploy_dir=deploy_dir, uefi_kernel_name=uefi_kernel_name)
         kernel = "{deploy_dir}/{kernel_image}"\
             .format(deploy_dir=deploy_dir, kernel_image=kernel_image)
-        initrd = "{deploy_dir}/{initrd_image}"\
-            .format(deploy_dir=deploy_dir, initrd_image=initrd_image)
         cmd = 'bg_gen_unified_kernel {efistub} {kernel} {uefi_kernel_file} \
-            -c "{cmdline}" -i {initrd}'.format(
+            -c "{cmdline}"'.format(
                 cmdline=cmdline,
                 kernel=kernel,
-                initrd=initrd,
                 efistub=efistub,
                 uefi_kernel_file=uefi_kernel_file)
+        if initrd_image:
+            initrd = "{deploy_dir}/{initrd_image}"\
+                .format(deploy_dir=deploy_dir, initrd_image=initrd_image)
+            cmd += ' -i {initrd}'.format(initrd=initrd)
         if dtb_files:
             for dtb in dtb_files:
                 cmd += ' -d {deploy_dir}/{dtb_file}'.format(
