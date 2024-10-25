@@ -82,7 +82,7 @@ EOF
 			panic "reencryption of filesystem $1 cannot continue!"
 		fi
 		;;
-	squashfs|swap|"")
+	squashfs|swap|erofs|"")
 		[ "$debug" = "y" ] && echo "skip disk resize as it is not supported or unnecessary for fstype: '$partition_fstype'"
 		;;
 	*)
