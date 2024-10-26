@@ -198,6 +198,22 @@ config IMAGE_DELTA_SWUPDATE
 
 endchoice
 
+choice
+	prompt "Read-only rootfs type"
+
+config IMAGE_RO_ROOTFS_SQUASHFS
+	bool "Squashfs"
+
+config IMAGE_RO_ROOTFS_EROFS
+	bool "EROFS"
+	depends on KERNEL_6_1 && !DEBIAN_BUSTER && !DEBIAN_BULLSEYE
+
+endchoice
+
+config KAS_INCLUDE_EROFS
+	string
+	default "kas/opt/erofs.yml" if IMAGE_RO_ROOTFS_EROFS
+
 config IMAGE_SECURE_BOOT
 	bool "Secure boot support"
 	depends on TARGET_QEMU_AMD64 || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM || TARGET_X86_UEFI
