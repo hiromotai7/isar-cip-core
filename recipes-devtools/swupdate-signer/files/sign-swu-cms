@@ -10,14 +10,11 @@ error_msg() {
 }
 
 if ! openssl rsa -check -noout -in "$inkey"; then
-	error_msg "key '$inkey' is not a rsa key "
+	error_msg "key '$inkey' is not a rsa key"
 fi
 
-# if openssl > 3.0 we have the x509 check option
-if openssl version | grep -q "3.[0-9].[0-9]"; then
-	if ! openssl x509 -check -noout -in "$cert"; then
-		error_msg  "certificate '$cert' is not a certificate"
-	fi
+if ! openssl x509 -noout -in "$cert"; then
+	error_msg  "certificate '$cert' is not a certificate"
 fi
 
 key_md5=$(openssl rsa -modulus -noout -in "$inkey" | openssl md5)
