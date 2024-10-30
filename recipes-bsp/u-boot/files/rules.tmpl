@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 #
-# Copyright (c) Siemens AG, 2018-2022
+# Copyright (c) Siemens AG, 2018-2024
 #
 # SPDX-License-Identifier: MIT
 
@@ -13,7 +13,11 @@ override_dh_auto_build:
 	if [ -e /usr/share/secure-boot-secrets/secure-boot.pem ]; then \
 		openssl x509 -in /usr/share/secure-boot-secrets/secure-boot.pem -out secure-boot.der -outform der; \
 		rm -f secure-boot.esl; \
-		efisiglist -a -c secure-boot.der -o secure-boot.esl; \
+		if [ -x /usr/bin/efisecdb ]; then \
+			efisecdb -g 32db313c-f7d4-42a6-9a49-e32870001c63 -a -c secure-boot.der -o secure-boot.esl; \
+		else \
+			efisiglist -a -c secure-boot.der -o secure-boot.esl; \
+		fi; \
 		rm -f ubootefi.var; \
 		tools/efivar.py set -i ubootefi.var -n PK -d secure-boot.esl -t file; \
 		tools/efivar.py set -i ubootefi.var -n KEK -d secure-boot.esl -t file; \

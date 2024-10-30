@@ -24,7 +24,10 @@ S = "${WORKDIR}/u-boot-${PV}"
 DEBIAN_BUILD_DEPENDS += ", libssl-dev:native, libssl-dev:${DISTRO_ARCH}"
 
 DEBIAN_BUILD_DEPENDS:append:secureboot = ", \
-    openssl, pesign, secure-boot-secrets, python3-openssl:native"
+    openssl, efivar, secure-boot-secrets, python3-openssl:native"
+DEBIAN_BUILD_DEPENDS:append:secureboot:buster   = ", pesign"
+DEBIAN_BUILD_DEPENDS:append:secureboot:bullseye = ", pesign"
+DEBIAN_BUILD_DEPENDS:append:secureboot:bookworm = ", pesign"
 DEPENDS:append:secureboot = " secure-boot-secrets"
 
 do_prepare_build:append:secureboot() {
