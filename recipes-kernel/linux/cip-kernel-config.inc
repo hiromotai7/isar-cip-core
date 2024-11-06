@@ -10,10 +10,15 @@
 #
 
 SRC_URI:append = " ${@ \
-    'git://gitlab.com/cip-project/cip-kernel/cip-kernel-config.git;protocol=https;branch=master;destsuffix=cip-kernel-config;name=cip-kernel-config' \
+    'git://gitlab.com/Quirin.Gy/cip-kernel-config.git;protocol=https;branch=quirin/fix-arm-merged-config;destsuffix=cip-kernel-config;name=cip-kernel-config' \
     if d.getVar('USE_CIP_KERNEL_CONFIG') == '1' else '' \
     }"
 
-SRCREV_cip-kernel-config ?= "f6b7018cb6845f34f8a03c126bf4f823ce10d637"
+KBUILD_DEPENDS:append = " ${@ \
+    'lzop, lz4' \
+    if d.getVar('USE_CIP_KERNEL_CONFIG') == '1' else '' \
+    }"
+
+SRCREV_cip-kernel-config ?= "f6092ac6fbc09755fd21e701eff08e19e892da19"
 
 do_fetch[vardeps] += "SRCREV_cip-kernel-config"
