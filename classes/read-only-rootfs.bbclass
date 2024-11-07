@@ -15,7 +15,10 @@ INITRD_IMAGE = "${INITRAMFS_RECIPE}-${DISTRO}-${MACHINE}.initrd.img"
 do_image_wic[depends] += "${INITRAMFS_RECIPE}:do_build"
 
 IMAGE_INSTALL += "home-fs"
-IMAGE_INSTALL += "tmp-fs"
+
+IMAGE_INSTALL:append:buster   = " tmp-fs"
+IMAGE_INSTALL:append:bullseye = " tmp-fs"
+IMAGE_INSTALL:append:bookworm = " tmp-fs"
 
 # For pre bookworm images, empty /var is not usable
 IMAGE_INSTALL:append = " immutable-rootfs"
