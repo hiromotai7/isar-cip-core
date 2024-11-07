@@ -34,7 +34,9 @@ PATCHTOOL = "git"
 
 inherit dpkg
 
-DEPENDS = "python-shtab"
+DEPENDS:buster   = "python-shtab"
+DEPENDS:bullseye = "python-shtab"
+DEPENDS:bookworm = "python-shtab"
 
 DEPENDS:trixie = "gnu-efi"
 DEPENDS:sid    = "gnu-efi"
