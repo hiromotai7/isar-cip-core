@@ -27,8 +27,8 @@ python () {
         if d.getVar("DELTA_RDIFF_REF_IMAGE") == "":
             bb.fatal("You must set DELTA_RDIFF_REF_IMAGE and provide the required files as artifacts to this recipe")
     elif d.getVar("DELTA_UPDATE_TYPE") == "zchunk":
-        if d.getVar("BASE_DISTRO_CODENAME") != "sid":
-            bb.fatal("Zchunk based delta update is only supported from sid")
+        if d.getVar("BASE_DISTRO_CODENAME") != "trixie":
+            bb.fatal("Zchunk based delta update is only supported from trixie onward")
     else:
         disable_delta_update_tasks(d)
 }

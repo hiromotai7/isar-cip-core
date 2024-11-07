@@ -39,7 +39,6 @@ DEPENDS:bullseye = "python-shtab"
 DEPENDS:bookworm = "python-shtab"
 
 DEPENDS:trixie = "gnu-efi"
-DEPENDS:sid    = "gnu-efi"
 
 # needed for buster, bullseye could use compat >= 13
 python() {

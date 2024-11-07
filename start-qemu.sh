@@ -40,9 +40,7 @@ if [ -n "${QEMU_PATH}" ]; then
 fi
 
 if [ -z "${DISTRO_RELEASE}" ]; then
-	if grep -s -q "DEBIAN_SID: true" .config.yaml; then
-		DISTRO_RELEASE="sid"
-	elif grep -s -q "DEBIAN_BUSTER: true" .config.yaml; then
+	if grep -s -q "DEBIAN_BUSTER: true" .config.yaml; then
 		DISTRO_RELEASE="buster"
 	elif grep -s -q "DEBIAN_BOOKWORM: true" .config.yaml; then
 		DISTRO_RELEASE="bookworm"
