@@ -23,6 +23,17 @@ SWUPDATE_SELFBUILT:buster = "1"
 SWUPDATE_SELFBUILT:bullseye = "1"
 SWUPDATE_SELFBUILT:bookworm = "1"
 
+python() {
+    base_distro = d.getVar('BASE_DISTRO_CODENAME')
+    if base_distro not in ['buster', 'bullseye', 'bookworm'] and \
+       bb.utils.to_boolean(d.getVar('SWUPDATE_SELFBUILT')):
+        bb.fatal(f'Self-built SWUpdate not supported for {base_distro}')
+
+    if not bb.utils.to_boolean(d.getVar('SWUPDATE_SELFBUILT')) and \
+       not bb.utils.to_boolean(d.getVar('SWU_SIGNED')):
+        bb.fatal('SWUpdate from Debian requires signed SWUs')
+}
+
 IMAGE_INSTALL:append = "${@' swupdate' if bb.utils.to_boolean(d.getVar('SWUPDATE_SELFBUILT')) else ''}"
 IMAGE_PREINSTALL:append = "${@'' if bb.utils.to_boolean(d.getVar('SWUPDATE_SELFBUILT')) else ' swupdate'}"
 
