@@ -95,6 +95,64 @@ EOF
 		/usr/sbin/cryptsetup reencrypt --encrypt --reduce-device-size "$reduce_device_size"k "$1" < "$2"
 	fi
 }
+
+expand_partition() {
+	boot_device="$(echo "${part_device}" | sed 's/p\?[0-9]*$//')"
+	last_part="$(sfdisk -d "${boot_device}" 2>/dev/null | \
+		     tail -1 | cut -d ' ' -f 1)"
+	if [ "$last_part" != "$1" ]; then
+		log_warning_msg "To be expanded partition is not last - skipping expansion"
+		return
+	fi
+
+	buffer_size=32768
+	boot_device_name=${boot_device##*/}
+	disk_size="$(cat /sys/class/block/"${boot_device_name}"/size)"
+	all_parts_size=0
+	for partition in /sys/class/block/"${boot_device_name}"/"${boot_device_name}"*; do
+		part_size=$(cat "${partition}"/size)
+		all_parts_size=$((all_parts_size + part_size))
+	done
+
+	minimal_size=$((all_parts_size + buffer_size))
+	if [ "$disk_size" -lt "$minimal_size" ]; then
+		return
+	fi
+
+	log_begin_msg "Expanding partition $last_part"
+
+	is_gpt="$(sfdisk -d "${boot_device}" 2>/dev/null | grep -q "label: gpt" \
+		  && echo 1 || echo 0)"
+	if [ "$is_gpt" = "1" ]; then
+		dd if="${boot_device}" of=/tmp/__mbr__.bak count=1 >/dev/null 2>&1
+	fi
+
+	# Transform the partition table as follows:
+	#
+	# - Remove any 'last-lba' header so sfdisk uses the entire available
+	#   space.
+	# - If this partition table is MBR and an extended partition container
+	#   (EBR) exists, we assume this needs to be expanded as well; remove
+	#   its size field so sfdisk expands it.
+	# - For the previously fetched last partition, also remove the size
+	#   field so sfdisk expands it.
+	sfdisk -d "${boot_device}" 2>/dev/null | \
+		grep -v last-lba | \
+		sed 's|^\(.*, \)size=[^,]*, \(type=[f5]\)$|\1\2|' | \
+		sed 's|^\('"${last_part}"' .*, \)size=[^,]*, |\1|' | \
+		sfdisk --force "${boot_device}" >/dev/null 2>&1
+
+	if [ "$is_gpt" = "1" ]; then
+		dd if=/tmp/__mbr__.bak of="${boot_device}" >/dev/null 2>&1
+		rm /tmp/__mbr__.bak
+	fi
+
+	# Inform the kernel about the partitioning change
+	partx -u "${last_part}"
+
+	log_end_msg
+}
+
 for candidate in /dev/tpm*; do
 	if [ -x /usr/bin/tpm2_pcrread ]; then
 		if ! tpm2_pcrread -T device:"$candidate" "$pcr_bank_hash_type":7 --quiet ; then
@@ -129,6 +187,7 @@ for partition_set in $partition_sets; do
 	partition="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[1]}')"
 	partition_mountpoint="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[2]}')"
 	partition_format="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[3]}')"
+	partition_expand="$(awk -v var="$partition_set" 'BEGIN{split(var,a,":"); print a[4]}')"
 	case "$partition" in
 		/*)
 			part_device=$(readlink -f "$partition")
@@ -151,6 +210,10 @@ for partition_set in $partition_sets; do
 	# check if we are trying to mount root
 	if [ "$partition_mountpoint" = "/" ]; then
 		echo "ROOT=$decrypted_part" >/conf/param.conf
+	fi
+
+	if [ "$partition_expand" = "expand" ]; then
+		expand_partition $part_device
 	fi
 
 	if /usr/sbin/cryptsetup luksDump --batch-mode "$part_device" \

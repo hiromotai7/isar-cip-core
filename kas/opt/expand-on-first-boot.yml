@@ -15,3 +15,6 @@ header:
 local_conf_header:
   package-expand-on-first-boot: |
     IMAGE_INSTALL:append = " expand-on-first-boot"
+  expand-before-encrypt: |
+    IMAGE_INSTALL:remove:encrypt-partitions = "expand-on-first-boot"
+    CRYPT_PARTITIONS:append:encrypt-partitions = ":expand"

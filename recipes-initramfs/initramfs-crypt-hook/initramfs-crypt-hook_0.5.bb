@@ -69,7 +69,7 @@ SRC_URI += "file://encrypt_partition.env.tmpl \
             file://hook \
             file://pwquality.conf"
 
-# CRYPT_PARTITIONS elements are <partition-label>:<mountpoint>:<reencrypt or format>
+# CRYPT_PARTITIONS elements are <partition-label>:<mountpoint>:<reencrypt or format>[:expand]
 CRYPT_PARTITIONS ??= "home:/home:reencrypt var:/var:reencrypt"
 # CRYPT_CREATE_FILE_SYSTEM_CMD contains the shell command to create the filesystem
 # in a newly formatted LUKS Partition
@@ -87,6 +87,10 @@ TEMPLATE_VARS += "CRYPT_PARTITIONS CRYPT_CREATE_FILE_SYSTEM_CMD \
     CRYPT_SETUP_TIMEOUT INITRAMFS_WATCHDOG_DEVICE CRYPT_HASH_TYPE \
     CRYPT_KEY_ALGORITHM CRYPT_ENCRYPTION_OPTIONAL"
 TEMPLATE_FILES += "encrypt_partition.env.tmpl"
+
+OVERRIDES .= "${@':expand-on-crypt' if ':expand' in d.getVar('CRYPT_PARTITIONS') else ''}"
+DEBIAN_DEPENDS:append:expand-on-crypt = ", fdisk, util-linux"
+HOOK_COPY_EXECS:append:expand-on-crypt = " sed sfdisk tail cut dd partx rm"
 
 do_install[cleandirs] += "${D}/usr/share/encrypt_partition"
 do_install:prepend() {
