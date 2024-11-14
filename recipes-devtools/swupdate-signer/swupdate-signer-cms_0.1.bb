@@ -10,7 +10,6 @@
 
 inherit dpkg-raw
 DPKG_ARCH = "all"
-DEBIAN_MULTI_ARCH = "foreign"
 
 PROVIDES = "swupdate-signer"
 DEBIAN_PROVIDES = "swupdate-signer"
