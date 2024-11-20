@@ -1,31 +1,12 @@
-#!/bin/sh
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2022-2023
+# Copyright (c) Siemens AG, 2022-2024
 #
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
 #
-
-PREREQ=""
-
-prereqs()
-{
-	echo "$PREREQ"
-}
-
-case $1 in
-# get pre-requisites
-prereqs)
-	prereqs
-	exit 0
-	;;
-esac
-
-. /scripts/functions
-
 
 ovl_partition_device="${INITRAMFS_OVERLAY_STORAGE_DEVICE}"
 ovl_storage_path="${INITRAMFS_OVERLAY_STORAGE_PATH}"
@@ -76,3 +57,5 @@ for ovl_lower_dir in ${ovl_lower_dirs}; do
 		panic "Can't mount overlay for '$ovl_lower_dir' !"
 	fi
 done
+
+exit 0

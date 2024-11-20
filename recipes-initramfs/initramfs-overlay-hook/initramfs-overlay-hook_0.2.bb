@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2022 - 2023
+# Copyright (c) Siemens AG, 2022 - 2024
 #
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
@@ -10,13 +10,12 @@
 # SPDX-License-Identifier: MIT
 #
 
-inherit dpkg-raw
+require recipes-initramfs/initramfs-hook/hook.inc
 
 INITRAMFS_OVERLAY_RECOVERY_SCRIPT ??= "overlay_recovery_action.script"
 
 SRC_URI += " \
-    file://overlay.hook \
-    file://overlay.script.tmpl \
+    file://local-bottom.tmpl \
     file://${INITRAMFS_OVERLAY_RECOVERY_SCRIPT} \
     "
 
@@ -34,7 +33,7 @@ INITRAMFS_OVERLAY_STORAGE_PATH ??= "/var/local"
 INITRAMFS_OVERLAY_STORAGE_DEVICE ??= "/dev/disk/by-label/var"
 INITRAMFS_OVERLAY_MOUNT_OPTION ??= "defaults,nodev,nosuid,noexec"
 
-TEMPLATE_FILES = "overlay.script.tmpl"
+TEMPLATE_FILES += "local-bottom.tmpl"
 TEMPLATE_VARS += " INITRAMFS_OVERLAY_STORAGE_PATH \
     INITRAMFS_OVERLAY_PATHS \
     INITRAMFS_OVERLAY_STORAGE_DEVICE \
@@ -43,15 +42,10 @@ TEMPLATE_VARS += " INITRAMFS_OVERLAY_STORAGE_PATH \
 
 DEBIAN_DEPENDS = "initramfs-tools, awk, coreutils, util-linux"
 
-do_install[cleandirs] += " \
-    ${D}/usr/share/initramfs-tools/hooks \
-    ${D}/usr/share/initramfs-tools/scripts/local-bottom"
+HOOK_ADD_MODULES = "overlay"
+HOOK_ADD_EXECS = "mountpoint awk e2fsck mke2fs"
 
-do_install() {
-    install -m 0755 "${WORKDIR}/overlay.hook" \
-        "${D}/usr/share/initramfs-tools/hooks/overlay"
-    install -m 0755 "${WORKDIR}/overlay.script" \
-        "${D}/usr/share/initramfs-tools/scripts/local-bottom/overlay"
+do_install:append() {
     install -m 0755 "${WORKDIR}/${INITRAMFS_OVERLAY_RECOVERY_SCRIPT}" \
         "${D}/usr/share/initramfs-tools/scripts"
 }
