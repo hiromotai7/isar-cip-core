@@ -9,20 +9,23 @@
 # SPDX-License-Identifier: MIT
 #
 
-inherit dpkg-raw
+require recipes-initramfs/initramfs-hook/hook.inc
 
 SRC_URI += " \
-    file://verity.hook \
-    file://verity.script.tmpl \
+    file://hook \
+    file://local-top-complete.tmpl \
     "
 
 VERITY_BEHAVIOR_ON_CORRUPTION ?= "--restart-on-corruption"
 
-TEMPLATE_FILES = "verity.script.tmpl"
+TEMPLATE_FILES += "local-top-complete.tmpl"
 TEMPLATE_VARS += "VERITY_BEHAVIOR_ON_CORRUPTION"
 
 DEBIAN_DEPENDS = "initramfs-tools, cryptsetup"
 DEBIAN_CONFLICTS = "initramfs-abrootfs-hook"
+
+HOOK_ADD_MODULES = "dm_mod dm_verity"
+HOOK_COPY_EXECS = "veritysetup dmsetup"
 
 VERITY_IMAGE_RECIPE ?= "cip-core-image"
 
@@ -33,22 +36,15 @@ IMAGE_FULLNAME ??= "${VERITY_IMAGE_RECIPE}-${DISTRO}-${MACHINE}"
 VERITY_ENV_FILE = "${DEPLOY_DIR_IMAGE}/${IMAGE_FULLNAME}.verity.env"
 
 do_install[depends] += "${VERITY_IMAGE_RECIPE}:do_image_verity"
-do_install[cleandirs] += " \
-    ${D}/usr/share/initramfs-tools/hooks \
-    ${D}/usr/share/verity-env \
-    ${D}/usr/share/initramfs-tools/scripts/local-top"
+do_install[cleandirs] += "${D}/usr/share/verity-env"
 
-do_install() {
+do_install:append() {
     # Insert the veritysetup commandline into the script
     if [ -f "${VERITY_ENV_FILE}" ]; then
         install -m 0600 "${VERITY_ENV_FILE}" "${D}/usr/share/verity-env/verity.env"
     else
         bberror "Did not find ${VERITY_ENV_FILE}. initramfs will not be build correctly!"
     fi
-    install -m 0755 "${WORKDIR}/verity.script" \
-        "${D}/usr/share/initramfs-tools/scripts/local-top/verity"
-    install -m 0755 "${WORKDIR}/verity.hook" \
-        "${D}/usr/share/initramfs-tools/hooks/verity"
 }
 
 addtask install after do_transform_template

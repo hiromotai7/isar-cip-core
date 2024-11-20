@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: MIT
+# Copyright (c) Siemens AG, 2021-2024
+
+copy_file library /lib/cryptsetup/functions /lib/cryptsetup/functions
+copy_file library /usr/share/verity-env/verity.env /usr/share/verity-env/verity.env
