@@ -12,7 +12,6 @@
 inherit dpkg-raw
 
 SRC_URI += " \
-    file://verity.conf-hook \
     file://verity.hook \
     file://verity.script.tmpl \
     "
@@ -37,8 +36,7 @@ do_install[depends] += "${VERITY_IMAGE_RECIPE}:do_image_verity"
 do_install[cleandirs] += " \
     ${D}/usr/share/initramfs-tools/hooks \
     ${D}/usr/share/verity-env \
-    ${D}/usr/share/initramfs-tools/scripts/local-top \
-    ${D}/usr/share/initramfs-tools/conf-hooks.d"
+    ${D}/usr/share/initramfs-tools/scripts/local-top"
 
 do_install() {
     # Insert the veritysetup commandline into the script
