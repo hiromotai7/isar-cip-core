@@ -62,7 +62,7 @@ service_watchdog() {
 }
 
 reencrypt_existing_partition() {
-	part_size_blocks="$(cat /sys/class/block/"$(awk -v dev="$1" 'BEGIN{split(dev,a,"/"); print a[3]}' )"/size)"
+	part_size_blocks="$(cat /sys/class/block/"${1##*/}"/size)"
 	# reduce the filesystem and partition by 32M to fit the LUKS header
 	partition_fstype=$(get_fstype "${1}")
 	reduce_device_size=32768
