@@ -1,1 +1,1 @@
-deb [check-valid-until=no trusted=yes] https://snapshot-cloudflare.debian.org/archive/debian/20240411T000000Z buster-backports main contrib non-free
+deb [check-valid-until=no trusted=yes] https://snapshot.debian.org/archive/debian/20240411T000000Z buster-backports main contrib non-free
