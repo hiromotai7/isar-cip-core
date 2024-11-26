@@ -17,14 +17,22 @@ target: cip-core-image
 
 build_system: isar
 
+defaults:
+  repos:
+    patches:
+      repo: cip-core
+
 repos:
   cip-core:
 
   isar:
     url: https://github.com/ilbers/isar.git
-    commit: b92e9076e27bf22b8296dd3440bf25ebf348e2c6
+    commit: 37f9d3f3953eb723a18119f017b94ed10832fe34
     layers:
       meta:
+    patches:
+      p1:
+        path: patches/0001-image.bbclass-use-oe.utils.directory_size-instead-of.patch
 
 bblayers_conf_header:
   standard: |
