@@ -17,3 +17,5 @@ SRC_URI:append = " ${@ \
 SRCREV_cip-kernel-config ?= "9b1b425c87248ba476e3a3aff3c9f905abdb3982"
 
 do_fetch[vardeps] += "SRCREV_cip-kernel-config"
+
+KBUILD_DEPENDS:append = "${@', lzop' if d.getVar('USE_CIP_KERNEL_CONFIG') == '1' else ''}"
