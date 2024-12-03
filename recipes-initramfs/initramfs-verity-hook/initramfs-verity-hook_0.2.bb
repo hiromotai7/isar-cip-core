@@ -21,7 +21,7 @@ VERITY_BEHAVIOR_ON_CORRUPTION ?= "--restart-on-corruption"
 TEMPLATE_FILES += "local-top-complete.tmpl"
 TEMPLATE_VARS += "VERITY_BEHAVIOR_ON_CORRUPTION"
 
-DEBIAN_DEPENDS = "initramfs-tools, cryptsetup"
+DEBIAN_DEPENDS .= ", cryptsetup"
 DEBIAN_CONFLICTS = "initramfs-abrootfs-hook"
 
 HOOK_ADD_MODULES = "dm_mod dm_verity"

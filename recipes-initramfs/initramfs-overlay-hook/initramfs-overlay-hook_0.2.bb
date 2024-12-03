@@ -40,7 +40,7 @@ TEMPLATE_VARS += " INITRAMFS_OVERLAY_STORAGE_PATH \
     INITRAMFS_OVERLAY_MOUNT_OPTION \
     INITRAMFS_OVERLAY_RECOVERY_SCRIPT"
 
-DEBIAN_DEPENDS = "initramfs-tools, awk, coreutils, util-linux"
+DEBIAN_DEPENDS .= ", awk, coreutils, util-linux"
 
 HOOK_ADD_MODULES = "overlay"
 HOOK_ADD_EXECS = "mountpoint awk e2fsck mke2fs"
