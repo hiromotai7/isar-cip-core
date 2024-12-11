@@ -38,7 +38,7 @@ python __anonymous() {
     # This allows to use the directory as a mount point.
     args = " -wildcards"
     for dir in exclude_directories:
-        args += " -e {dir}/* ".format(dir=dir)
+        args += " -e '{dir}/*' ".format(dir=dir)
     d.appendVar('SQUASHFS_CREATION_ARGS', args)
 }
 
