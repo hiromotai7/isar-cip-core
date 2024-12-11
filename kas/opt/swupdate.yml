@@ -20,6 +20,7 @@ local_conf_header:
     OVERRIDES .= ":swupdate"
 
   wic-swu: |
+    RO_ROOTFS_TYPE ??= "squashfs"
     IMAGE_TYPEDEP:wic += "${RO_ROOTFS_TYPE}"
     IMAGE_FSTYPES:append = " swu"
     # input is already compressed
