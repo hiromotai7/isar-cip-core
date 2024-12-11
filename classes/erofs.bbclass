@@ -19,6 +19,7 @@ python __anonymous() {
     exclude_directories = d.getVar('EROFS_EXCLUDE_DIRS').split()
     if len(exclude_directories) == 0:
         return
+    args = ""
     # Use regex to exclude only content of the directory.
     # This allows to use the directory as a mount point.
     for dir in exclude_directories:
