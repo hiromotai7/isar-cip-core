@@ -23,7 +23,7 @@ python __anonymous() {
     # Use regex to exclude only content of the directory.
     # This allows to use the directory as a mount point.
     for dir in exclude_directories:
-        args += " --exclude-regex {dir}/.* ".format(dir=dir)
+        args += " --exclude-regex '^{dir}/.*' ".format(dir=dir)
     d.appendVar('EROFS_CREATION_ARGS', args)
 }
 
