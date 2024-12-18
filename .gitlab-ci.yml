@@ -241,6 +241,16 @@ build:qemu-amd64-secure-boot-encrypt:
     deploy: disable
     encrypt: enable
 
+build:x86-uefi-secure-boot:
+  extends:
+    - .build_base
+  variables:
+    target: x86-uefi
+    extension: security
+    use_rt: disable
+    targz: disable
+    encrypt: disable
+
 build:qemu-amd64-swupdate:
   extends:
     - .build_base
