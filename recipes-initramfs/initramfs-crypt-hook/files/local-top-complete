@@ -12,10 +12,13 @@
 prereqs()
 {
 	# Make sure that this script is run last in local-top
+	# If the abroofs or verity hooks are installed, this script
+	# should still come after them.
 	local req
 	for req in "${0%/*}"/*; do
 		script="${req##*/}"
-		if [ "$script" != "${0##*/}" ]; then
+		if [ "$script" != "${0##*/}" ] &&
+		   [ "$script" != "abrootfs" ] && [ "$script" != "verity" ]; then
 			printf '%s\n' "$script"
 		fi
 	done
