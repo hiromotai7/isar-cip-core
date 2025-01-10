@@ -14,7 +14,6 @@
   variables:
     use_rt: disable
     deploy: disable
-    deploy_kernelci: disable
     base_yaml: "kas-cip.yml:kas/board/${target}.yml:kas/opt/reproducible.yml"
     release: bookworm
     # This target include base + swupdate + secureboot + security
