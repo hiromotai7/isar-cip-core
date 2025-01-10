@@ -126,7 +126,7 @@ build:qemu-amd64-base-kernelci:
     extension: kernelci
     use_rt: disable
     deploy: disable
-    deploy_kernelci: enable
+    #deploy_kernelci: enable
 
 build:qemu-arm64-base:
   extends:
@@ -145,7 +145,7 @@ build:qemu-arm64-base-kernelci:
     extension: kernelci
     use_rt: disable
     deploy: disable
-    deploy_kernelci: enable
+    #deploy_kernelci: enable
 
 build:qemu-arm-base:
   extends:
@@ -164,7 +164,7 @@ build:qemu-arm-base-kernelci:
     extension: kernelci
     use_rt: disable
     deploy: disable
-    deploy_kernelci: enable
+    #deploy_kernelci: enable
 
 # test
 build:x86-uefi-test:
