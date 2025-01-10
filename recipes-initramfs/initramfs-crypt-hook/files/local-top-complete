@@ -82,14 +82,14 @@ reencrypt_existing_partition() {
 EOF
 		e2fsck -p -f "$1"
 		if ! resize2fs "$1" "${reduced_size_in_kb}"; then
-			panic "reencryption of filesystem $1 cannot continue!"
+			panic "reencryption of partition $1 cannot continue - resizing of the partition failed!"
 		fi
 		;;
 	squashfs|swap|erofs|"")
 		[ "$debug" = "y" ] && echo "skip disk resize as it is not supported or unnecessary for fstype: '$partition_fstype'"
 		;;
 	*)
-		panic "cannot resize parition. unsupport fstype: $partition_fstype"
+		panic "cannot resize partition, unsupported fstype: '$partition_fstype'"
 		;;
 	esac
 	if [ -x /usr/sbin/cryptsetup-reencrypt ]; then
