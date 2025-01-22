@@ -8,17 +8,19 @@
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
 #
 
-ovl_partition_device="${INITRAMFS_OVERLAY_STORAGE_DEVICE}"
 ovl_storage_path="${INITRAMFS_OVERLAY_STORAGE_PATH}"
 ovl_lower_dirs="${INITRAMFS_OVERLAY_PATHS}"
-ovl_mount_option="${INITRAMFS_OVERLAY_MOUNT_OPTION}"
-ovl_recovery_script="/scripts/${INITRAMFS_OVERLAY_RECOVERY_SCRIPT}"
 
 root_mount_storage=${rootmnt}${ovl_storage_path}
 storage_mount_point="$(echo "${ovl_storage_path}" | awk -F/ '{print FS$2}' )"
-partition_fstype=$(get_fstype "${ovl_partition_device}")
 
 if ! mountpoint -q "${rootmnt}${storage_mount_point}"; then
+	ovl_partition_device="${INITRAMFS_OVERLAY_STORAGE_DEVICE}"
+	ovl_mount_option="${INITRAMFS_OVERLAY_MOUNT_OPTION}"
+	ovl_recovery_script="/scripts/${INITRAMFS_OVERLAY_RECOVERY_SCRIPT}"
+
+	partition_fstype=$(get_fstype "${ovl_partition_device}")
+
 	case $partition_fstype in
 	ext*)
 		e2fsck -p -f "$ovl_partition_device"
