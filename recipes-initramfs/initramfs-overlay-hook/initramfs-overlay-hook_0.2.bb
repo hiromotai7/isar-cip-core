@@ -25,12 +25,14 @@ INITRAMFS_OVERLAY_PATHS ??= "/etc"
 
 # The variable INITRAMFS_OVERLAY_STORAGE_PATH designates the path were the
 # changes to the overlayed directory are stored (upper dir). The initramfs
-# also mounts the first directory after root to the
-# INITRAMFS_OVERLAY_STORAGE_DEVICE.
+# hook also mounts the first directory after root to
+# INITRAMFS_OVERLAY_STORAGE_DEVICE if it is not mounted yet.
 INITRAMFS_OVERLAY_STORAGE_PATH ??= "/var/local"
 
 # override this to switch to UUID or PARTUUID based mounts
 INITRAMFS_OVERLAY_STORAGE_DEVICE ??= "/dev/disk/by-label/var"
+
+# options to use for mounting INITRAMFS_OVERLAY_STORAGE_DEVICE
 INITRAMFS_OVERLAY_MOUNT_OPTION ??= "defaults,nodev,nosuid,noexec"
 
 TEMPLATE_FILES += "local-bottom.tmpl"
