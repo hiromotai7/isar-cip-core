@@ -11,6 +11,8 @@
 
 require recipes-bsp/u-boot/u-boot-custom.inc
 
+FILESPATH:append := ":${FILE_DIRNAME}/files"
+
 SRC_URI += " \
     https://ftp.denx.de/pub/u-boot/u-boot-${PV}.tar.bz2 \
     file://rules.tmpl;subdir=debian"
