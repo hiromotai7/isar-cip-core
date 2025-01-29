@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2020-2024
+# Copyright (c) Siemens AG, 2020-2025
 #
 # Authors:
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
@@ -23,8 +23,8 @@ SRC_URI = " \
     git://salsa.debian.org/debian/efibootguard.git;protocol=https;branch=master;name=debian \
     file://debian-patches/0001-d-control-Make-compatible-with-debian-buster.patch \
     "
-SRC_URI[tarball.sha256sum] = "023b96548e0779bd7aaf58899883099dba9993b1b4af0c858adc00382523ae52"
-SRCREV_debian = "7e31b8f9cc204d1210c6c03381f936a96c29b35f"
+SRC_URI[tarball.sha256sum] = "167a808d508558341b81d9a493f76161ac7fd7119e764435eae1b13e31a69737"
+SRCREV_debian = "040c116a61ffc99a92b6cbdb793abb7f51ef8d4a"
 
 PROVIDES = "libebgenv-dev libebgenv0 efibootguard"
 
