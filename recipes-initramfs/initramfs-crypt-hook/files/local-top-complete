@@ -85,6 +85,13 @@ EOF
 			panic "reencryption of partition $1 cannot continue - resizing of the partition failed!"
 		fi
 		;;
+	btrfs)
+		mkdir /.mnt-tmp
+		mount -t btrfs "$1" /.mnt-tmp
+		btrfs filesystem resize "${reduced_size_in_kb}" /.mnt-tmp
+		umount /.mnt-tmp
+		rmdir /.mnt-tmp
+		;;
 	squashfs|swap|erofs|"")
 		[ "$debug" = "y" ] && echo "skip disk resize as it is not supported or unnecessary for fstype: '$partition_fstype'"
 		;;
