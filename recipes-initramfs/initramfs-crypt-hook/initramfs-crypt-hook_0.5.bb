@@ -82,6 +82,8 @@ INITRAMFS_WATCHDOG_DEVICE ??= "/dev/watchdog"
 CRYPT_HASH_TYPE ??= "sha256"
 CRYPT_KEY_ALGORITHM ??= "ecc"
 CRYPT_ENCRYPTION_OPTIONAL ??= "false"
+# add support for btrfs encryption
+CRYPT_BTRFS_SUPPORT ??= "0"
 
 TEMPLATE_VARS += "CRYPT_PARTITIONS CRYPT_CREATE_FILE_SYSTEM_CMD \
     CRYPT_SETUP_TIMEOUT INITRAMFS_WATCHDOG_DEVICE CRYPT_HASH_TYPE \
@@ -91,6 +93,10 @@ TEMPLATE_FILES += "encrypt_partition.env.tmpl"
 OVERRIDES .= "${@':expand-on-crypt' if ':expand' in d.getVar('CRYPT_PARTITIONS') else ''}"
 DEBIAN_DEPENDS:append:expand-on-crypt = ", fdisk, util-linux"
 HOOK_COPY_EXECS:append:expand-on-crypt = " sed sfdisk tail cut dd partx rm"
+
+OVERRIDES .= "${@':btrfs-support' if bb.utils.to_boolean(d.getVar('CRYPT_BTRFS_SUPPORT')) else ''}"
+DEBIAN_DEPENDS:append:btrfs-support = ", btrfs-progs"
+HOOK_COPY_EXECS:append:btrfs-support = " mkdir rmdir btrfs"
 
 do_install[cleandirs] += "${D}/usr/share/encrypt_partition"
 do_install:prepend() {
