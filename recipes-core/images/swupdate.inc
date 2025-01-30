@@ -1,7 +1,7 @@
 #
 # CIP Core, generic profile
 #
-# Copyright (c) Siemens AG, 2023-2024
+# Copyright (c) Siemens AG, 2023-2025
 #
 # Authors:
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
@@ -11,6 +11,12 @@
 
 inherit image_uuid
 inherit read-only-rootfs
+
+# read-only rootfs with /home and /var
+# as separate partitions is used
+# /boot is excluded as an unified kernel image
+# is used. This images are stored in separate partitions.
+RO_ROOTFS_EXCLUDE_DIRS = "boot var home"
 
 SWU_SIGNED ?= "1"
 SWU_HW_COMPAT ?= "cip-core-1.0"
