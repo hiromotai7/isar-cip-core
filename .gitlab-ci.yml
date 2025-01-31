@@ -219,56 +219,12 @@ build:qemu-arm-test:
     target:  qemu-arm
     extension: test
 
-# secure boot images
-build:qemu-amd64-secure-boot:
-  extends:
-    - .build_base
-  variables:
-    target: qemu-amd64
-    extension: ebg-secure-boot-snakeoil
-    use_rt: disable
-    targz: disable
-    deploy: disable
-
-build:qemu-amd64-secure-boot-encrypt:
-  extends:
-    - .build_base
-  variables:
-    target: qemu-amd64
-    extension: ebg-secure-boot-snakeoil
-    use_rt: disable
-    targz: disable
-    deploy: disable
-    encrypt: enable
-
 build:qemu-amd64-swupdate:
   extends:
     - .build_base
   variables:
     target: qemu-amd64
     extension: ebg-swu
-    use_rt: disable
-    targz: disable
-    deploy: disable
-
-# secure boot images arm64
-build:qemu-arm64-secure-boot:
-  extends:
-    - .build_base
-  variables:
-    target: qemu-arm64
-    extension: ebg-secure-boot-snakeoil
-    use_rt: disable
-    targz: disable
-    deploy: disable
-
-# secure boot images arm
-build:qemu-arm-secure-boot:
-  extends:
-    - .build_base
-  variables:
-    target: qemu-arm
-    extension: ebg-secure-boot-snakeoil
     use_rt: disable
     targz: disable
     deploy: disable
