@@ -12,10 +12,14 @@
 prereqs()
 {
 	# Make sure that this script is run last in local-top
+	# but before overlay
+	# This script mounts all encrypted partition, which are
+	# not mounted previously
 	local req
 	for req in "${0%/*}"/*; do
 		script="${req##*/}"
-		if [ "$script" != "${0##*/}" ]; then
+		if [ "$script" != "${0##*/}" ] &&
+			[ "$script" != "overlay" ] ; then
 			printf '%s\n' "$script"
 		fi
 	done
