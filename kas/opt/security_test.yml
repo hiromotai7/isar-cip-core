@@ -1,0 +1,15 @@
+#
+# Copyright (c) Siemens, 2025
+#
+# Authors:
+#  Quirin Gylstorff <quirin.gylstorff@siemens.com>
+#
+# SPDX-License-Identifier: MIT
+#
+
+header:
+  version: 14
+
+local_conf_header:
+  lava-testing-add-curl: |
+    IMAGE_PREINSTALL += "curl"
