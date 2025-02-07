@@ -57,7 +57,7 @@ actions:
       password_prompt: "Password:"
       password: "CIPsecurity@123"
 
-# TEST_BLOCK
+# TEST_BLOCK 1
 # Fail the job if software update application failed
 - test:
     timeout:
@@ -102,6 +102,7 @@ actions:
     parameters:
        kernel-start-message: "kernel: C:BOOT1:linux.efi"
 
+# TEST BLOCK 2
 # Fail the job if ustate is not #updatestate# after reboot
 - test:
     timeout:
