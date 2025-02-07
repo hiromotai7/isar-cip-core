@@ -1,0 +1,52 @@
+# Copyright (c) 2025, Siemens AG, Quirin Gylstorff <quirin.gylstorff@siemens.com>
+# SPDX-License-Identifier:      AGPL-3.0
+# This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+job_name: mtda-mcom-#test_function#
+device_type: mcom-mtda
+timeouts:
+  job:
+    minutes: 180
+  action:
+    minutes: 95
+  connection:
+    minutes: 25
+priority: medium
+visibility: public
+context:
+  lava_test_results_dir: /home/lava/%s
+notify:
+  criteria:
+    status: finished
+  recipients:
+  - to:
+     method: email
+     email: cip-testing-results@lists.cip-project.org
+
+# ACTION_BLOCK
+actions:
+- deploy:
+    timeout:
+      minutes: 60
+    to: flasher
+    images:
+      image:
+        url: #project_url#/#branch#/x86-uefi/cip-core-image-security-cip-core-#distribution#-x86-uefi.wic.xz
+
+# BOOT BLOCK
+- boot:
+    method: minimal
+    timeout:
+      minutes: 30
+    reset: true
+    failure_retry: 1
+    prompts: ["root@demo:~#"]
+    auto_login:
+      login_prompt: "demo login:"
+      username: "root"
+      password_prompt: "Password:"
+      password: "CIPsecurity@123"
+    transfer_overlay:
+      transfer_method: http
+      download_command: "curl -H 'Connection: close' -v --trace-time --output overlay-1.1.1.4.tar.gz"
+      unpack_command: rm -rf /home/lava; mkdir /home/lava; tar -C /home/lava/ -xf

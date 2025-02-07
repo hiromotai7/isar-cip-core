@@ -1,0 +1,18 @@
+# TEST BLOCK 1
+# Fail the job if software update application failed
+- test:
+    timeout:
+      minutes: 15
+    definitions:
+    - repository:
+        metadata:
+          format: Lava-Test Test Definition 1.0
+          name: sample-test
+          description: "Test software update"
+        run:
+          steps:
+            - curl -v --trace-time http://$LAVA_DISPATCHER_IP/tmp/$LAVA_JOB_ID/downloads/common/cip-core-image-security-cip-core-bookworm-x86-uefi.swu --output test.swu
+            - if swupdate -i test.swu; then echo software update is successful!!; else lava-test-raise "Fail job"; fi
+      from: inline
+      name: sample-test-1
+      path: inline/sample-test.yaml
