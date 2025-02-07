@@ -52,7 +52,7 @@ add_firmware_artifacts () {
 
 # This method creates LAVA job definitions for QEMU amd64, arm64 and armhf
 # The created job definitions test SWUpdate, Secureboot and IEC layer
-create_job () {
+create_job_qemu () {
 	if [ "$1" = "IEC" ]; then
 		cp $LAVA_TEMPLATES/IEC_template.yml "${job_dir}/${1}_${2}.yml"
 
@@ -91,6 +91,33 @@ create_job () {
 	local arch
 	arch=$(echo "$2" | cut -d '-' -f 2)
 	sed -i "s@#context-architecture#@${arch}@g" "${job_dir}"/*.yml
+}
+
+# This method creates LAVA job definitions for M-COM-x86
+# The created job definitions test SWUpdate, Secureboot and IEC layer
+create_job_mcom () {
+	cp $LAVA_TEMPLATES/M-COM-x86.yml "${job_dir}/${1}_${2}.yml"
+	if [ "$1" = "IEC" ]; then
+		grep -A 9 "# TEST_BLOCK" $LAVA_TEMPLATES/$1_template.yml >> "${job_dir}/${1}_${2}.yml"
+	elif [ "$1" = "secure-boot" ]; then
+		grep -A 1 "parameters" $LAVA_TEMPLATES/secureboot_template.yml >> "${job_dir}/${1}_${2}.yml"
+	else
+		# swupdate -d option does not work on M-COM, so .swu file is deployed to downloads
+		grep -A 7 "deploy:" "${job_dir}/${1}_${2}.yml" > "${job_dir}/swupdate_deploy_download.yml"
+		sed -i -e "s@flasher@downloads@g" -e "s@wic.xz@swu@g" "${job_dir}/swupdate_deploy_download.yml"
+		sed -i -e "/actions/r ${job_dir}/swupdate_deploy_download.yml" "${job_dir}/${1}_${2}.yml"
+
+		# Remove the deploy to download yml file once it is placed in the job definition
+		rm "${job_dir}/swupdate_deploy_download.yml"
+
+		# swupdate test action on M-COM is different from the test block used in QEMU
+		cat $LAVA_TEMPLATES/swupdate-test-action-M-COM.yml | tee -a "${job_dir}/${1}_${2}.yml" > /dev/null
+		grep -A 12 "# BOOT BLOCK" $LAVA_TEMPLATES/M-COM-x86.yml >> "${job_dir}/${1}_${2}.yml"
+		grep -A 16 "# TEST BLOCK 2" $LAVA_TEMPLATES/$1_template.yml >> "${job_dir}/${1}_${2}.yml"
+		sed -i -e "s@#updatestate#@2@g" -e "s@overlay-1.1.1.4@overlay-2.1.1.4@g" "${job_dir}/${1}_${2}.yml"
+	fi
+	sed -i -e "s@#test_function#@${1}@g" -e "s@#branch#@${COMMIT_BRANCH}@g" "${job_dir}/${1}_${2}.yml"
+	sed -i -e "s@#distribution#@${RELEASE}@g" -e "s@#project_url#@${PROJECT_URL}@g" "${job_dir}/${1}_${2}.yml"
 }
 
 # This method attaches SQUAD watch job to the submitted LAVA job
@@ -231,7 +258,14 @@ get_junit_test_results () {
 
 set_up
 
-create_job "$TEST" "$TARGET"
+if [[ $TARGET =~ "qemu" ]]; then
+	create_job_qemu "$TEST" "$TARGET"
+elif [[ $TARGET =~ "x86-uefi" ]]; then
+	create_job_mcom "$TEST" "$TARGET"
+else
+	echo "Invalid target"
+	exit 1
+fi
 
 if ! validate_job; then
 	clean_up
