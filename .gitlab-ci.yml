@@ -231,6 +231,7 @@ build:x86-uefi-secure-boot:
     targz: disable
     watchdog: disable
     security_test: enable
+    build_swu_v2: enable
 
 build:qemu-amd64-swupdate:
   extends:
