@@ -359,6 +359,14 @@ test:qemu-arm-secure-boot:
     target: qemu-arm
     test_function: secure-boot
 
+test:x86-uefi-secure-boot:
+  extends:
+    - .test-cip-core
+  needs: ["build:x86-uefi-secure-boot"]
+  variables:
+    target: x86-uefi
+    test_function: secure-boot
+
 test:qemu-amd64-swupdate:
   extends:
     - .test-cip-core
@@ -381,6 +389,14 @@ test:qemu-arm-swupdate:
   needs: ["build:qemu-arm-base"]
   variables:
     target: qemu-arm
+    test_function: swupdate
+
+test:x86-uefi-swupdate:
+  extends:
+    - .test-cip-core
+  needs: ["build:x86-uefi-secure-boot"]
+  variables:
+    target: x86-uefi
     test_function: swupdate
 
 test:qemu-amd64-swupdate-kernel-panic:
@@ -421,6 +437,14 @@ test:qemu-arm-IEC:
   needs: ["build:qemu-arm-base"]
   variables:
     target: qemu-arm
+    test_function: IEC
+
+test:x86-uefi-IEC:
+  extends:
+   - .test-cip-core
+  needs: ["build:x86-uefi-secure-boot"]
+  variables:
+    target: x86-uefi
     test_function: IEC
 
 cve-checks:
