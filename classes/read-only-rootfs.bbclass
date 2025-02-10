@@ -17,6 +17,10 @@ do_image_wic[depends] += "${INITRAMFS_RECIPE}:do_build"
 IMAGE_INSTALL += "home-fs"
 HOME_PARTITION_CMD = "part /home --source rootfs --change-directory=home --fstype=ext4 --label home --align 1024  --size 1G --fsuuid 1f55d66a-40d8-11ee-be56-0242ac120002"
 
+HOME_PARTITION_CMD:home-to-var = ""
+IMAGE_INSTALL:remove:home-to-var = " home-fs"
+IMAGE_INSTALL:append:home-to-var = " move-homedir-var"
+
 IMAGE_INSTALL:append:buster   = " tmp-fs"
 IMAGE_INSTALL:append:bullseye = " tmp-fs"
 IMAGE_INSTALL:append:bookworm = " tmp-fs"
@@ -35,6 +39,13 @@ copy_dpkg_state() {
     IMMUTABLE_VAR_LIB="${ROOTFSDIR}/${IMMUTABLE_DATA_DIR}/var/lib"
     sudo mkdir -p "$IMMUTABLE_VAR_LIB"
     sudo cp -a ${ROOTFSDIR}/var/lib/dpkg "$IMMUTABLE_VAR_LIB/"
+}
+
+ROOTFS_POSTPROCESS_COMMAND:append:home-to-var =" copy_home_to_immutable_data"
+copy_home_to_immutable_data() {
+    IMMUTABLE_HOME_DIR="${ROOTFSDIR}/${IMMUTABLE_DATA_DIR}/"
+    sudo mkdir -p "$IMMUTABLE_HOME_DIR"
+    sudo cp -a ${ROOTFSDIR}/var/home "$IMMUTABLE_HOME_DIR/"
 }
 
 RO_ROOTFS_EXCLUDE_DIRS ??= ""
