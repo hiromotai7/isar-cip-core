@@ -1,2 +1,0 @@
-L /var/lib/dpkg - - - - /usr/share/immutable-data/var/lib/dpkg
-d /var/log/audit 0700 root adm -

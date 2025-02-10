@@ -15,8 +15,12 @@ inherit dpkg-raw
 MAINTAINER = "Felix Moessbauer <felix.moessbauer@siemens.com>"
 DESCRIPTION = "Config to link volatile data to immutable copies"
 
-SRC_URI = "file://${BPN}.tmpfiles"
+SRC_URI = "file://${BPN}.tmpfiles.tmpl"
 DPKG_ARCH = "all"
+
+IMMUTABLE_DATA_DIR ??= "usr/share/immutable-data"
+TEMPLATE_VARS = "IMMUTABLE_DATA_DIR"
+TEMPLATE_FILES += "${BPN}.tmpfiles.tmpl"
 
 do_prepare_build:append() {
     cp ${WORKDIR}/${BPN}.tmpfiles ${S}/debian/

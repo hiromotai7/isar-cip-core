@@ -28,8 +28,10 @@ IMAGE_INSTALL:remove:bullseye = " immutable-rootfs"
 ROOTFS_POSTPROCESS_COMMAND:append =" copy_dpkg_state"
 ROOTFS_POSTPROCESS_COMMAND:remove:buster =" copy_dpkg_state"
 ROOTFS_POSTPROCESS_COMMAND:remove:bullseye =" copy_dpkg_state"
+
+IMMUTABLE_DATA_DIR ??= "usr/share/immutable-data"
 copy_dpkg_state() {
-    IMMUTABLE_VAR_LIB="${ROOTFSDIR}/usr/share/immutable-data/var/lib"
+    IMMUTABLE_VAR_LIB="${ROOTFSDIR}/${IMMUTABLE_DATA_DIR}/var/lib"
     sudo mkdir -p "$IMMUTABLE_VAR_LIB"
     sudo cp -a ${ROOTFSDIR}/var/lib/dpkg "$IMMUTABLE_VAR_LIB/"
 }
