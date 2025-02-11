@@ -11,6 +11,11 @@
 
 inherit dpkg-raw
 
+PROVIDES := "${PN}"
+DEBIAN_PROVIDES := "${PN}"
+
+PN .= "-${MACHINE}"
+
 SRC_URI = "file://swupdate.cfg \
            file://hwrevision.tmpl"
 
