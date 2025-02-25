@@ -1,0 +1,32 @@
+From 5dc3f7d755b5adf447b419816002076bed21b8e1 Mon Sep 17 00:00:00 2001
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Date: Mon, 24 Feb 2025 21:25:49 +0100
+Subject: [PATCH] sbuild-chroot: Drop no longer needed and now broken riscv64
+ special case
+
+This was forgotten while cleaning up for trixie in 735dc16c1e. However,
+it continued to work - until these days. Fix the riscv64 build by simply
+dropping the obsolete package list.
+
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+ meta/recipes-devtools/sbuild-chroot/sbuild-chroot-host.bb | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/meta/recipes-devtools/sbuild-chroot/sbuild-chroot-host.bb b/meta/recipes-devtools/sbuild-chroot/sbuild-chroot-host.bb
+index 255d6937..3f0888d8 100644
+--- a/meta/recipes-devtools/sbuild-chroot/sbuild-chroot-host.bb
++++ b/meta/recipes-devtools/sbuild-chroot/sbuild-chroot-host.bb
+@@ -18,9 +18,3 @@ SBUILD_CHROOT_PREINSTALL ?= " \
+     crossbuild-essential-${DISTRO_ARCH} \
+     apt-utils \
+     "
+-
+-SBUILD_CHROOT_PREINSTALL:riscv64 ?= " \
+-    ${SBUILD_CHROOT_PREINSTALL_COMMON} \
+-    gcc-riscv64-linux-gnu \
+-    g++-riscv64-linux-gnu \
+-    dpkg-cross"
+-- 
+2.43.0
+

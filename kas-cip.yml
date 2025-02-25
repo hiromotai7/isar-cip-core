@@ -25,6 +25,10 @@ repos:
     commit: b5f7aef4e4fd26d852f8b09e545d5ade551224df
     layers:
       meta:
+    patches:
+      01:
+        path: isar-patches/0001-sbuild-chroot-Drop-no-longer-needed-and-now-broken-r.patch
+        repo: cip-core
 
 bblayers_conf_header:
   standard: |
