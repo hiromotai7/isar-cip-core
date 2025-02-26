@@ -102,6 +102,8 @@ reencrypt_existing_partition() {
 }
 
 expand_partition() {
+	key_file="$2"
+
 	boot_device="$(echo "${part_device}" | sed 's/p\?[0-9]*$//')"
 	last_part="$(sfdisk -d "${boot_device}" 2>/dev/null | \
 		     tail -1 | cut -d ' ' -f 1)"
@@ -154,6 +156,33 @@ expand_partition() {
 
 	# Inform the kernel about the partitioning change
 	partx -u "${last_part}"
+
+	last_part_device_name=${last_part#\/dev/}
+
+	mapping_name=$(cat /sys/class/block/"$last_part_device_name"/holders/*/dm/name)
+	# systemd based systems do not need to have the
+	# key_file provided since systemd backend for 
+	# cryptsetup resolves the passphrase directly
+	cat $key_file | cryptsetup resize "$mapping_name"
+
+	last_part_mapped=/dev/mapper/"$mapping_name"
+	fs_type=$(get_fstype ${last_part_mapped})
+
+	case ${fs_type} in
+	ext*)
+		resize2fs "${last_part_mapped}"
+		;;
+	btrfs)
+		mkdir /.mnt-tmp
+		mount -t btrfs "${last_part_mapped}" /.mnt-tmp
+		btrfs filesystem resize max /.mnt-tmp
+		umount /.mnt-tmp
+		rmdir /.mnt-tmp
+		;;
+	*)
+		log_warning_msg "Unrecognized filesystem type ${fs_type} - no resize performed"
+		;;
+	esac
 
 	log_end_msg
 }
@@ -217,10 +246,6 @@ for partition_set in $partition_sets; do
 		echo "ROOT=$decrypted_part" >/conf/param.conf
 	fi
 
-	if [ "$partition_expand" = "expand" ]; then
-		expand_partition $part_device
-	fi
-
 	if /usr/sbin/cryptsetup luksDump --batch-mode "$part_device" \
 			| grep -q "luks2"; then
 		open_tpm2_partition "$part_device" "$crypt_mount_name" "$tpm_device"
@@ -259,6 +284,10 @@ for partition_set in $partition_sets; do
 			panic "Unknown value ${partition_format}. Cannot create a encrypted partition !"
 		;;
 	esac
+
+	if [ "$partition_expand" = "expand" ]; then
+		expand_partition $part_device $tmp_key
+	fi
 
 	finalize_tpm2_encryption "$part_device"
 done
