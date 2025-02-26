@@ -33,12 +33,14 @@
     # Build 2nd time
     - !reference [.build_base, script]
     - mv build/tmp/deploy/images/${target} image2
+    # Compress artifacts
+    - tar --ignore-failed-read -cJf image1.tar.xz image1/*.wic* image1/*.swu
+    - tar --ignore-failed-read -cJf image2.tar.xz image2/*.wic* image2/*.swu
   artifacts:
     expire_in: 1 day
     paths:
       - scripts/repro-tests.sh
-      - image*/*.wic.p*
-      - image*/*.swu
+      - image*.tar.xz
 
 .repro-test:
   image:
@@ -55,6 +57,10 @@
   before_script:
     - apt update && DEBIAN_FRONTEND=noninteractive apt install -y diffoscope
   script:
+    - mkdir image1
+    - tar -xJf image1.tar.xz --strip-components=1 -C image1
+    - mkdir image2
+    - tar -xJf image2.tar.xz --strip-components=1 -C image2
     - ./scripts/repro-tests.sh --release ${release} --target ${target} --extension ${extension} image1 image2
   artifacts:
     when: always
