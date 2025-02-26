@@ -257,7 +257,7 @@ for partition_set in $partition_sets; do
 		;;
 		*)
 			panic "Unknown value ${partition_format}. Cannot create a encrypted partition !"
-		 ;;
+		;;
 	esac
 
 	finalize_tpm2_encryption "$part_device"
