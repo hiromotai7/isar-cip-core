@@ -100,6 +100,9 @@ config KERNEL_5_10
 config KERNEL_6_1
 	bool "Kernel 6.1.x-cip"
 
+config NO_KERNEL
+	bool "Do not install kernel to image"
+
 endchoice
 
 config KAS_INCLUDE_KERNEL
@@ -108,6 +111,7 @@ config KAS_INCLUDE_KERNEL
 	default "kas/opt/4.19.yml" if KERNEL_4_19
 	default "kas/opt/5.10.yml" if KERNEL_5_10
 	default "kas/opt/6.1.yml" if KERNEL_6_1
+	default "kas/opt/no_kernel.yml" if NO_KERNEL
 
 config KERNEL_RT
 	bool "Real-time CIP kernel"
