@@ -25,6 +25,14 @@ python __anonymous() {
     for dir in exclude_directories:
         args += " --exclude-regex '^{dir}/.*' ".format(dir=dir)
     d.appendVar('EROFS_CREATION_ARGS', args)
+
+    import uuid
+
+    sde_time = int(d.getVar('SOURCE_DATE_EPOCH'))
+    erofs_uuid = uuid.UUID(int=sde_time)
+
+    args = "-U " + str(erofs_uuid)
+    d.appendVar('EROFS_CREATION_ARGS', args)
 }
 
 IMAGE_CMD:erofs[depends] = "${PN}:do_transform_template"
