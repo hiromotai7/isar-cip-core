@@ -33,3 +33,8 @@ local_conf_header:
     IMAGER_BUILD_DEPS:append:qemu-arm64 = " u-boot-qemu-arm64"
     IMAGER_BUILD_DEPS:append:qemu-arm = " u-boot-qemu-arm"
     IMAGER_BUILD_DEPS:append:qemu-riscv64 = " opensbi-qemu-riscv64"
+  drop-ext4-images: |
+    IMAGE_FSTYPES:remove:qemu-amd64 = "ext4"
+    IMAGE_FSTYPES:remove:qemu-arm64 = "ext4"
+    IMAGE_FSTYPES:remove:qemu-arm = "ext4"
+    IMAGE_FSTYPES:remove:qemu-riscv64= "ext4"
