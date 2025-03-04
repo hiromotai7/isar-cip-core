@@ -18,7 +18,8 @@ prereqs()
 	for req in "${0%/*}"/*; do
 		script="${req##*/}"
 		if [ "$script" != "${0##*/}" ] &&
-		   [ "$script" != "abrootfs" ] && [ "$script" != "verity" ]; then
+		   [ "$script" != "abrootfs" ] && [ "$script" != "verity" ] &&
+		   [ "$script" != "cryptroot" ]; then
 			printf '%s\n' "$script"
 		fi
 	done
