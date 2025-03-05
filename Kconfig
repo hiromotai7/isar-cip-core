@@ -241,6 +241,12 @@ config IMAGE_FULL_ENCRYPTION
 	  If the partitions contain secrets the first boot must occur in a secure
 	  location.
 
+config SEPARATE_HOME_PARTITION
+	bool "Separate Home Partition"
+	help
+	  This adds a separate home partition to the build image instead of moving
+	  home to the var partition.
+
 config KAS_INCLUDE_DATA_ENCRYPTION
 	string
 	default "kas/opt/encrypt-data.yml" if IMAGE_DATA_ENCRYPTION
@@ -248,6 +254,10 @@ config KAS_INCLUDE_DATA_ENCRYPTION
 config KAS_INCLUDE_FULL_ENCRYPTION
 	string
 	default "kas/opt/encrypt-all.yml" if IMAGE_FULL_ENCRYPTION
+
+config KAS_INCLUDE_SEPARATE_HOME_PARTITION
+	string
+	default "kas/opt/separate-home-partition.yml" if SEPARATE_HOME_PARTITION
 
 config WDOG_TIMEOUT
 	int "EFI Boot Guard watchdog timeout in seconds"
