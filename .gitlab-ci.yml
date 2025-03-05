@@ -27,6 +27,7 @@ variables:
   build_swu_v2: disable
   swupdate_version: default
   test_function: swupdate
+  separate_home_partition: disable
 
 stages:
   - build
@@ -59,6 +60,7 @@ default:
     - if [ "${use_rt}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/rt.yml"; fi
     - if [ "${extension}" != "none" ]; then base_yaml="${base_yaml}:kas/opt/${extension}.yml"; fi
     - if [ "${targz}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/targz.yml"; fi
+    - if [ "${separate_home_partition}" = "enable" ]; then base_yaml="${base_yaml}:kas/opt/separate-home-partition.yml"; fi
     - if [ "${release}" = "buster" ]; then base_yaml="${base_yaml}:kas/opt/buster.yml"; fi
     - if [ "${release}" = "bullseye" ]; then base_yaml="${base_yaml}:kas/opt/bullseye.yml"; fi
     - if [ "${release}" = "bookworm" ]; then base_yaml="${base_yaml}:kas/opt/bookworm.yml"; fi
@@ -232,6 +234,7 @@ build:x86-uefi-secure-boot:
     watchdog: disable
     security_test: enable
     build_swu_v2: enable
+    separate_home_partition: enable
 
 build:qemu-amd64-swupdate:
   extends:
