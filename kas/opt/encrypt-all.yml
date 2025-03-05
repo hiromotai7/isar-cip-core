@@ -20,4 +20,4 @@ local_conf_header:
     # As we use a weak default assignment in the intramfs-crypt-hook recipe we need
     # to set all partitions
     CRYPT_PARTITIONS = "${ABROOTFS_PART_UUID_A}::reencrypt ${ABROOTFS_PART_UUID_B}::reencrypt \
-                         home:/home:reencrypt var:/var:reencrypt"
+                         var:/var:reencrypt"

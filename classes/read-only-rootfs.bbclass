@@ -14,8 +14,12 @@ INITRD_IMAGE = "${INITRAMFS_RECIPE}-${DISTRO}-${MACHINE}.initrd.img"
 
 do_image_wic[depends] += "${INITRAMFS_RECIPE}:do_build"
 
-IMAGE_INSTALL += "home-fs"
-WIC_HOME_PARTITION = "part /home --source rootfs --change-directory=home --fstype=ext4 --label home --align 1024  --size 1G --fsuuid 1f55d66a-40d8-11ee-be56-0242ac120002 --uuid c07d5e8f-3448-46dc-9c0f-58904f369524"
+WIC_HOME_PARTITION = ""
+WIC_HOME_PARTITION:separate-home-part = "part /home --source rootfs --change-directory=home --fstype=ext4 --label home --align 1024  --size 1G --fsuuid 1f55d66a-40d8-11ee-be56-0242ac120002 --uuid c07d5e8f-3448-46dc-9c0f-58904f369524"
+
+IMAGE_INSTALL += " move-homedir-var"
+IMAGE_INSTALL:append:separate-home-part = " home-fs"
+IMAGE_INSTALL:remove:separate-home-part = " move-homedir-var"
 
 IMAGE_INSTALL:append:buster   = " tmp-fs"
 IMAGE_INSTALL:append:bullseye = " tmp-fs"
@@ -36,6 +40,17 @@ copy_dpkg_state() {
     IMMUTABLE_VAR_LIB="${ROOTFSDIR}${IMMUTABLE_DATA_DIR}/var/lib"
     sudo mkdir -p "$IMMUTABLE_VAR_LIB"
     sudo cp -a ${ROOTFSDIR}/var/lib/dpkg "$IMMUTABLE_VAR_LIB/"
+}
+
+ROOTFS_POSTPROCESS_COMMAND:append = " copy_home_to_immutable_data"
+ROOTFS_POSTPROCESS_COMMAND:remove:separate-home-part = " copy_home_to_immutable_data"
+copy_home_to_immutable_data() {
+    IMMUTABLE_HOME_DIR="${ROOTFSDIR}${IMMUTABLE_DATA_DIR}/"
+    sudo mkdir -p "$IMMUTABLE_HOME_DIR"
+    sudo mv ${ROOTFSDIR}/home "$IMMUTABLE_HOME_DIR/"
+    # as the rootfs is read-only we need to create the link
+    # between /var/home and /home during creation.
+    sudo chroot ${IMAGE_ROOTFS} ln -s /var/home /home
 }
 
 RO_ROOTFS_EXCLUDE_DIRS ??= ""

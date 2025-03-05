@@ -70,7 +70,7 @@ SRC_URI += "file://encrypt_partition.env.tmpl \
             file://pwquality.conf"
 
 # CRYPT_PARTITIONS elements are <partition-label>:<mountpoint>:<reencrypt or format>[:expand]
-CRYPT_PARTITIONS ??= "home:/home:reencrypt var:/var:reencrypt"
+CRYPT_PARTITIONS ??= "var:/var:reencrypt"
 # CRYPT_CREATE_FILE_SYSTEM_CMD contains the shell command to create the filesystem
 # in a newly formatted LUKS Partition
 CRYPT_CREATE_FILE_SYSTEM_CMD ??= "/usr/sbin/mke2fs -t ext4"
