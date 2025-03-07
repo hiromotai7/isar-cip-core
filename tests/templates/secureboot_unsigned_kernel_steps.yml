@@ -1,0 +1,7 @@
+          - "apt-get update"
+          - "apt install --yes guestfish sbsigntool"
+          - "guestfish add cip-core-image-security-cip-core-#distribution#-#architecture#.wic : run : mount /dev/sda2 / : copy-out /linux.efi ."
+          - "sbverify --list linux.efi"
+          - "sbattach --remove linux.efi"
+          - "sbverify --list linux.efi"
+          - "guestfish add cip-core-image-security-cip-core-#distribution#-#architecture#.wic : run : mount /dev/sda2 / : copy-in linux.efi /"

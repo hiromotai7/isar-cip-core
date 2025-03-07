@@ -1,0 +1,81 @@
+device_type: qemu
+job_name: #architecture# secure boot testing
+timeouts:
+  job:
+    minutes: 50
+  action:
+   minutes: 40
+  actions:
+    power-off:
+      seconds: 60
+priority: medium
+tags:
+- swtpm-jobs
+visibility: public
+notify:
+  criteria:
+    status: finished
+  recipients:
+  - to:
+     method: email
+     email: cip-testing-results@lists.cip-project.org
+
+# ACTION BLOCK
+actions:
+- command:
+    name: start_tpm
+    timeout:
+          minutes: 20
+
+# DEPLOY BLOCK
+- deploy:
+    to: downloads
+    timeout:
+      minutes: 30
+    images:
+      system:
+        url: #project_url#/#branch#/#architecture#/cip-core-image-security-cip-core-#distribution#-#architecture#.wic.xz
+        compression: xz
+    postprocess:
+      docker:
+        image: debian:bookworm
+        steps:
+        #POSTPROCESS_STEPS#
+    timeout:
+      minutes: 30
+    to: downloads
+
+- deploy:
+    timeout:
+      minutes: 30
+    to: tmpfs
+    images:
+      system:
+        image_arg: '-drive file={system},discard=unmap,if=none,id=disk,format=raw -m 1G -serial mon:stdio -smp 4
+                    -nographic -netdev user,id=net,hostfwd=tcp:127.0.0.1:22222-:22 -chardev socket,id=chrtpm,path=/tmp/qemu-swtpm.sock
+                    -tpmdev emulator,id=tpm0,chardev=chrtpm #imageargs#'
+        url: downloads://cip-core-image-security-cip-core-#distribution#-#architecture#.wic
+
+      #Firmware#
+        #Firmware_args#
+        #Firmware_url#
+
+# BOOT BLOCK
+- boot:
+    timeout:
+      minutes: 25
+    method: qemu
+    media: tmpfs
+- test:
+    monitors:
+    - end: "#END_MONITOR#"
+      name: corrupted-#ARTIFACT#-image
+      pattern: _unused_
+      start: "#START_MONITOR#"
+    timeout:
+      minutes: 25
+
+context:
+  arch: #context-architecture#
+  guestfs_interface: virtio
+  lava_test_results_dir: '/home/lava-%s'

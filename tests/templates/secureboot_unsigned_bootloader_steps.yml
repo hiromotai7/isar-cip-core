@@ -1,0 +1,7 @@
+          - "apt-get update"
+          - "apt install --yes guestfish sbsigntool"
+          - "guestfish add cip-core-image-security-cip-core-#distribution#-#architecture#.wic : run : mount /dev/sda1 / : copy-out /EFI/BOOT/bootx64.efi ."
+          - "sbverify --list bootx64.efi"
+          - "sbattach --remove bootx64.efi"
+          - "sbverify --list bootx64.efi"
+          - "guestfish add cip-core-image-security-cip-core-#distribution#-#architecture#.wic : run : mount /dev/sda1 / : copy-in bootx64.efi /EFI/BOOT/"
