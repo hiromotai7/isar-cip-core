@@ -450,6 +450,150 @@ test:x86-uefi-IEC:
     target: x86-uefi
     test_function: IEC
 
+test:qemu-amd64-secure-boot-unsigned-kernel:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-amd64-base"]
+  variables:
+    target: qemu-amd64
+    test_function: secure-boot-unsigned-kernel
+
+test:qemu-arm64-secure-boot-unsigned-kernel:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-arm64-base"]
+  variables:
+    target: qemu-arm64
+    test_function: secure-boot-unsigned-kernel
+
+test:qemu-arm-secure-boot-unsigned-kernel:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-arm-base"]
+  variables:
+    target: qemu-arm
+    test_function: secure-boot-unsigned-kernel
+
+test:qemu-amd64-secure-boot-unsigned-bootloader:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-amd64-base"]
+  variables:
+    target: qemu-amd64
+    test_function: secure-boot-unsigned-bootloader
+
+test:qemu-arm64-secure-boot-unsigned-bootloader:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-arm64-base"]
+  variables:
+    target: qemu-arm64
+    test_function: secure-boot-unsigned-bootloader
+
+test:qemu-arm-secure-boot-unsigned-bootloader:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-arm-base"]
+  variables:
+    target: qemu-arm
+    test_function: secure-boot-unsigned-bootloader
+
+test:qemu-amd64-swupdate-corrupt-swu:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-amd64-base"]
+  variables:
+    target: qemu-amd64
+    test_function: swupdate-corrupt-swu
+
+test:qemu-arm64-swupdate-corrupt-swu:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-arm64-base"]
+  variables:
+    target: qemu-arm64
+    test_function: swupdate-corrupt-swu
+
+test:qemu-arm-swupdate-corrupt-swu:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-arm-base"]
+  variables:
+    target: qemu-arm
+    test_function: swupdate-corrupt-swu
+
+test:qemu-amd64-swupdate-corrupt-swu-artifact:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-amd64-base"]
+  variables:
+    target: qemu-amd64
+    test_function: swupdate-corrupt-swu-artifact
+
+test:qemu-arm64-swupdate-corrupt-swu-artifact:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-arm64-base"]
+  variables:
+    target: qemu-arm64
+    test_function: swupdate-corrupt-swu-artifact
+
+test:qemu-arm-swupdate-corrupt-swu-artifact:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-arm-base"]
+  variables:
+    target: qemu-arm
+    test_function: swupdate-corrupt-swu-artifact
+
+test:qemu-amd64-swupdate-reboot-without-confirm:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-amd64-base"]
+  variables:
+    target: qemu-amd64
+    test_function: swupdate-reboot-without-confirm
+
+test:qemu-arm64-swupdate-reboot-without-confirm:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-arm64-base"]
+  variables:
+    target: qemu-arm64
+    test_function: swupdate-reboot-without-confirm
+
+test:qemu-arm-swupdate-reboot-without-confirm:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-arm-base"]
+  variables:
+    target: qemu-arm
+    test_function: swupdate-reboot-without-confirm
+
+test:qemu-amd64-swupdate-apply-same-image-swu:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-amd64-base"]
+  variables:
+    target: qemu-amd64
+    test_function: swupdate-apply-same-image-swu
+
+test:qemu-arm64-swupdate-apply-same-image-swu:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-arm64-base"]
+  variables:
+    target: qemu-arm64
+    test_function: swupdate-apply-same-image-swu
+
+test:qemu-arm-swupdate-apply-same-image-swu:
+  extends:
+    - .test-cip-core
+  needs: ["build:qemu-arm-base"]
+  variables:
+    target: qemu-arm
+    test_function: swupdate-apply-same-image-swu
+
 cve-checks:
   stage: cve-check
   needs: []
