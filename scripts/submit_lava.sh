@@ -71,6 +71,70 @@ create_job_qemu () {
 			sed -i "s@kernel: C:BOOT1:linux.efi@Can't open verity rootfs - continuing will lead to a broken trust chain!@g" "${job_dir}"/*.yml
 			sed -i "s@echo software update is successful!!@dd if=/dev/urandom of=/dev/sda5 bs=512 count=1@g" "${job_dir}"/*.yml
 		fi
+	elif [ "$1" = "secure-boot-unsigned-kernel" ]; then
+		cp $LAVA_TEMPLATES/secureboot_negative_test.yml "${job_dir}/${1}_unsigned_kernel_${2}.yml"
+		cd $LAVA_TEMPLATES
+		sed -e '/#POSTPROCESS_STEPS#/ {' -e 'r secureboot_unsigned_kernel_steps.yml' -e 'd' -e '}' -i "${job_dir}/${1}_unsigned_kernel_${2}.yml"
+		cd -
+		if [ "$2" = "qemu-amd64" ]; then
+			sed -i "s@#END_MONITOR#@Access Denied@g" "${job_dir}/${1}_unsigned_kernel_${2}.yml"
+			sed -i "s@#START_MONITOR#@Cannot load specified kernel image@g" "${job_dir}/${1}_unsigned_kernel_${2}.yml"
+			sed -i "s@#ARTIFACT#@linux@g" "${job_dir}/${1}_unsigned_kernel_${2}.yml"
+		fi
+
+		if [ "$2" = "qemu-arm64" ] || [ "$2" = "qemu-arm" ]; then
+			sed -i "s@sda@vda@g" "${job_dir}/${1}_unsigned_kernel_${2}.yml"
+			sed -i "s@#END_MONITOR#@Application failed@g" "${job_dir}/${1}_unsigned_kernel_${2}.yml"
+			sed -i "s@#START_MONITOR#@Image not authenticated@g" "${job_dir}/${1}_unsigned_kernel_${2}.yml"
+			sed -i "s@#ARTIFACT#@linux@g" "${job_dir}/${1}_unsigned_kernel_${2}.yml"
+		fi
+	elif [ "$1" = "secure-boot-unsigned-bootloader" ]; then
+		cp $LAVA_TEMPLATES/secureboot_negative_test.yml "${job_dir}/${1}_unsigned_bootloader_${2}.yml"
+		cd $LAVA_TEMPLATES
+		sed -e '/#POSTPROCESS_STEPS#/ {' -e 'r secureboot_unsigned_bootloader_steps.yml' -e 'd' -e '}' -i "${job_dir}/${1}_unsigned_bootloader_${2}.yml"
+		cd -
+
+		if [ "$2" = "qemu-amd64" ]; then
+			sed -i "s@#END_MONITOR#@BdsDxe: failed to load Boot@g" "${job_dir}/${1}_unsigned_bootloader_${2}.yml"
+			sed -i "s@#START_MONITOR#@Access Denied@g" "${job_dir}/${1}_unsigned_bootloader_${2}.yml"
+			sed -i "s@#ARTIFACT#@bootloader@g" "${job_dir}/${1}_unsigned_bootloader_${2}.yml"
+		fi
+
+		if [ "$2" = "qemu-arm64" ] || [ "$2" = "qemu-arm" ]; then
+			sed -i "s@sda@vda@g" "${job_dir}/${1}_unsigned_bootloader_${2}.yml"
+
+			sed -i "s@#END_MONITOR#@EFI Boot failed!@g" "${job_dir}/${1}_unsigned_bootloader_${2}.yml"
+			sed -i "s@#START_MONITOR#@Image not authenticated@g" "${job_dir}/${1}_unsigned_bootloader_${2}.yml"
+			sed -i "s@#ARTIFACT#@bootloader@g" "${job_dir}/${1}_unsigned_bootloader_${2}.yml"
+		fi
+
+		if [ "$2" = "qemu-arm64" ]; then
+			sed -i "s@bootx64.efi@bootaa64.efi@g" "${job_dir}/${1}_unsigned_bootloader_${2}.yml"
+		fi
+		if [ "$2" = "qemu-arm" ]; then
+			sed -i "s@bootx64.efi@bootarm.efi@g" "${job_dir}/${1}_unsigned_bootloader_${2}.yml"
+		fi
+	elif [ "$1" = "swupdate-corrupt-swu" ]; then
+		cp $LAVA_TEMPLATES/swupdate_negative_test.yml "${job_dir}/${1}_corrupt_swu_${2}.yml"
+		cd $LAVA_TEMPLATES
+		sed -e '/#TEST_BLOCK_STEPS#/ {' -e 'r swupdate_corrupt_swu_steps.yml' -e 'd' -e '}' -i "${job_dir}/${1}_corrupt_swu_${2}.yml"
+		cd -
+	elif [ "$1" = "swupdate-corrupt-swu-artifact" ]; then
+		cp $LAVA_TEMPLATES/swupdate_negative_test.yml "${job_dir}/${1}_corrupt_swu_artifact_${2}.yml"
+		cd $LAVA_TEMPLATES
+		sed -e '/#TEST_BLOCK_STEPS#/ {' -e 'r swupdate_corrupt_swu_artifact_steps.yml' -e 'd' -e '}' -i "${job_dir}/${1}_corrupt_swu_artifact_${2}.yml"
+		cd -
+	elif [ "$1" = "swupdate-reboot-without-confirm" ]; then
+		cp $LAVA_TEMPLATES/swupdate_template.yml "${job_dir}/${1}_reboot_without_confirm_${2}.yml"
+		cd $LAVA_TEMPLATES
+		sed -e '/#REBOOT_WITHOUT_CONFIRM_STEPS#/ {' -e 'r swupdate_reboot_without_confirm.yml' -e 'd' -e '}' -i "${job_dir}/${1}_reboot_without_confirm_${2}.yml"
+		cd -
+		sed -i "s@bg_setenv -c@echo No update confirm@g" "${job_dir}/${1}_reboot_without_confirm_${2}.yml"
+	elif [ "$1" = "swupdate-apply-same-image-swu" ]; then
+		cp $LAVA_TEMPLATES/swupdate_negative_test.yml "${job_dir}/${1}_same_uuid_${2}.yml"
+		cd $LAVA_TEMPLATES
+		sed -e '/#TEST_BLOCK_STEPS#/ {' -e 'r swupdate_same_uuid_steps.yml' -e 'd' -e '}' -i "${job_dir}/${1}_same_uuid_${2}.yml"
+		cd -
 	else
 		cp $LAVA_TEMPLATES/secureboot_template.yml "${job_dir}/${1}_${2}.yml"
 	fi
