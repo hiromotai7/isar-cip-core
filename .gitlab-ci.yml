@@ -119,6 +119,7 @@ build:qemu-amd64-base:
   variables:
     target: qemu-amd64
     extension: security
+    security_test: enable
     use_rt: disable
     build_swu_v2: enable
 
@@ -138,6 +139,7 @@ build:qemu-arm64-base:
   variables:
     target: qemu-arm64
     extension: security
+    security_test: enable
     use_rt: disable
     build_swu_v2: enable
 
@@ -157,6 +159,7 @@ build:qemu-arm-base:
   variables:
     target: qemu-arm
     extension: security
+    security_test: enable
     use_rt: disable
     build_swu_v2: enable
 
