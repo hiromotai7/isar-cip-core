@@ -30,6 +30,14 @@ actions:
 # DEPLOY BLOCK
 - deploy:
     timeout:
+      minutes: 10
+    to: downloads
+    images:
+      image:
+        url: #project_url#/#branch#/#architecture#/cip-core-image-security-cip-core-#distribution#-#architecture#.swu
+
+- deploy:
+    timeout:
       minutes: 30
     to: tmpfs
     images:
@@ -57,70 +65,23 @@ actions:
       password_prompt: "Password:"
       password: "CIPsecurity@123"
 
-# TEST_BLOCK 1
-# Fail the job if software update application failed
+# TEST_BLOCK
+# Fail the job if software update application error is not as expected
 - test:
     timeout:
-      minutes: 15
+      minutes: 25
     definitions:
     - repository:
         metadata:
           format: Lava-Test Test Definition 1.0
           name: sample-test
-          description: "Test software update"
+          description: "Test software update by modifying the files"
         run:
           steps:
-            - if swupdate -d "-u #project_url#/#branch#/#architecture#/cip-core-image-security-cip-core-#distribution#-#architecture#.swu"; then echo software update is successful!!; else lava-test-raise "Fail job"; fi
+            #TEST_BLOCK_STEPS#
       from: inline
       name: sample-test-1
       path: inline/sample-test.yaml
-
-# qemu-swtpm.sock will be gone after soft reboot.
-# So the swtpm socket need to be started again for proper reboot
-# To start the swtpm daemon, first the existing one should be killed
-- command:
-    name: manual_kill
-    timeout:
-          minutes: 1
-# Start the swtpm daemon
-- command:
-    name: start_tpm
-    timeout:
-          minutes: 1
-
-- boot:
-    timeout:
-      minutes: 5
-    method: qemu
-    media: tmpfs
-    prompts: ["root@demo:~#"]
-    auto_login:
-      login_prompt: "demo login:"
-      username: "root"
-      password_prompt: "Password:"
-      password: "CIPsecurity@123"
-    parameters:
-       kernel-start-message: "kernel: C:BOOT1:linux.efi"
-
-# TEST BLOCK 2
-# Fail the job if ustate is not #updatestate# after reboot
-- test:
-    timeout:
-      minutes: 5
-    definitions:
-    - repository:
-        metadata:
-          format: Lava-Test Test Definition 1.0
-          name: sample-test
-          description: "check boot loader environment variables"
-        run:
-          steps:
-            - if [ $(bg_printenv | grep ustate | awk 'FNR == 2{print $2}') = 2 ]; then bg_setenv -c; else lava-test-raise "Fail job"; fi
-      from: inline
-      name: sample-test-2
-      path: inline/sample-test.yaml
-
-#REBOOT_WITHOUT_CONFIRM_STEPS#
 
 context:
   arch: #context-architecture#

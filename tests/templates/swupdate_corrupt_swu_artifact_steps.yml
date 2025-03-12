@@ -1,0 +1,9 @@
+            - curl -v --trace-time http://$LAVA_DISPATCHER_IP/tmp/$LAVA_JOB_ID/downloads/common/cip-core-image-security-cip-core-#distribution#-#architecture#.swu --output /root/cip-core-image-security-cip-core-#distribution#-#architecture#.swu
+            - mkdir -p swu
+            - cpio -ivd --directory=/root/swu < /root/cip-core-image-security-cip-core-#distribution#-#architecture#.swu
+            - dd if=/dev/zero of=/root/swu/cip-core-image-security-cip-core-#distribution#-#architecture#.delta_update bs=1 count=256
+            - cd /root/swu
+            - for file in sw-description sw-description.sig cip-core-image-security-cip-core-#distribution#-#architecture#.delta_update linux.efi; do echo "${file}"; done | cpio -ovL --reproducible -H crc > cip-core-image-security-cip-core-#distribution#-#architecture#.swu
+            - swupdate -l 5 -i cip-core-image-security-cip-core-#distribution#-#architecture#.swu > /root/swupdate.txt
+            - cat /root/swupdate.txt
+            - if grep -q "Image invalid or corrupted" /root/swupdate.txt; then echo "kernel file corrupt test verification successful!!"; else lava-test-raise "Fail job"; fi

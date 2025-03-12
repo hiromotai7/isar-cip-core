@@ -1,0 +1,9 @@
+            - curl -v --trace-time http://$LAVA_DISPATCHER_IP/tmp/$LAVA_JOB_ID/downloads/common/cip-core-image-security-cip-core-#distribution#-#architecture#.swu --output /root/cip-core-image-security-cip-core-#distribution#-#architecture#.swu
+            - mkdir -p swu
+            - cpio -ivd --directory=/root/swu < /root/cip-core-image-security-cip-core-#distribution#-#architecture#.swu
+            - current_uuid=$( cat /etc/os-release | grep IMAGE_UUID= | cut -d'"' -f 2)
+            - swu_uuid=$(cat /root/swu/sw-description | grep IMAGE_UUID | cut -d'=' -f3 | cut -c 1-36)
+            - sed -i s/$current_uuid/$swu_uuid/g /etc/os-release
+            - swupdate -l 5 -i /root/cip-core-image-security-cip-core-#distribution#-#architecture#.swu > /root/swupdate.txt
+            - cat /root/swupdate.txt
+            - if grep -q "'configfilecheck()' failed" /root/swupdate.txt; then echo "test verification successful!!!"; else lava-test-raise "Fail job"; fi

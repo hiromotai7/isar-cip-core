@@ -1,0 +1,6 @@
+            - curl -v --trace-time http://$LAVA_DISPATCHER_IP/tmp/$LAVA_JOB_ID/downloads/common/cip-core-image-security-cip-core-#distribution#-#architecture#.swu --output /root/cip-core-image-security-cip-core-#distribution#-#architecture#.swu
+            - mkdir -p swu
+            - dd if=/dev/zero of=/root/cip-core-image-security-cip-core-#distribution#-#architecture#.swu bs=1M count=5
+            - swupdate -l 5 -i /root/cip-core-image-security-cip-core-#distribution#-#architecture#.swu > /root/swupdate.txt
+            - cat /root/swupdate.txt
+            - if grep -q "CPIO Header corrupted, cannot be parsed" /root/swupdate.txt; then echo ".swu file corrupt test verification successful!!!"; else lava-test-raise "Fail job"; fi
