@@ -162,9 +162,9 @@ create_job_qemu () {
 create_job_mcom () {
 	cp $LAVA_TEMPLATES/M-COM-x86.yml "${job_dir}/${1}_${2}.yml"
 	if [ "$1" = "IEC" ]; then
-		grep -A 9 "# TEST_BLOCK" $LAVA_TEMPLATES/$1_template.yml >> "${job_dir}/${1}_${2}.yml"
+		grep -A 9 "# TEST_BLOCK" "$LAVA_TEMPLATES/$1_template.yml" >> "${job_dir}/${1}_${2}.yml"
 	elif [ "$1" = "secure-boot" ]; then
-		grep -A 1 "parameters" $LAVA_TEMPLATES/secureboot_template.yml >> "${job_dir}/${1}_${2}.yml"
+		grep -A 1 "parameters" "$LAVA_TEMPLATES/secureboot_template.yml" >> "${job_dir}/${1}_${2}.yml"
 	else
 		# swupdate -d option does not work on M-COM, so .swu file is deployed to downloads
 		grep -A 7 "deploy:" "${job_dir}/${1}_${2}.yml" > "${job_dir}/swupdate_deploy_download.yml"
@@ -176,8 +176,8 @@ create_job_mcom () {
 
 		# swupdate test action on M-COM is different from the test block used in QEMU
 		cat $LAVA_TEMPLATES/swupdate-test-action-M-COM.yml | tee -a "${job_dir}/${1}_${2}.yml" > /dev/null
-		grep -A 12 "# BOOT BLOCK" $LAVA_TEMPLATES/M-COM-x86.yml >> "${job_dir}/${1}_${2}.yml"
-		grep -A 16 "# TEST BLOCK 2" $LAVA_TEMPLATES/$1_template.yml >> "${job_dir}/${1}_${2}.yml"
+		grep -A 12 "# BOOT BLOCK" "$LAVA_TEMPLATES/M-COM-x86.yml" >> "${job_dir}/${1}_${2}.yml"
+		grep -A 16 "# TEST BLOCK 2" "$LAVA_TEMPLATES/$1_template.yml" >> "${job_dir}/${1}_${2}.yml"
 		sed -i -e "s@#updatestate#@2@g" -e "s@overlay-1.1.1.4@overlay-2.1.1.4@g" "${job_dir}/${1}_${2}.yml"
 	fi
 	sed -i -e "s@#test_function#@${1}@g" -e "s@#branch#@${COMMIT_BRANCH}@g" "${job_dir}/${1}_${2}.yml"
@@ -257,7 +257,9 @@ submit_job() {
 
 			submit_squad_watch_job "${ret}"
 
+			# shellcheck disable=2086
 			lavacli $LAVACLI_ARGS jobs logs "${ret}"
+			# shellcheck disable=2086
 			lavacli $LAVACLI_ARGS results "${ret}"
 
 			get_junit_test_results "$ret"
@@ -288,8 +290,9 @@ is_device_online () {
 
 # This method checks if the job is valid before submitting it later on.
 validate_job () {
+	local job
+	job=$(find "${job_dir}"/*.yml)
 	# shellcheck disable=2086
-	local job=$(find "${job_dir}"/*.yml)
 	if lavacli $LAVACLI_ARGS jobs validate "${job}"; then
 		echo "$job is a valid definition"
 		if ! submit_job $job; then
