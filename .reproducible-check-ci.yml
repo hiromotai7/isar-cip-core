@@ -96,6 +96,12 @@ build:bbb-repro-build:
     target: bbb
     extension: "none"
 
+build:x86-uefi-repro-build:
+  extends:
+    - .repro-build
+  variables:
+    target: x86-uefi
+
 # repro build test
 test:qemu-amd64-repro-test:
   extends:
@@ -129,3 +135,11 @@ test:bbb-repro-test:
     extension: "none"
   dependencies:
     - build:bbb-repro-build
+
+test:x86-uefi-repro-test:
+  extends:
+    - .repro-test
+  variables:
+    target: x86-uefi
+  dependencies:
+    - build:x86-uefi-repro-build
