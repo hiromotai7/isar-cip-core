@@ -64,7 +64,7 @@ actions:
      definitions:
      - repository: https://gitlab.com/cip-project/cip-testing/cip-security-tests.git
        from: git
-       revision: 064a92b98127b0001ca527a83b175521bea4b626
+       revision: 5dbc47f55d4a43449dcbde4363e5d23d6e96344f
        path: iec-security-tests/Singlenode-TestDefinition.yaml
        name: Security-Testcases
 
