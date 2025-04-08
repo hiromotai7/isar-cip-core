@@ -251,7 +251,7 @@ IMAGE_CMD:swu() {
             # check if swu_files are less than 4GBytes.
             # This avoids the limit of cpio
             for swu_file in $swu_files; do
-                file_size =$(stat -c %s "$swu_file")
+                file_size=$(stat -c %s "$swu_file")
                 if [ "$file_size" -ge 4294967295 ] ; then
                     echo "The size of '$swu_file': '$file_size' is greater" \
                           "than the limit of the swu format of 4294967295" \
