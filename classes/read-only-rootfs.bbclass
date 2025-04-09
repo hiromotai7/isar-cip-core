@@ -45,12 +45,13 @@ copy_dpkg_state() {
 ROOTFS_POSTPROCESS_COMMAND:append = " copy_home_to_immutable_data"
 ROOTFS_POSTPROCESS_COMMAND:remove:separate-home-part = " copy_home_to_immutable_data"
 copy_home_to_immutable_data() {
-    IMMUTABLE_HOME_DIR="${ROOTFSDIR}${IMMUTABLE_DATA_DIR}/"
+    IMMUTABLE_HOME_DIR="${ROOTFSDIR}${IMMUTABLE_DATA_DIR}"
     sudo mkdir -p "$IMMUTABLE_HOME_DIR"
     sudo mv ${ROOTFSDIR}/home "$IMMUTABLE_HOME_DIR/"
     # as the rootfs is read-only we need to create the link
     # between /var/home and /home during creation.
-    sudo chroot ${IMAGE_ROOTFS} ln -s /var/home /home
+    sudo ln -s var/home ${IMAGE_ROOTFS}/home
+    sudo mkdir -p ${IMAGE_ROOTFS}/var/home
 }
 
 RO_ROOTFS_EXCLUDE_DIRS ??= ""
