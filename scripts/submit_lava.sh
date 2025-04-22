@@ -24,6 +24,10 @@ TARGET=$2
 COMMIT_REF=$3
 RELEASE=$4
 COMMIT_BRANCH=$5
+IEC_TEST_TIMEOUT_MINUTES=$6
+
+# Export to replace the timeout variable declared in IEC template
+export IEC_TEST_TIMEOUT_MINUTES
 
 if [ -z "$SUBMIT_ONLY" ]; then SUBMIT_ONLY=false; fi
 
@@ -333,6 +337,9 @@ else
 	echo "Invalid target"
 	exit 1
 fi
+
+# Only replace the IEC_TEST_TIMEOUT_MINUTES variable in template files
+envsubst '$IEC_TEST_TIMEOUT_MINUTES' < ${job_dir}/*.yml > template.tmp && mv template.tmp ${job_dir}/*.yml
 
 if ! validate_job; then
 	clean_up
