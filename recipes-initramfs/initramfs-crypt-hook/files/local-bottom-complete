@@ -11,7 +11,7 @@
 
 prereqs()
 {
-	# Make sure that this script is run last in local-top
+	# Make sure that this script is run last in local-bottom
 	# but before overlay
 	# This script mounts all encrypted partition, which are
 	# not mounted previously
