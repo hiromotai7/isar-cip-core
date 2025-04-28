@@ -178,7 +178,7 @@ class EfibootguardBootPlugin(SourcePlugin):
             .format(rootfs_path=rootfs_path,
                     libpath=libarch,
                     efiarch=efiarch)
-        uefi_kernel_name = "linux.efi"
+        uefi_kernel_name = get_bitbake_var('UKI_FILENAME') or 'linux.efi'
         uefi_kernel_file = "{deploy_dir}/{uefi_kernel_name}"\
             .format(deploy_dir=deploy_dir, uefi_kernel_name=uefi_kernel_name)
         kernel = "{deploy_dir}/{kernel_image}"\
