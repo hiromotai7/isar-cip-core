@@ -23,6 +23,5 @@ local_conf_header:
     USER_root[flags] = "clear-text-password"
   adjust-swupdate: |
     ABROOTFS_IMAGE_RECIPE = "cip-core-image-security"
-    VERITY_IMAGE_RECIPE = "cip-core-image-security"
   security-override: |
     OVERRIDES .= ":security"

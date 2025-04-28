@@ -32,7 +32,44 @@ esac
 
 . /scripts/functions
 . /lib/cryptsetup/functions
-. /usr/share/verity-env/verity.env
+
+load_verity_env_from_cmdline()
+{
+    local verity_opts
+    local key
+    local val
+    local opt
+    verity_opts=$(cat /proc/cmdline | sed -n 's/.*cip.verity_root_options=\([^ ]*\).*/\1/p' | sed 's/,/ /g')
+    for opt in $verity_opts; do
+        key=$(echo $opt | sed 's/=.*//')
+        val=$(echo $opt | sed 's/^[^=]*=//')
+        case "$key" in
+            uuid)
+                UUID="$val"
+                ;;
+            salt)
+                SALT="$val"
+                ;;
+            data-blocks)
+                DATA_BLOCKS="$val"
+                ;;
+            data-block-size)
+                DATA_BLOCK_SIZE="$val"
+                ;;
+            hash-block-size)
+                HASH_BLOCK_SIZE="$val"
+                ;;
+            hash-offset)
+                HASH_OFFSET="$val"
+                ;;
+            hash)
+                ROOT_HASH="$val"
+                ;;
+            *)
+                ;;
+        esac
+    done
+}
 
 find_root_via_image_uuid()
 {
@@ -62,6 +99,8 @@ find_root_via_image_uuid()
 # broken trust chain.
 echo "ROOT=/dev/null" >/conf/param.conf
 wait_for_udev 10
+
+load_verity_env_from_cmdline
 
 case "$ROOT" in
     PART*)
