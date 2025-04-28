@@ -87,6 +87,10 @@ class EfibootguardBootPlugin(SourcePlugin):
         boot_files = source_params.get("files", "").split(' ')
         unified_kernel = source_params.get("unified-kernel") or 'y'
         cmdline = bootloader.append or ''
+        # the verity cmdline format is identical to systemd.verity_root_options
+        if source_params.get("verity_root") == 'y':
+            cmdline += " cip.verity_root_options=panic-on-corruption,%s" \
+                % cls._get_verity_opts()
         if unified_kernel == 'y':
             boot_image = cls._create_unified_kernel_image(rootfs_dir,
                                                           cr_workdir,
@@ -142,6 +146,32 @@ class EfibootguardBootPlugin(SourcePlugin):
                 exit(1)
         cls._create_img(part_rootfs_dir, part, cr_workdir,
                         native_sysroot, oe_builddir)
+
+    @classmethod
+    def _get_verity_opts(cls):
+        verity_sd_keys = ["data-block-size", "hash-block-size", "data-blocks",
+                          "hash-offset", "salt", "uuid", "hash"]
+        opts = {}
+        image_basename = get_bitbake_var("IMAGE_BASENAME")
+        deploy_dir = get_bitbake_var("DEPLOY_DIR_IMAGE")
+        verityenv = None
+        for file in os.listdir(deploy_dir):
+            if fnmatch.fnmatch(file, f'{image_basename}*.verity.env'):
+                verityenv = os.path.join(deploy_dir, file)
+                break
+        if not verityenv:
+            msger.error("No verity env file found in directory %s", deploy_dir)
+            exit(1)
+        with open(verityenv, "r") as venv:
+            for line in venv:
+                k, v = line.strip().split("=")
+                if k == "ROOT_HASH":
+                    sd_key = "hash"
+                else:
+                    sd_key = k.replace("_", "-").lower()
+                opts[sd_key] = v
+        sd_opts = {k: v for k, v in opts.items() if k in verity_sd_keys}
+        return ",".join(["%s=%s" % (k, v) for k, v in sd_opts.items()])
 
     @classmethod
     def _create_img(cls, part_rootfs_dir, part, cr_workdir,
