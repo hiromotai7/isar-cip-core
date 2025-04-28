@@ -21,7 +21,5 @@ local_conf_header:
     USERS += "root"
     USER_root[password] = "CIPsecurity@123"
     USER_root[flags] = "clear-text-password"
-  adjust-swupdate: |
-    ABROOTFS_IMAGE_RECIPE = "cip-core-image-security"
   security-override: |
     OVERRIDES .= ":security"

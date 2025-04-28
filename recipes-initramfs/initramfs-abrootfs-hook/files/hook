@@ -1,5 +1,0 @@
-# Copyright (C) Siemens AG, 2020-2022
-#
-# SPDX-License-Identifier: MIT
-
-copy_file library /usr/share/abrootfs/image-uuid.env /usr/share/abrootfs/image-uuid.env

@@ -30,7 +30,23 @@ prereqs)
 esac
 
 . /scripts/functions
-. /usr/share/abrootfs/image-uuid.env
+
+load_abrootfs_env_from_cmdline()
+{
+    abrootfs_opts=$(cat /proc/cmdline | sed -n 's/.*cip.abrootfs_root_options=\([^ ]*\).*/\1/p' | sed 's/,/ /g')
+    for opt in $abrootfs_opts; do
+        key=$(echo $opt | sed 's/=.*//')
+        val=$(echo $opt | sed 's/^[^=]*=//')
+        case "$key" in
+            target-image-uuid)
+                TARGET_IMAGE_UUID="$val"
+                ;;
+            *)
+                ;;
+        esac
+    done
+}
+
 
 find_root_via_image_uuid()
 {
@@ -56,6 +72,8 @@ find_root_via_image_uuid()
 # broken boot.
 echo "ROOT=/dev/null" >/conf/param.conf
 wait_for_udev 10
+
+load_abrootfs_env_from_cmdline
 
 case "$ROOT" in
     PART*)
