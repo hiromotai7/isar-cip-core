@@ -91,6 +91,9 @@ class EfibootguardBootPlugin(SourcePlugin):
         if source_params.get("verity_root") == 'y':
             cmdline += " cip.verity_root_options=panic-on-corruption,%s" \
                 % cls._get_verity_opts()
+        if source_params.get("abrootfs_root") == 'y':
+            cmdline += " cip.abrootfs_root_options=%s" \
+                % cls._get_abrootfs_opts()
         if unified_kernel == 'y':
             boot_image = cls._create_unified_kernel_image(rootfs_dir,
                                                           cr_workdir,
@@ -148,30 +151,48 @@ class EfibootguardBootPlugin(SourcePlugin):
                         native_sysroot, oe_builddir)
 
     @classmethod
-    def _get_verity_opts(cls):
-        verity_sd_keys = ["data-block-size", "hash-block-size", "data-blocks",
-                          "hash-offset", "salt", "uuid", "hash"]
+    def _generate_kernel_opts_from_file(cls, filename, keys):
+        env_file = None
         opts = {}
-        image_basename = get_bitbake_var("IMAGE_BASENAME")
         deploy_dir = get_bitbake_var("DEPLOY_DIR_IMAGE")
-        verityenv = None
         for file in os.listdir(deploy_dir):
-            if fnmatch.fnmatch(file, f'{image_basename}*.verity.env'):
-                verityenv = os.path.join(deploy_dir, file)
+            if fnmatch.fnmatch(file, filename):
+                env_file = os.path.join(deploy_dir, file)
                 break
-        if not verityenv:
-            msger.error("No verity env file found in directory %s", deploy_dir)
+        if not env_file:
+            msger.error("File '%s' not found in directory %s", filename, deploy_dir)
             exit(1)
-        with open(verityenv, "r") as venv:
+        with open(env_file, "r") as venv:
             for line in venv:
                 k, v = line.strip().split("=")
-                if k == "ROOT_HASH":
-                    sd_key = "hash"
-                else:
-                    sd_key = k.replace("_", "-").lower()
+                sd_key = k.replace("_", "-").lower()
                 opts[sd_key] = v
-        sd_opts = {k: v for k, v in opts.items() if k in verity_sd_keys}
-        return ",".join(["%s=%s" % (k, v) for k, v in sd_opts.items()])
+        return {k: v for k, v in opts.items() if k in keys}
+
+    @classmethod
+    def _get_verity_opts(cls):
+        verity_sd_keys = ["data-block-size", "hash-block-size", "data-blocks",
+                          "hash-offset", "salt", "uuid", "root-hash"]
+        image_basename = get_bitbake_var("IMAGE_BASENAME")
+        opts = cls._generate_kernel_opts_from_file(f'{image_basename}*.verity.env',
+                                               verity_sd_keys)
+        cmdline=[]
+        # fixup for root-hash to avoid an error in the initramfs search for the
+        # root option in the kernel cmdline
+        for k,v in opts.items():
+            if k == 'root-hash':
+                cmdline.append(f'hash={v}')
+            else:
+                cmdline.append(f'{k}={v}')
+        return ",".join(cmdline)
+
+    @classmethod
+    def _get_abrootfs_opts(cls):
+        abrootfs_sd_keys = ["target-image-uuid"]
+        image_basename = get_bitbake_var("IMAGE_BASENAME")
+        opts = cls._generate_kernel_opts_from_file(f'{image_basename}*.uuid.env',
+                                                   abrootfs_sd_keys)
+        return ",".join(["%s=%s" % (k, v) for k, v in opts.items()])
 
     @classmethod
     def _create_img(cls, part_rootfs_dir, part, cr_workdir,
