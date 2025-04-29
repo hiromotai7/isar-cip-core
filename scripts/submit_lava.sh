@@ -118,6 +118,15 @@ create_job_qemu () {
 		if [ "$2" = "qemu-arm" ]; then
 			sed -i "s@bootx64.efi@bootarm.efi@g" "${job_dir}/${1}_unsigned_bootloader_${2}.yml"
 		fi
+	elif [ "$1" = "secure-boot-mismatch-keys" ]; then
+		if [ "$2" = "qemu-amd64" ]; then
+			cp $LAVA_TEMPLATES/secureboot_negative_test.yml "${job_dir}/${1}_mismatch_keys_${2}.yml"
+
+			sed -i "s@#END_MONITOR#@BdsDxe: failed to load Boot@g" "${job_dir}/${1}_mismatch_keys_${2}.yml"
+			sed -i "s@#START_MONITOR#@Access Denied@g" "${job_dir}/${1}_mismatch_keys_${2}.yml"
+			sed -i "s@#ARTIFACT#@keys@g" "${job_dir}/${1}_mismatch_keys_${2}.yml"
+			sed -i "s@#POSTPROCESS_STEPS#@- echo 'no postprocess steps'@g" "${job_dir}/${1}_mismatch_keys_${2}.yml"
+		fi
 	elif [ "$1" = "swupdate-corrupt-swu" ]; then
 		cp $LAVA_TEMPLATES/swupdate_negative_test.yml "${job_dir}/${1}_corrupt_swu_${2}.yml"
 		cd $LAVA_TEMPLATES
@@ -153,6 +162,11 @@ create_job_qemu () {
 
 	sed -i -e "s@#distribution#@${RELEASE}@g" -e "s@#project_url#@${PROJECT_URL}@g" "${job_dir}"/*.yml
 	sed -i -e "s@#architecture#@${2}@g" -e "s@#imageargs#@${image_args[$2]}@g" "${job_dir}"/*.yml
+
+	if [ "$1" = "secure-boot-mismatch-keys" ]; then
+		sed -i "s@/usr/share/OVMF/OVMF_CODE_4M.secboot.fd@/root/keys/trixie-ovmf/OVMF_CODE_4M.snakeoil.fd@g" "${job_dir}/${1}_mismatch_keys_${2}.yml"
+		sed -i "s@/usr/share/OVMF/OVMF_VARS_4M.snakeoil.fd@/root/keys/trixie-ovmf/OVMF_VARS_4M.snakeoil.fd@g" "${job_dir}/${1}_mismatch_keys_${2}.yml"
+	fi
 
 	# Target is recieved from gitlab job in form of qemu-"architecture"
 	# In the template context field needs only architecture excepting the device type
