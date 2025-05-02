@@ -13,6 +13,7 @@ inherit initramfs
 
 INITRAMFS_INSTALL += " \
     initramfs-factory-reset-hook \
+    initramfs-data-reset-hook \
     initramfs-overlay-hook \
     "
 

@@ -7,19 +7,8 @@
 # Authors:
 #  Quirin Gylstorff <quirin.gylstorff@siemens.com>
 #
-prereqs()
-{
-	# Make sure that this script is run last in local-bottom
-	# but before crypt and/or overlay
-	local req
-	for req in "${0%/*}"/*; do
-		script="${req##*/}"
-		if [ "$script" != "${0##*/}" ] &&
-			[ "$script" != "crypt" ] &&
-			[ "$script" != "overlay" ] ; then
-			printf '%s\n' "$script"
-		fi
-	done
+prereqs() {
+	echo ""
 }
 case $1 in
 prereqs)
