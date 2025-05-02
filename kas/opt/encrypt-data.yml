@@ -15,3 +15,6 @@ header:
 local_conf_header:
   initramfs-option-encrypt-partitions: |
     OVERRIDES .= ":encrypt-partitions"
+  initramfs-factory-reset: |
+    INITRAMFS_FACTORY_RESET_MARKER_STORAGE_DEVICE = "/dev/disk/by-partlabel/BOOT0"
+
