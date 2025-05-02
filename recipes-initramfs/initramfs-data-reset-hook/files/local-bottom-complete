@@ -1,0 +1,63 @@
+#!/bin/sh
+#
+# CIP Core, generic profile
+#
+# Copyright (c) Siemens AG, 2025
+#
+# Authors:
+#  Quirin Gylstorff <quirin.gylstorff@siemens.com>
+#
+prereqs()
+{
+	# Make sure that this script is run last in local-bottom
+	# but before crypt and/or overlay
+	local req
+	for req in "${0%/*}"/*; do
+		script="${req##*/}"
+		if [ "$script" != "${0##*/}" ] &&
+			[ "$script" != "crypt" ] &&
+			[ "$script" != "overlay" ] ; then
+			printf '%s\n' "$script"
+		fi
+	done
+}
+case $1 in
+prereqs)
+	prereqs
+	exit 0
+	;;
+esac
+
+. /scripts/functions
+. /usr/share/data-reset/reset-env
+. /usr/share/data-reset/data_reset_marker
+
+target_devices="${INITRAMFS_DATA_RESET_DEVICES}"
+
+if [ "$(check_for_reset_trigger)" = "true" ]; then
+	log_begin_msg "data Reset"
+	for target in ${target_devices}; do
+		log_begin_msg "Reset device: $target"
+		tmp_mount=$(mktemp -d)
+		target_mnt="$(findmnt findmnt  --first-only --output TARGET --noheadings "${target}")"
+		if [ -z "$target_mnt" ]; then
+			if ! mount -t "$(get_fstype "${target}")" \
+				"${target}" \
+				"${tmp_mount}"; then
+				panic "Can't mount '${target}'!"
+			fi
+			target_mnt="$tmp_mount"
+		fi
+
+		# delete all files in the target mount point
+		find "${target_mnt}" ! -wholename "${target_mnt}" \
+			! -name "lost+found" -exec rm -rf --one-file-system {} +
+
+		if mountpoint -q "$tmp_mount"; then
+			umount "$tmp_mount"
+		fi
+		rmdir "$tmp_mount"
+		log_end_msg "Reset device: $target"
+	done
+	log_end_msg "Data Reset"
+fi
