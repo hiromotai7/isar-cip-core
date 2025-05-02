@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# CIP Core, generic profile
+#
+# Copyright (c) Siemens AG, 2025
+#
+# Authors:
+#  Quirin Gylstorff <quirin.gylstorff@siemens.com>
+#
+# SPDX-License-Identifier: MIT
+
+
+marker_file="/sys/firmware/efi/efivars/${FACTORY_RESET_MARKER}-${FACTORY_RESET_EFIVARS_GUID}"
+if ! mountpoint -q /sys/firmware/efi/efivars; then
+	if ! mount -t efivarfs none /sys/firmware/efi/efivars; then
+		echo "Could not mount efivarfs"
+		exit 1
+	fi
+fi
+
+if [ ! -e "$marker_file" ]; then
+	tmpfile=$(mktemp)
+	echo "FactoryReset" > $tmpfile
+	efivar -w -n ${FACTORY_RESET_EFIVARS_GUID}-${FACTORY_RESET_MARKER} -t 7 -f "$tmpfile"
+fi
