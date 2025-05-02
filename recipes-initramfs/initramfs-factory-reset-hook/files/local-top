@@ -1,0 +1,53 @@
+#!/bin/sh
+#
+# CIP Core, generic profile
+#
+# Copyright (c) Siemens AG, 2025
+#
+# Authors:
+#  Quirin Gylstorff <quirin.gylstorff@siemens.com>
+#
+. /usr/share/factory-reset/reset-env
+. /usr/share/factory-reset/factory_reset_marker
+
+target_devices="${INITRAMFS_FACTORY_RESET_DEVICES}"
+
+if [ "$(check_for_factory_reset)" = "true" ]; then
+	log_begin_msg "Factory Reset"
+	for target in ${target_devices}; do
+		log_begin_msg "Reset device: $target"
+		fs_type=$(get_fstype ${target})
+		case "$target" in
+			*by-partlabel*)
+				label="$(basename "${target}" )"
+			;;
+			*)
+				label=$(blkid --match-tag LABEL "$target" | awk -F= '{gsub(/"/,"");print $2}' )
+				if [ -z "${label}" ]; then
+					log_warning_msg "Could not find any label  for target '$target'"
+				fi
+			;;
+		esac
+		if [ "$fs_type" = "luks" ]; then
+			# after this the data on the encrypted partition
+			# is inaccessible
+			tpm2_clear
+			# with encryption the original fs_type is hidden
+			# use a variable from the reset-env to set it
+			fs_type="$INITRAMFS_FACTORY_RESET_LUKS_FORMAT_TYPE"
+		fi
+		case ${fs_type} in
+		ext*)
+			/sbin/mke2fs -L "${label}" -F -t ext4 "${target}"
+			;;
+		btrfs)
+			/sbin/mkfs.btrfs -L "${label}" --force "${target}"
+			;;
+		*)
+			log_warning_msg "Unrecognized filesystem type ${fs_type} - could not format"
+			;;
+		esac
+		log_end_msg "Reset device: $target"
+	done
+	log_end_msg "Factory Reset"
+fi

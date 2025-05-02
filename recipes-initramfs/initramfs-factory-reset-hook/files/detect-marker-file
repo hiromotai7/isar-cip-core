@@ -1,0 +1,14 @@
+#!/bin/sh
+# Copyright (C) Siemens AG, 2025
+#
+# SPDX-License-Identifier: MIT
+#
+# This implementation check for the a existing file to trigger a
+# factory reset. Prints 'true' in case the marker was found
+
+check_for_factory_reset() {
+	if /usr/sbin/get-factory-reset.sh | grep -q "factory-reset"; then
+		echo "true"
+	fi
+}
+
