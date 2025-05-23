@@ -16,12 +16,12 @@ for MAJOR_VERSION in 4.4 4.19 5.10 6.1 6.12; do
 	RECIPE_FILE=linux-cip_${VERSION}.bb
 	if [ ! -f ${RECIPE_FILE} ]; then
 		echo "Updating recipe to ${VERSION}"
-		git mv linux-cip_${MAJOR_VERSION}*.bb ${RECIPE_FILE}
+		git mv linux-cip_${MAJOR_VERSION}.*.bb ${RECIPE_FILE}
 		SHASUM=${LAST_ENTRY/ */}
 		sed -i 's/\(SRC_URI\[sha256sum\] = "\).*/\1'${SHASUM}'"'/ ${RECIPE_FILE}
 		git add ${RECIPE_FILE}
 		if [ "${MAJOR_VERSION}" == "6.12" ]; then
-			git rm linux-cip-rt_${MAJOR_VERSION}*.bb
+			git rm linux-cip-rt_${MAJOR_VERSION}.*.bb
 			ln -s ${RECIPE_FILE} linux-cip-rt_${VERSION}.bb
 			git add linux-cip-rt_${VERSION}.bb
 		fi
@@ -34,7 +34,7 @@ for MAJOR_VERSION in 4.4 4.19 5.10 6.1 6.12; do
 		RECIPE_FILE=linux-cip-rt_${VERSION}.bb
 		if [ ! -f "${RECIPE_FILE}" ]; then
 			echo "Updating recipe to ${VERSION}"
-			git mv linux-cip-rt_${MAJOR_VERSION}*.bb ${RECIPE_FILE}
+			git mv linux-cip-rt_${MAJOR_VERSION}.*.bb ${RECIPE_FILE}
 			SHASUM=${LAST_ENTRY/ */}
 			sed -i 's/\(SRC_URI\[sha256sum\] = "\).*/\1'${SHASUM}'"'/ ${RECIPE_FILE}
 			git add ${RECIPE_FILE}
