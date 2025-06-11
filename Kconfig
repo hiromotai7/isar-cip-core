@@ -31,6 +31,9 @@ config ARCH_ARM
 config ARCH_RISCV64
 	bool
 
+config HAS_SWUPDATE
+	bool
+
 choice
 	prompt "Target board"
 	default TARGET_QEMU_AMD64
@@ -38,26 +41,32 @@ choice
 config TARGET_QEMU_AMD64
 	bool "QEMU AMD64 (x86-64)"
 	select ARCH_AMD64
+	select HAS_SWUPDATE
 
 config TARGET_X86_UEFI
 	bool "Generic x86 machine booting via UEFI"
 	select ARCH_AMD64
+	select HAS_SWUPDATE
 
 config TARGET_QEMU_ARM64
 	bool "QEMU ARM64 (aarch64)"
 	select ARCH_ARM64
+	select HAS_SWUPDATE
 
 config TARGET_HIHOPE_RZG2M
 	bool "HopeRun HiHope-RZ/G2M"
 	select ARCH_ARM64
+	select HAS_SWUPDATE
 
 config TARGET_QEMU_ARM
 	bool "QEMU ARM (armhf)"
 	select ARCH_ARM
+	select HAS_SWUPDATE
 
 config TARGET_BBB
 	bool "BeagleBone Black"
 	select ARCH_ARM
+	select HAS_SWUPDATE
 
 config TARGET_IWG20D
 	bool "iWave Systems RainboW-G20D-Qseven"
@@ -66,6 +75,7 @@ config TARGET_IWG20D
 config TARGET_QEMU_RISCV64
 	bool "QEMU RISC-V 64-bit (riscv64)"
 	select ARCH_RISCV64
+	select HAS_SWUPDATE if KERNEL_6_1 || KERNEL_6_12
 
 endchoice
 
@@ -197,7 +207,7 @@ config KAS_INCLUDE_SECURITY
 
 config IMAGE_SWUPDATE
 	bool "SWUpdate support for root partition"
-	depends on TARGET_QEMU_AMD64 || TARGET_X86_UEFI || TARGET_QEMU_ARM64 || TARGET_QEMU_ARM || TARGET_BBB || ( TARGET_QEMU_RISCV64 && KERNEL_6_1 ) || TARGET_HIHOPE_RZG2M
+	depends on HAS_SWUPDATE
 
 if IMAGE_SWUPDATE
 
