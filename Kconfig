@@ -58,6 +58,10 @@ config TARGET_HIHOPE_RZG2M
 	select ARCH_ARM64
 	select HAS_SWUPDATE
 
+config TARGET_ZYNQMP_ZCU102
+	bool "Zynq UltraScale+ MPSoC ZCU102"
+	select ARCH_ARM64
+
 config TARGET_QEMU_ARM
 	bool "QEMU ARM (armhf)"
 	select ARCH_ARM
@@ -85,6 +89,7 @@ config KAS_INCLUDE_BOARD
 	default "kas/board/x86-uefi.yml" if TARGET_X86_UEFI
 	default "kas/board/qemu-arm64.yml" if TARGET_QEMU_ARM64
 	default "kas/board/hihope-rzg2m.yml" if TARGET_HIHOPE_RZG2M
+	default "kas/board/zynqmp-zcu102.yml" if TARGET_ZYNQMP_ZCU102
 	default "kas/board/qemu-arm.yml" if TARGET_QEMU_ARM
 	default "kas/board/bbb.yml" if TARGET_BBB
 	default "kas/board/iwg20m.yml" if TARGET_IWG20D
