@@ -293,6 +293,11 @@ for partition_set in $partition_sets; do
 	finalize_tpm2_encryption "$part_device"
 done
 
+if [ -x /usr/bin/tpm2_shutdown ]; then
+	# shutdown the TPM to avoid DA lockout due to powerfailure
+	tpm2_shutdown
+fi
+
 if [ -n "$watchdog_pid" ]; then
 	kill "$watchdog_pid"
 fi
