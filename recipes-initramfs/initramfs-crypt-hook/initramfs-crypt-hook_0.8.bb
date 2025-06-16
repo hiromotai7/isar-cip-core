@@ -42,7 +42,7 @@ HOOK_ADD_MODULES = " \
 HOOK_COPY_EXECS = " \
     openssl mke2fs grep awk expr seq sleep basename uuidparse mountpoint \
     e2fsck resize2fs cryptsetup \
-    tpm2_pcrread tpm2_testparms tpm2_flushcontext \
+    tpm2_pcrread tpm2_testparms tpm2_flushcontext tpm2_shutdown \
     /usr/lib/*/libgcc_s.so.1"
 
 HOOK_COPY_EXECS:append:clevis = " \
@@ -58,7 +58,7 @@ HOOK_COPY_EXECS:append:systemd = " \
 
 HOOK_COPY_EXECS:append:buster = " cryptsetup-reencrypt tpm2_pcrlist"
 HOOK_COPY_EXECS:remove:buster = " \
-    tpm2_pcrread tpm2_testparms tpm2_flushcontext \
+    tpm2_pcrread tpm2_testparms tpm2_flushcontext tpm2_shutdown \
     clevis-luks-list clevis-luks-common-functions"
 HOOK_COPY_EXECS:append:bullseye = " cryptsetup-reencrypt"
 
