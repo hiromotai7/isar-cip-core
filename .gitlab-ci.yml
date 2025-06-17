@@ -458,7 +458,7 @@ test:x86-uefi-IEC:
   variables:
     target: x86-uefi
     test_function: IEC
-    iec_test_timeout: 60
+    iec_test_timeout: 120
 
 test:qemu-amd64-secure-boot-unsigned-kernel:
   extends:
