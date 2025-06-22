@@ -18,7 +18,7 @@ After the build is finished, insert a micro SDCard and flash the image with `bma
 
 ```
 $ sudo apt install bmap-tools
-$ sudo bmaptool copy --bmap build/tmp/deploy/images/iwg20m/cip-core-image-cip-core-iwg20m.wic.img.bmap build/tmp/deploy/images/iwg20m/cip-core-image-cip-core-iwg20m.wic.img /dev/sdX
+$ sudo bmaptool copy --bmap build/tmp/deploy/images/iwg20m/cip-core-image-cip-core-iwg20m.wic.bmap build/tmp/deploy/images/iwg20m/cip-core-image-cip-core-iwg20m.wic /dev/sdX
 ```
 
 [Note] If you cannot use `bmaptool` then use `dd` instead.
