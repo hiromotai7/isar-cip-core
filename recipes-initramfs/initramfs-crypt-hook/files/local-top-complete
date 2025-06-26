@@ -305,6 +305,27 @@ for partition_set in $partition_sets; do
 			eval "${create_file_system_cmd} ${decrypted_part}"
 			log_end_msg
 		;;
+		"format-if-empty")
+			# Check if first 10MiB contain only zeros, or if it contains a luks
+			# header, but no TPM2 token
+			if cmp -s -n "$(( 10 * 1024 * 1024 ))" "${part_device}" /dev/zero || \
+				( [ "$(get_fstype "${part_device}")" = "luks" ] && \
+				! ( /usr/sbin/cryptsetup luksDump --batch-mode "$part_device" |
+					grep -q "systemd-tpm2\|clevis" ) )
+			then
+				log_begin_msg "Encryption of ${part_device}"
+				/usr/sbin/cryptsetup luksFormat --batch-mode \
+					 --type luks2 "$part_device" < "$tmp_key"
+				enroll_tpm2_token "$part_device" "$tmp_key" "$tpm_device" "$tpm_key_algorithm" "$pcr_bank_hash_type"
+				tpm2_key_del
+				open_tpm2_partition "$part_device" "$crypt_mount_name" "$tpm_device"
+				eval "${create_file_system_cmd} ${decrypted_part}"
+				log_end_msg
+			else
+				# If not empty, leave it alone.
+				continue
+			fi
+		;;
 		*)
 			panic "Unknown value ${partition_format}. Cannot create a encrypted partition !"
 		;;

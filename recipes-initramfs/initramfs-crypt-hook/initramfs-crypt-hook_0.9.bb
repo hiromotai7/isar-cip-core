@@ -44,7 +44,7 @@ HOOK_ADD_MODULES = " \
 
 HOOK_COPY_EXECS = " \
     pwgen mke2fs grep awk expr seq sleep basename uuidparse mountpoint \
-    e2fsck resize2fs cryptsetup rm \
+    e2fsck resize2fs cryptsetup rm cmp \
     tpm2_pcrread tpm2_testparms tpm2_flushcontext tpm2_shutdown \
     tpm2_startauthsession tpm2_policypcr tpm2_createprimary tpm2_create \
     tpm2_load tpm2_evictcontrol tpm2_unseal tpm2_getcap \
