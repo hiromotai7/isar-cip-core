@@ -42,11 +42,12 @@ The initramfs-crypt-hook recipe has the following variables which can be overwri
 ### CRYPT_PARTITIONS
 
 The variable `CRYPT_PARTITIONS` contains the information which partition shall be encrypted where to mount it.
-Each entry uses the schema `<partition-identifier>:<mountpoint>:<reencrypt or format>`.
+Each entry uses the schema `<partition-identifier>:<mountpoint>:<reencrypt | format | noencrypt>`.
 - The `partition-idenitifer` is used to identify the partition on the disk, it can contain a partition label, partition UUID or absolute path to the partition device, e.g. `/dev/sda`.
 - The `mountpoint` is used mount the decrypted partition in the root file system
 - `reencrypt` uses `cryptsetup reencrypt` to encrypt the exiting content of the partition. This reduces the partition by 32MB and the file system by a similar amount
 - `format` creates a empty LUKS partition and creates a file system defined with the shell command given in `CRYPT_CREATE_FILE_SYSTEM_CMD`
+- `noencrypt` will not try to encrypt the partition if it isn't encrypted already, but will open it if it is. See the section [Encrypting the shared partition via an update](#### Encrypting the shared partition via an update) for more information
 
 #### Encrypted root file system
 
@@ -57,6 +58,25 @@ CRYPT_PARTITIONS = "${ABROOTFS_PART_UUID_A}::reencrypt ${ABROOTFS_PART_UUID_B}::
 The mountpoint is empty as the root partition is mounted  by a seperate initramfs hook.
 Both partitions are encrypted during first boot. The initramfs hook opens `${ABROOTFS_PART_UUID_A}` and `${ABROOTFS_PART_UUID_B}`
 during boot.
+
+#### Encrypting the shared partition via an update
+
+With the following requirements, special handling is necessary:
+
+- A/B update scheme is used.
+- Both slots have a shared volume that needs to be encrypted as well.
+- The system in the field is currently unencrypted, and encryption should be added via an update.
+- When the update fails, the fallback system needs to deal with an encrypted data partition.
+
+In this case, the fallback system needs to support an encrypted shared data partition but would not encrypt it on its own. For this, the `noencrypt` flag can be used.
+
+The data partition in the fallback system will have the `noencrypt` flag set, while the update system will set the flag to `reencrypt`. This will handle the following case:
+
+- Unencrypted system on slot A is running; the shared data partition has set the `noencrypt` flag and is not encrypted.
+- Update for enabling encryption is applied to slot B, where the shared data partition has the `reencrypt` flag.
+- System reboots to slot B, encrypting the shared data partition.
+- Update fails at a later point and is not blessed; system reboots into the fallback system on slot A.
+- Fallback system now needs to be able to use the shared data partition.
 
 ### CRYPT_CREATE_FILE_SYSTEM_CMD
 

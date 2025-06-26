@@ -243,15 +243,18 @@ for partition_set in $partition_sets; do
 	if [ ! -e  "$part_device" ]; then
 		panic "Could not find device  mapped to '$partition' cannot be encrypted!"
 	fi
-	decrypted_part=/dev/mapper/"$crypt_mount_name"
-	# check if we are trying to mount root
-	if [ "$partition_mountpoint" = "/" ]; then
-		echo "ROOT=$decrypted_part" >/conf/param.conf
-	fi
 
+	# If partition is already encrypted, decrypt and continue with next partition:
+	decrypted_part=/dev/mapper/"$crypt_mount_name"
 	if /usr/sbin/cryptsetup luksDump --batch-mode "$part_device" \
 			| grep -q "systemd-tpm2\|clevis"; then
 		open_tpm2_partition "$part_device" "$crypt_mount_name" "$tpm_device"
+
+		# check if we are trying to mount root, set ROOT to decrypted partition:
+		if [ "$partition_mountpoint" = "/" ]; then
+			echo "ROOT=$decrypted_part" >/conf/param.conf
+		fi
+
 		continue
 	fi
 
@@ -259,6 +262,17 @@ for partition_set in $partition_sets; do
 	if /usr/sbin/cryptsetup luksDump --batch-mode "${part_device}" \
 			| grep -q "online-reencrypt-v2"; then
 		partition_format="reencrypt"
+	fi
+
+	# If partition should not be encrypted, continue with next partition:
+	if [ "$partition_format" = "noencrypt" ]
+	then
+		continue
+	fi
+
+	# check if we are trying to mount root, set ROOT to decrypted partition:
+	if [ "$partition_mountpoint" = "/" ]; then
+		echo "ROOT=$decrypted_part" >/conf/param.conf
 	fi
 
 	# service watchdog in the background during lengthy re-encryption
