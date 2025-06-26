@@ -44,15 +44,17 @@ HOOK_ADD_MODULES = " \
 
 HOOK_COPY_EXECS = " \
     pwgen mke2fs grep awk expr seq sleep basename uuidparse mountpoint \
-    e2fsck resize2fs cryptsetup \
+    e2fsck resize2fs cryptsetup rm \
     tpm2_pcrread tpm2_testparms tpm2_flushcontext tpm2_shutdown \
+    tpm2_startauthsession tpm2_policypcr tpm2_createprimary tpm2_create \
+    tpm2_load tpm2_evictcontrol tpm2_unseal tpm2_getcap \
     /usr/lib/*/libgcc_s.so.1"
 
 HOOK_COPY_EXECS:append:clevis = " \
     clevis clevis-decrypt clevis-encrypt-tpm2 clevis-decrypt-tpm2 \
     clevis-luks-bind clevis-luks-unlock \
     clevis-luks-list clevis-luks-common-functions \
-    tpm2_createprimary tpm2_unseal tpm2_create tpm2_load tpm2_createpolicy \
+    tpm2_createpolicy \
     bash luksmeta jose sed tail sort rm mktemp pwmake file"
 HOOK_COPY_EXECS:append:systemd = " \
     systemd-cryptenroll /usr/lib/systemd/systemd-cryptsetup \
@@ -61,6 +63,7 @@ HOOK_COPY_EXECS:append:systemd = " \
 HOOK_COPY_EXECS:append:buster = " cryptsetup-reencrypt tpm2_pcrlist"
 HOOK_COPY_EXECS:remove:buster = " \
     tpm2_pcrread tpm2_testparms tpm2_flushcontext tpm2_shutdown \
+    tpm2_startauthsession tpm2_policypcr tpm2_evictcontrol tpm2_getcap \
     clevis-luks-list clevis-luks-common-functions"
 HOOK_COPY_EXECS:append:bullseye = " cryptsetup-reencrypt"
 

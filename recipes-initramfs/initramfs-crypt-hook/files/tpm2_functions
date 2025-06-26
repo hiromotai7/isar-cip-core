@@ -5,6 +5,7 @@
 # Copyright (c) Siemens AG, 2025
 #
 # Authors:
+#  Claudius Heine <ch@denx.de>
 #  Jan Kiszka <jan.kiszka@siemens.com>
 #
 # SPDX-License-Identifier: MIT
@@ -12,4 +13,54 @@
 tpm2_check_device() {
 	tpm2_pcrread -T device:"$1" "$pcr_bank_hash_type":7 --quiet &&
 		tpm2_testparms -T device:"$1" "$tpm_key_algorithm" --quiet
+}
+
+TPM2_HANDLE="0x81080001"
+
+tpm2_key_get() {
+	key_file="$1"
+	TPM2_WORKDIR="/tmp/tpm2"
+
+	export TPM2TOOLS_TCTI="device:${tpm_device}"
+
+	if ! tpm2_getcap handles-persistent | grep -q "$TPM2_HANDLE"; then
+		mkdir -p "${TPM2_WORKDIR}"
+		# Open session:
+		tpm2_startauthsession -S "${TPM2_WORKDIR}/session.ctx"
+		tpm2_policypcr -Q -S "${TPM2_WORKDIR}/session.ctx" \
+			-l "${pcr_bank_hash_type}:7" \
+			-L "${TPM2_WORKDIR}/pcr7.${pcr_bank_hash_type}.policy"
+		tpm2_flushcontext "${TPM2_WORKDIR}/session.ctx"
+
+		# Add new key to tpm:
+		tpm2_createprimary -Q -C o -c "${TPM2_WORKDIR}/prim.ctx"
+		pwgen -s -1 32 | tpm2_create -Q -g sha256 \
+			-u "${TPM2_WORKDIR}/pcr_seal_key.pub" \
+			-r "${TPM2_WORKDIR}/pcr_seal_key.priv" \
+			-i - \
+			-C "${TPM2_WORKDIR}/prim.ctx" \
+			-L "${TPM2_WORKDIR}/pcr7.${pcr_bank_hash_type}.policy"
+		tpm2_load -Q \
+			-C "${TPM2_WORKDIR}/prim.ctx" \
+			-u "${TPM2_WORKDIR}/pcr_seal_key.pub" \
+			-r "${TPM2_WORKDIR}/pcr_seal_key.priv" \
+			-c "${TPM2_WORKDIR}/pcr_seal_key.ctx"
+		tpm2_evictcontrol -c "${TPM2_WORKDIR}/pcr_seal_key.ctx" \
+			"$TPM2_HANDLE" -C o
+
+		rm -rf "${TPM2_WORKDIR}"
+	fi
+
+	mkdir -p "${TPM2_WORKDIR}"
+	tpm2_startauthsession --policy-session -S "${TPM2_WORKDIR}/session.ctx"
+	tpm2_policypcr -Q -S "${TPM2_WORKDIR}/session.ctx" \
+		-l "${pcr_bank_hash_type}:7"
+	tpm2_unseal -p "session:${TPM2_WORKDIR}/session.ctx" -c "$TPM2_HANDLE" \
+		-o "$key_file"
+	tpm2_flushcontext "${TPM2_WORKDIR}/session.ctx"
+	rm -rf "${TPM2_WORKDIR}"
+}
+
+tpm2_key_del() {
+	tpm2_evictcontrol -C o -c "$TPM2_HANDLE"
 }

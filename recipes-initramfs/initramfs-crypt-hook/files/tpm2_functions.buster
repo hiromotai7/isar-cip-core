@@ -13,3 +13,12 @@ tpm2_check_device() {
 	export TPM2TOOLS_DEVICE_FILE="$1"
 	tpm2_pcrlist -L "${pcr_bank_hash_type}:7" > /dev/null
 }
+
+tpm2_key_get() {
+	# key persistence not supported with buster
+	key_file="$1"
+	pwgen -s -1 32 > $key_file
+}
+
+tpm2_key_del() {
+}
