@@ -27,8 +27,11 @@ IMAGE_INSTALL:append:bookworm = " tmp-fs"
 
 # For pre bookworm images, empty /var is not usable
 IMAGE_INSTALL:append = " immutable-rootfs"
+IMAGE_INSTALL:append = " journald-config"
 IMAGE_INSTALL:remove:buster = " immutable-rootfs"
 IMAGE_INSTALL:remove:bullseye = " immutable-rootfs"
+IMAGE_INSTALL:remove:buster = " journald-config"
+IMAGE_INSTALL:remove:bullsye = " journald-config"
 
 ROOTFS_POSTPROCESS_COMMAND:append =" copy_dpkg_state"
 ROOTFS_POSTPROCESS_COMMAND:remove:buster =" copy_dpkg_state"
