@@ -112,6 +112,7 @@ config KERNEL_6_1
 
 config KERNEL_6_12
 	bool "Kernel 6.12.x-cip"
+	depends on !TARGET_IWG20D
 
 endchoice
 
