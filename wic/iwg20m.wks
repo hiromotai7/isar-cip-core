@@ -16,3 +16,5 @@ part /boot --source bootimg-partition --ondisk mmcblk0 --fstype vfat --label boo
 
 # Rootfs partition
 part / --source rootfs --ondisk mmcblk0 --fstype ext4 --label root --align 1024 --size 2G --active --fsuuid 1f55d66a-40d8-11ee-be56-0242ac120002 --uuid d0fa8361-7deb-43df-acee-1725d40d403e
+
+bootloader --ptable gpt
