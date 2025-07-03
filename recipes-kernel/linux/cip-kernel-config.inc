@@ -14,7 +14,7 @@ SRC_URI:append = " ${@ \
     if d.getVar('USE_CIP_KERNEL_CONFIG') == '1' else '' \
     }"
 
-SRCREV_cip-kernel-config ?= "4bebf19735a238f9e46e653751e8d47fb22f8c07"
+SRCREV_cip-kernel-config ?= "29e3fbfb85303cc4dc9797740df5d54f77f43feb"
 
 do_fetch[vardeps] += "SRCREV_cip-kernel-config"
 
