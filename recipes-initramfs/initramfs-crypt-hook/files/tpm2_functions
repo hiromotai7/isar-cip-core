@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# CIP Core, generic profile
+#
+# Copyright (c) Siemens AG, 2025
+#
+# Authors:
+#  Jan Kiszka <jan.kiszka@siemens.com>
+#
+# SPDX-License-Identifier: MIT
+
+tpm2_check_device() {
+	tpm2_pcrread -T device:"$1" "$pcr_bank_hash_type":7 --quiet &&
+		tpm2_testparms -T device:"$1" "$tpm_key_algorithm" --quiet
+}

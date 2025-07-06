@@ -1,4 +1,4 @@
-# Copyright (C) Siemens AG, 2020-2024
+# Copyright (C) Siemens AG, 2020-2025
 #
 # SPDX-License-Identifier: MIT
 
@@ -8,4 +8,5 @@ done
 
 copy_file library /usr/share/encrypt_partition/encrypt_partition.env /usr/share/encrypt_partition/encrypt_partition.env
 copy_file library /usr/share/encrypt_partition/encrypt_partition_tpm2 /usr/share/encrypt_partition/encrypt_partition_tpm2
+copy_file library /usr/share/encrypt_partition/tpm2_functions /usr/share/encrypt_partition/tpm2_functions
 copy_file pwmake-config /usr/share/encrypt_partition/pwquality.conf /etc/security/pwquality.conf

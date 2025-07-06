@@ -24,6 +24,9 @@ CRYPT_BACKEND:buster = "clevis"
 CRYPT_BACKEND:bullseye = "clevis"
 CRYPT_BACKEND ?= "systemd"
 
+TPM2_FUNCTIONS = "tpm2_functions"
+TPM2_FUNCTIONS:buster = "tpm2_functions.buster"
+
 OVERRIDES .= ":${CRYPT_BACKEND}"
 
 DEBIAN_DEPENDS:append:buster = ", libgcc-7-dev, libtss2-esys0"
@@ -64,6 +67,7 @@ HOOK_COPY_EXECS:append:bullseye = " cryptsetup-reencrypt"
 SRC_URI += "file://encrypt_partition.env.tmpl \
             file://local-top-complete \
             file://encrypt_partition.${CRYPT_BACKEND}.script \
+            file://${TPM2_FUNCTIONS} \
             file://local-bottom-complete \
             file://hook \
             file://pwquality.conf"
@@ -103,4 +107,6 @@ do_install:prepend() {
     install -m 0644 "${WORKDIR}/pwquality.conf" "${D}/usr/share/encrypt_partition/pwquality.conf"
     install -m 0755 "${WORKDIR}/encrypt_partition.${CRYPT_BACKEND}.script" \
         "${D}/usr/share/encrypt_partition/encrypt_partition_tpm2"
+    install -m 0755 "${WORKDIR}/${TPM2_FUNCTIONS}" \
+        "${D}/usr/share/encrypt_partition/tpm2_functions"
 }

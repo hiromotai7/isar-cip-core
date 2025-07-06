@@ -38,6 +38,8 @@ esac
 
 # get the implementation
 . /usr/share/encrypt_partition/encrypt_partition_tpm2
+. /usr/share/encrypt_partition/tpm2_functions
+
 # load necessary kernel modules:
 modprobe tpm_tis
 modprobe tpm_crb
@@ -189,23 +191,9 @@ expand_partition() {
 }
 
 for candidate in /dev/tpmrm*; do
-	if [ -x /usr/bin/tpm2_pcrread ]; then
-		if ! tpm2_pcrread -T device:"$candidate" "$pcr_bank_hash_type":7 --quiet ; then
-			continue
-		fi
-	elif [ -x /usr/bin/tpm2_pcrlist ]; then
-		export TPM2TOOLS_DEVICE_FILE="$candidate"
-		if ! tpm2_pcrlist -L "$pcr_bank_hash_type":7 > /dev/null; then
-			continue
-		fi
+	if tpm2_check_device "$candidate"; then
+		tpm_device=$candidate
 	fi
-	# Debian buster does not have tpm_testparms
-	if [ -x /usr/bin/tpm2_testparms ]; then
-		if ! tpm2_testparms -T device:"$candidate" "$tpm_key_algorithm" --quiet; then
-			continue
-		fi
-	fi
-	tpm_device=$candidate
 done
 
 if [ ! -e "$tpm_device" ]; then
