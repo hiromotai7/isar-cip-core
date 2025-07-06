@@ -188,7 +188,7 @@ expand_partition() {
 	log_end_msg
 }
 
-for candidate in /dev/tpm*; do
+for candidate in /dev/tpmrm*; do
 	if [ -x /usr/bin/tpm2_pcrread ]; then
 		if ! tpm2_pcrread -T device:"$candidate" "$pcr_bank_hash_type":7 --quiet ; then
 			continue
