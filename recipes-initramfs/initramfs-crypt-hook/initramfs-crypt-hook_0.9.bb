@@ -52,8 +52,7 @@ HOOK_COPY_EXECS:append:clevis = " \
     tpm2_createprimary tpm2_unseal tpm2_create tpm2_load tpm2_createpolicy \
     bash luksmeta jose sed tail sort rm mktemp pwmake file"
 HOOK_COPY_EXECS:append:systemd = " \
-    systemd-cryptenroll tpm2_pcrread tpm2_testparms \
-    /usr/lib/systemd/systemd-cryptsetup \
+    systemd-cryptenroll /usr/lib/systemd/systemd-cryptsetup \
     /usr/lib/*/cryptsetup/libcryptsetup-token-systemd-tpm2.so"
 
 HOOK_COPY_EXECS:append:buster = " cryptsetup-reencrypt tpm2_pcrlist"
