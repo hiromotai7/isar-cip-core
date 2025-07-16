@@ -23,6 +23,10 @@ repos:
   isar:
     url: https://github.com/ilbers/isar.git
     commit: 8e3122249a52db470efb32b92ed9c44e4b758712
+    patches:
+      00-archived-buster:
+        repo: cip-core
+        path: isar-patches/0001-Pull-buster-from-archive.d.o.patch
     layers:
       meta:
 

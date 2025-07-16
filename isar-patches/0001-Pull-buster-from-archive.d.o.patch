@@ -1,0 +1,40 @@
+From cfb78915e9c272c74bbfda7ab5f91bfa2892daf3 Mon Sep 17 00:00:00 2001
+From: Jan Kiszka <jan.kiszka@siemens.com>
+Date: Wed, 16 Jul 2025 21:53:09 +0200
+Subject: [PATCH] Pull buster from archive.d.o
+
+Debian buster is now out of LTS, so update the URLs to continue allowing
+to build against it. Security updates are no longer provided this way.
+For supported packages, those are now coming from Extended LTS [1]. But
+as the provider is asking to not use their server heavily, we refrain
+from providing those sources here.
+
+[1] https://www.freexian.com/lts/extended/docs/how-to-use-extended-lts/
+
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+ meta/conf/distro/debian-buster.list | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/meta/conf/distro/debian-buster.list b/meta/conf/distro/debian-buster.list
+index b3a3b769..3fe0d61b 100644
+--- a/meta/conf/distro/debian-buster.list
++++ b/meta/conf/distro/debian-buster.list
+@@ -1,8 +1,8 @@
+-deb	http://deb.debian.org/debian buster main contrib non-free
+-deb-src	http://deb.debian.org/debian buster main contrib non-free
++deb	http://archive.debian.org/debian buster main contrib non-free
++deb-src	http://archive.debian.org/debian buster main contrib non-free
+ 
+-deb	http://deb.debian.org/debian-security buster/updates main contrib non-free
+-deb-src	http://deb.debian.org/debian-security buster/updates main contrib non-free
++deb	http://archive.debian.org/debian-security buster/updates main contrib non-free
++deb-src	http://archive.debian.org/debian-security buster/updates main contrib non-free
+ 
+-deb	http://deb.debian.org/debian buster-updates main contrib non-free
+-deb-src	http://deb.debian.org/debian buster-updates main contrib non-free
++deb	http://archive.debian.org/debian buster-updates main contrib non-free
++deb-src	http://archive.debian.org/debian buster-updates main contrib non-free
+-- 
+2.43.0
+
