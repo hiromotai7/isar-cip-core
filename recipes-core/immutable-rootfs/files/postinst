@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+# These services are installed by "apt" to ensure the system receives
+# updates. As we don't allow updates on an immutable system, we need
+# to disable them.
+deb-systemd-helper disable apt-daily.timer
+deb-systemd-helper disable apt-daily-upgrade.timer
+deb-systemd-helper disable dpkg-db-backup.timer
+
+#DEBHELPER#
